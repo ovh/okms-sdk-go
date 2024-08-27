@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/deepmap/oapi-codegen/HEAD/configuration-schema.json
+package: internal
+output: internal/client.gen.go
+generate:
+  client: true
+output-options:
+  exclude-tags:
+    - SecretsApi
+  exclude-operation-ids:
+    - GenerateRandomBytes
+  skip-prune: false
+  response-type-suffix: HTTPResponse
+additional-imports:
+  - package: github.com/ovh/okms-sdk-go/types
+    alias: "."

@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/deepmap/oapi-codegen/HEAD/configuration-schema.json
+package: types
+output: types/types.gen.go
+generate:
+  models: true
+output-options:
+  exclude-tags:
+    - SecretsApi
+  exclude-operation-ids:
+    - GenerateRandomBytes
+  skip-prune: false
+  response-type-suffix: HTTPResponse

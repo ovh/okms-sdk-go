@@ -1,0 +1,15 @@
+with-expecter: true
+inpackage: false
+dir: "{{.InterfaceDir}}/mocks"
+mockname: "{{.InterfaceName}}Mock"
+outpkg: "mocks"
+packages:
+  github.com/ovh/okms-sdk-go:
+    interfaces:
+      # RandomApi:
+      DataKeyApi:
+      SignatureApi:
+      EncryptionApi:
+      ServiceKeyApi:
+      # SecretApi:
+      Client:
