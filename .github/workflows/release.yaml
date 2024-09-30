@@ -25,7 +25,7 @@ jobs:
           fetch-tags: true
 
       - name: Generate a changelog
-        uses: orhun/git-cliff-action@v3
+        uses: orhun/git-cliff-action@v4
         with:
           config: .github/release-note.toml
           args: --verbose --current
