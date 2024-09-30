@@ -11,7 +11,6 @@ package okms
 
 import (
 	"context"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
@@ -165,14 +164,10 @@ func (client *RestAPIClient) DecryptDataKey(ctx context.Context, keyId uuid.UUID
 	if err != nil {
 		return nil, err
 	}
-	if r.JSON200.Plaintext == nil {
+	if len(r.JSON200.Plaintext) == 0 {
 		return nil, errors.New("Server returned no key")
 	}
-	plain, err := base64.StdEncoding.DecodeString(*r.JSON200.Plaintext)
-	if err != nil {
-		return nil, err
-	}
-	return plain, nil
+	return r.JSON200.Plaintext, nil
 }
 
 // GenerateDataKey creates a new data key of the given size, protected by the service key with the ID `keyId`.
@@ -186,14 +181,10 @@ func (client *RestAPIClient) GenerateDataKey(ctx context.Context, keyId uuid.UUI
 	if err != nil {
 		return nil, "", err
 	}
-	if r.JSON201.Plaintext == nil {
+	if r.JSON201.Plaintext == nil || len(*r.JSON201.Plaintext) == 0 {
 		return nil, "", errors.New("Server returned no key")
 	}
-	plain, err = base64.StdEncoding.DecodeString(*r.JSON201.Plaintext)
-	if err != nil {
-		return nil, "", err
-	}
-	return plain, r.JSON201.Key, nil
+	return *r.JSON201.Plaintext, r.JSON201.Key, nil
 }
 
 // Decrypt decrypts JWE `data` previously encrypted with the remote symmetric key having the ID `keyId`.
@@ -206,12 +197,12 @@ func (client *RestAPIClient) Decrypt(ctx context.Context, keyId uuid.UUID, keyCt
 	if err != nil {
 		return nil, err
 	}
-	return base64.StdEncoding.DecodeString(r.JSON200.Plaintext)
+	return r.JSON200.Plaintext, nil
 }
 
 // Encrypt encrypts `data` with the remote symmetric key having the ID `keyId`. Returns a JWE (Json Web Encryption) string.
 func (client *RestAPIClient) Encrypt(ctx context.Context, keyId uuid.UUID, keyCtx string, data []byte) (string, error) {
-	req := types.EncryptRequest{Plaintext: base64.StdEncoding.EncodeToString(data)}
+	req := types.EncryptRequest{Plaintext: data}
 	if keyCtx != "" {
 		req.Context = &keyCtx
 	}
@@ -227,16 +218,16 @@ func (client *RestAPIClient) Sign(ctx context.Context, keyId uuid.UUID, alg type
 	req := types.SignRequest{
 		Alg:      alg,
 		Isdigest: &preHashed,
-		Message:  base64.StdEncoding.EncodeToString(msg),
+		Message:  msg,
 	}
 	r, err := mapRestErr(client.inner.SignWithResponse(ctx, keyId, req))
 	if err != nil {
 		return "", err
 	}
-	if r.JSON200.Signature == nil {
+	if r.JSON200.Signature == "" {
 		return "", errors.New("Server returned no signature")
 	}
-	return *r.JSON200.Signature, err
+	return r.JSON200.Signature, err
 }
 
 // Verify checks the signature of given message against the remote public key having the ID `keyId`. The message can be pre-hashed or not.
@@ -244,14 +235,14 @@ func (client *RestAPIClient) Verify(ctx context.Context, keyId uuid.UUID, alg ty
 	req := types.VerifyRequest{
 		Alg:       alg,
 		Isdigest:  &preHashed,
-		Message:   base64.StdEncoding.EncodeToString(msg),
+		Message:   msg,
 		Signature: sig,
 	}
 	r, err := mapRestErr(client.inner.VerifyWithResponse(ctx, keyId, req))
 	if err != nil {
 		return false, err
 	}
-	return r.JSON200.Result != nil && *r.JSON200.Result, nil
+	return r.JSON200.Result, nil
 }
 
 // func (client *RestAPIClient) DeleteSecretMetadata(ctx context.Context, path string) error {

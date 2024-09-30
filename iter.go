@@ -35,15 +35,15 @@ func (it *KeyIter) Next(ctx context.Context) bool {
 		if it.err != nil {
 			return true
 		}
-		return len(*it.buf.ObjectsList) > 0
+		return len(it.buf.ObjectsList) > 0
 	}
-	if it.buf.ObjectsList != nil && len(*it.buf.ObjectsList) > 1 {
-		*it.buf.ObjectsList = (*it.buf.ObjectsList)[1:]
+	if len(it.buf.ObjectsList) > 1 {
+		it.buf.ObjectsList = it.buf.ObjectsList[1:]
 		return true
 	}
-	if it.buf.IsTruncated != nil && *it.buf.IsTruncated {
+	if it.buf.IsTruncated {
 		it.buf, it.err = it.client.ListServiceKeys(ctx, it.buf.ContinuationToken, it.pageSize, it.state)
-		return it.buf.ObjectsList != nil && len(*it.buf.ObjectsList) > 0
+		return len(it.buf.ObjectsList) > 0
 	}
 	return false
 }
@@ -55,8 +55,8 @@ func (it *KeyIter) Value() (*types.GetServiceKeyResponse, error) {
 	if it.err != nil {
 		return nil, it.err
 	}
-	if it.buf.ObjectsList != nil && len(*it.buf.ObjectsList) > 0 {
-		val := (*it.buf.ObjectsList)[0]
+	if len(it.buf.ObjectsList) > 0 {
+		val := it.buf.ObjectsList[0]
 		return &val, nil
 	}
 	return nil, nil

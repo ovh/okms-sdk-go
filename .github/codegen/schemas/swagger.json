@@ -73,7 +73,7 @@
         "tags": [
           "SecretsApi"
         ],
-        "summary": "Updates backend level settings.",
+        "summary": "Updates backend level settings",
         "description": "",
         "operationId": "PostSecretConfig",
         "requestBody": {
@@ -149,7 +149,7 @@
         "tags": [
           "SecretsApi"
         ],
-        "summary": "Post secret kv value.",
+        "summary": "Post secret kv value",
         "description": "",
         "operationId": "PostSecretRequest",
         "parameters": [
@@ -382,7 +382,7 @@
         "tags": [
           "SecretsApi"
         ],
-        "summary": "Delete data in the kv store.",
+        "summary": "Delete data in the kv store",
         "description": "",
         "operationId": "DeleteSecretRequest",
         "parameters": [
@@ -2417,18 +2417,24 @@
             "maxLength": 5000,
             "minLength": 1,
             "type": "string",
-            "description": "Encrypted data key blob (base64), output of generate data key operations"
+            "description": "Encrypted data key blob, output of generate data key operations",
+            "format": "jwe-token"
           }
         },
         "additionalProperties": false,
         "description": "Request to extract and decrypt data key from protobuffer key metadata message"
       },
       "DecryptDataKeyResponse": {
+        "required": [
+          "plaintext"
+        ],
         "type": "object",
         "properties": {
           "plaintext": {
+            "minLength": 1,
             "type": "string",
-            "description": "Plaintext data key (based64 encoded)"
+            "description": "Plaintext data key (base64 encoded bytes)",
+            "format": "byte"
           }
         },
         "additionalProperties": false,
@@ -2444,7 +2450,8 @@
             "maxLength": 5120,
             "minLength": 1,
             "type": "string",
-            "description": "Ciphertext for Decrypt operation"
+            "description": "Ciphertext for Decrypt operation",
+            "format": "jwe-token"
           },
           "context": {
             "maxLength": 64,
@@ -2465,7 +2472,8 @@
           "plaintext": {
             "minLength": 1,
             "type": "string",
-            "description": "Decrypted ciphertext"
+            "description": "Decrypted ciphertext",
+            "format": "byte"
           }
         },
         "additionalProperties": false,
@@ -2495,7 +2503,8 @@
             "maxLength": 4096,
             "minLength": 1,
             "type": "string",
-            "description": "Plaintext for encryption"
+            "description": "Plaintext for encryption",
+            "format": "byte"
           },
           "context": {
             "maxLength": 64,
@@ -2505,7 +2514,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "Decrypt request model"
+        "description": "Encrypt request model"
       },
       "EncryptResponse": {
         "required": [
@@ -2516,7 +2525,8 @@
           "ciphertext": {
             "minLength": 1,
             "type": "string",
-            "description": "Result of encrypt operation, ciphertext"
+            "description": "Result of encrypt operation, ciphertext",
+            "format": "jwe-token"
           }
         },
         "additionalProperties": false,
@@ -2578,11 +2588,13 @@
           "key": {
             "minLength": 1,
             "type": "string",
-            "description": "Data key blob (base64, protobuffer bytes)"
+            "description": "Data key blob (JWE token)",
+            "format": "jwe-token"
           },
           "plaintext": {
             "type": "string",
-            "description": "Plaintext key material (based64 encoded)"
+            "description": "Plaintext key material (based64 encoded bytes)",
+            "format": "byte"
           }
         },
         "additionalProperties": false,
@@ -2675,11 +2687,16 @@
         "description": "Get secret metadata values or list of keys"
       },
       "GetRandomResponse": {
+        "required": [
+          "bytes"
+        ],
         "type": "object",
         "properties": {
           "bytes": {
+            "minLength": 1,
             "type": "string",
-            "description": "Random bytes string (base64 encoded)"
+            "description": "Random bytes string (base64 encoded)",
+            "format": "byte"
           }
         },
         "additionalProperties": false,
@@ -2808,7 +2825,7 @@
           },
           "attributes": {
             "type": "object",
-            "additionalProperties": { },
+            "additionalProperties": {},
             "description": "Additional key metadata",
             "nullable": true
           },
@@ -2856,16 +2873,19 @@
           "n": {
             "type": "string",
             "description": "The \"n\" (modulus) parameter contains the modulus value for the RSA public key. It is represented as a Base64urlUInt-encoded value.\r\nRequired for RSA public key",
+            "format": "base64url",
             "nullable": true
           },
           "e": {
             "type": "string",
             "description": "The \"e\" (exponent) parameter contains the exponent value for the RSA public key. It is represented as a Base64urlUInt-encoded value.\r\nRequired for RSA public key",
+            "format": "base64url",
             "nullable": true
           },
           "k": {
             "type": "string",
             "description": "The \"k\" (key value) parameter contains the value of the symmetric (or other single-valued) key.\r\nIt is represented as the base64url encoding of the octet sequence containing the key value.",
+            "format": "base64url",
             "nullable": true
           },
           "crv": {
@@ -2874,41 +2894,49 @@
           "x": {
             "type": "string",
             "description": "The \"x\" (x coordinate) parameter contains the x coordinate for the Elliptic Curve point.\r\nIt is represented as the base64url encoding of the octet string representation of the coordinate",
+            "format": "base64url",
             "nullable": true
           },
           "y": {
             "type": "string",
             "description": "The \"y\" (y coordinate) parameter contains the y coordinate for the Elliptic Curve point.\r\nIt is represented as the base64url encoding of the octet string representation of the coordinate",
+            "format": "base64url",
             "nullable": true
           },
           "d": {
             "type": "string",
             "description": "The \"d\" parameter of EC key or RSA private exponent",
+            "format": "base64url",
             "nullable": true
           },
           "dp": {
             "type": "string",
             "description": "\"dp\" RSA private key parameter (first factor CRT exponent)",
+            "format": "base64url",
             "nullable": true
           },
           "dq": {
             "type": "string",
             "description": "\"dq\" RSA private key parameter (second factor CRT exponent)",
+            "format": "base64url",
             "nullable": true
           },
           "p": {
             "type": "string",
             "description": "\"p\" RSA private key parameter (first prime factor)",
+            "format": "base64url",
             "nullable": true
           },
           "q": {
             "type": "string",
             "description": "\"q\" RSA private key parameter (second prime factor)",
+            "format": "base64url",
             "nullable": true
           },
           "qi": {
             "type": "string",
             "description": "\"qi\" RSA private key parameter (first CRT coefficient)",
+            "format": "base64url",
             "nullable": true
           }
         },
@@ -2960,6 +2988,10 @@
         "type": "string"
       },
       "ListServiceKeysResponse": {
+        "required": [
+          "is_truncated",
+          "objects_list"
+        ],
         "type": "object",
         "properties": {
           "objects_list": {
@@ -2970,6 +3002,7 @@
             "description": "List of keys returnede"
           },
           "continuation_token": {
+            "minLength": 1,
             "type": "string",
             "description": "continuation token if list is not complete"
           },
@@ -3345,7 +3378,8 @@
             "maxLength": 4096,
             "minLength": 1,
             "type": "string",
-            "description": "Message to be signed"
+            "description": "Message to be signed",
+            "format": "byte"
           },
           "alg": {
             "$ref": "#/components/schemas/DigitalSignatureAlgorithms"
@@ -3359,9 +3393,13 @@
         "description": "Sign request model"
       },
       "SignResponse": {
+        "required": [
+          "signature"
+        ],
         "type": "object",
         "properties": {
           "signature": {
+            "minLength": 1,
             "type": "string",
             "description": "Base64 encoded signature"
           }
@@ -3385,7 +3423,8 @@
             "maxLength": 4094,
             "minLength": 1,
             "type": "string",
-            "description": "Initial message"
+            "description": "Initial message",
+            "format": "byte"
           },
           "signature": {
             "minLength": 1,
@@ -3404,6 +3443,9 @@
         "description": "Verify signature request model"
       },
       "VerifyResponse": {
+        "required": [
+          "result"
+        ],
         "type": "object",
         "properties": {
           "result": {
