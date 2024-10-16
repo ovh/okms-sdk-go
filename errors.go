@@ -187,6 +187,7 @@ type KmsError struct {
 	ErrorCode ErrorCode
 	ErrorId   string
 	Errors    []error
+	RequestId string
 }
 
 func NewKmsErrorFromBytes(sbody []byte) *KmsError {
@@ -210,13 +211,16 @@ func newKmsErrorFromRestResponse(resp types.ErrorResponse) *KmsError {
 			kmsErr.Errors = append(kmsErr.Errors, errors.New(er))
 		}
 	}
+	if resp.RequestId != nil {
+		kmsErr.RequestId = *resp.RequestId
+	}
 	return kmsErr
 }
 
 func (err *KmsError) Error() string {
 	errs := make([]error, 0, len(err.Errors)+1)
 	errs = append(errs, err.Errors...)
-	errs = append(errs, fmt.Errorf("ID=%s, %s", err.ErrorId, err.ErrorCode))
+	errs = append(errs, fmt.Errorf("ID=%q, Request-ID:%q, %s", err.ErrorId, err.RequestId, err.ErrorCode))
 	return errors.Join(errs...).Error()
 }
 
