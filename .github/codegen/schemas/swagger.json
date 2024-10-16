@@ -1230,6 +1230,7 @@
             "in": "query",
             "description": "Continuation token from previous incomplete call",
             "schema": {
+              "maxLength": 50,
               "type": "string"
             }
           },
@@ -1238,7 +1239,7 @@
             "in": "query",
             "description": "Maximum number of keys returned in one call",
             "schema": {
-              "maximum": 500,
+              "maximum": 100,
               "minimum": 10,
               "type": "integer",
               "format": "int32",
@@ -2537,12 +2538,14 @@
         "properties": {
           "error_id": {
             "type": "string",
-            "description": "Error id"
+            "description": "Error id",
+            "readOnly": true
           },
           "error_code": {
             "type": "integer",
             "description": "Error code",
-            "format": "int32"
+            "format": "int32",
+            "readOnly": true
           },
           "errors": {
             "type": "array",
@@ -2550,6 +2553,11 @@
               "type": "string"
             },
             "description": "List with text error messages associated with ErrorId",
+            "readOnly": true
+          },
+          "request_id": {
+            "type": "string",
+            "description": "Request id",
             "readOnly": true
           }
         },

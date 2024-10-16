@@ -171,6 +171,9 @@ type ErrorResponse struct {
 
 	// Errors List with text error messages associated with ErrorId
 	Errors *[]string `json:"errors,omitempty"`
+
+	// RequestId Request id
+	RequestId *string `json:"request_id,omitempty"`
 }
 
 // GenerateDataKeyRequest Generate data key shortcut helper
