@@ -11,16 +11,24 @@ package okms
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
+	"net/http/httputil"
+	"os"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/ovh/okms-sdk-go/internal"
 	"github.com/ovh/okms-sdk-go/types"
 )
+
+const DefaultHTTPClientTimeout = 30 * time.Second
 
 // RestAPIClient is the main client to the KMS rest api.
 type RestAPIClient struct {
@@ -28,8 +36,95 @@ type RestAPIClient struct {
 	customHeaders map[string]string
 }
 
-// NewRestAPIClientWithHttp creates and initialize a new HTTP connection to the KMS at url `endpoint`
-// using the provided [http.Client].
+// LeveledLogger represents loggers that can be used inside the client.
+type LeveledLogger retryablehttp.LeveledLogger
+
+// ClientConfig is used to configure Rest clients created using NewRestAPIClient().
+type ClientConfig struct {
+	Timeout    *time.Duration
+	Retry      *RetryConfig
+	Logger     LeveledLogger
+	TlsCfg     *tls.Config
+	Middleware func(http.RoundTripper) http.RoundTripper
+}
+
+type RetryConfig struct {
+	RetryMax     int
+	RetryWaitMin time.Duration
+	RetryWaitMax time.Duration
+}
+
+type debugTransport struct {
+	next http.RoundTripper
+	out  io.Writer
+}
+
+// RoundTrip implements http.RoundTripper.
+func (t *debugTransport) RoundTrip(r *http.Request) (*http.Response, error) {
+	data, _ := httputil.DumpRequestOut(r, true)
+	fmt.Fprintf(os.Stderr, "REQUEST:\n%s\n", data)
+	resp, err := t.next.RoundTrip(r)
+	if err != nil {
+		return resp, err
+	}
+	data, _ = httputil.DumpResponse(resp, true)
+	fmt.Fprintf(os.Stderr, "RESPONSE:\n%s\n", data)
+	return resp, nil
+}
+
+// DebugTransport creates an http client middleware that will dump all the HTTP resquests and
+// responses to the giver io.Writer. It can be passed to ClientConfig.Middleware.
+func DebugTransport(out io.Writer) func(http.RoundTripper) http.RoundTripper {
+	return func(rt http.RoundTripper) http.RoundTripper {
+		if rt == nil {
+			rt = http.DefaultTransport
+		}
+		if out == nil {
+			out = os.Stderr
+		}
+		return &debugTransport{
+			next: rt,
+			out:  out,
+		}
+	}
+}
+
+// NewRestAPIClient creates and initializes a new HTTP connection to the KMS at url `endpoint`
+// using the provided client configuration. It allows configuring retries, timeouts and loggers.
+func NewRestAPIClient(endpoint string, clientCfg ClientConfig) (*RestAPIClient, error) {
+	client := retryablehttp.NewClient()
+	client.HTTPClient.Timeout = DefaultHTTPClientTimeout
+	client.Logger = nil
+
+	client.HTTPClient.Transport.(*http.Transport).TLSClientConfig = clientCfg.TlsCfg
+	if clientCfg.Logger != nil {
+		client.Logger = clientCfg.Logger
+	}
+
+	if clientCfg.Timeout != nil {
+		client.HTTPClient.Timeout = *clientCfg.Timeout
+	}
+
+	if clientCfg.Retry != nil {
+		client.RetryMax = clientCfg.Retry.RetryMax
+		if clientCfg.Retry.RetryWaitMin > 0 {
+			client.RetryWaitMin = clientCfg.Retry.RetryWaitMin
+		}
+		if clientCfg.Retry.RetryWaitMax > 0 {
+			client.RetryWaitMax = clientCfg.Retry.RetryWaitMax
+		}
+	}
+	if clientCfg.Middleware != nil {
+		client.HTTPClient.Transport = clientCfg.Middleware(client.HTTPClient.Transport)
+	}
+
+	client.ErrorHandler = retryablehttp.PassthroughErrorHandler
+
+	return NewRestAPIClientWithHttp(endpoint, client.StandardClient())
+}
+
+// NewRestAPIClientWithHttp is a lower level constructor to create and initialize a new HTTP
+// connection to the KMS at url `endpoint` using the provided [http.Client].
 //
 // The client must be configured with an appropriate tls.Config using client TLS certificates for authentication.
 func NewRestAPIClientWithHttp(endpoint string, c *http.Client) (*RestAPIClient, error) {
