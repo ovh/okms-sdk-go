@@ -43,4 +43,6 @@ func main() {
 	dataKeyEncryptDecrypt(ctx, kmsClient)
 	listKeys(ctx, kmsClient)
 	getKey(ctx, kmsClient)
+	dataKeyEncryptStream(ctx, kmsClient)
+	dataKeyDecryptStream(ctx, kmsClient)
 }
