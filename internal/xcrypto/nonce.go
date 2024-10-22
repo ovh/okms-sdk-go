@@ -77,9 +77,11 @@ func (sq *NonceSequence) NonceLength() int {
 // The buffer len must be >= than NonceLength().
 // If final is set to true, the nonce will be marked as being the last one,
 // and not other nonce can be generated. Subsequent calls to NextInto() will panic.
+//
+// It also panics if the given buffer nonce does not have a size equals to NonceLength().
 func (sq *NonceSequence) NextInto(nonce []byte, final bool) {
-	if len(nonce) < sq.nonceLen {
-		panic("Provided buffer is too small for a nonce")
+	if len(nonce) != sq.nonceLen {
+		panic(fmt.Sprintf("Provided buffer must have a size of exactly %d bytes", sq.nonceLen))
 	}
 	if sq.count == math.MaxUint32 {
 		panic("nonce limit reached")
@@ -107,6 +109,9 @@ func (sq *NonceSequence) Next(final bool) []byte {
 	if len(sq.buf) < sq.nonceLen {
 		sq.buf = make([]byte, sq.nonceLen)
 	}
+
+	// Ensure the buffer is not bigger than required
+	sq.buf = sq.buf[:sq.nonceLen:sq.nonceLen]
 	sq.NextInto(sq.buf, final)
-	return sq.buf[:sq.nonceLen]
+	return sq.buf
 }
