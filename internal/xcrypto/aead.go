@@ -53,10 +53,14 @@ func (s *AEADStream) Overhead() int {
 // additional data and appends the result to dst, returning the updated
 // slice.
 //
+// Setting final to true marks the block to be the final one. Meaning that this call to Seal()
+// will be (and must be) the last one. The Nonce used for encrypting this last block will have the finalization bit
+// set to 1.
+//
 // To reuse plaintext's storage for the encrypted output, use plaintext[:0]
 // as dst. Otherwise, the remaining capacity of dst must not overlap plaintext.
-func (s *AEADStream) Seal(dst, plaintext, additionalData []byte) []byte {
-	return s.inner.Seal(dst, s.seq.Next(), plaintext, additionalData)
+func (s *AEADStream) Seal(dst, plaintext, additionalData []byte, final bool) []byte {
+	return s.inner.Seal(dst, s.seq.Next(final), plaintext, additionalData)
 }
 
 // Open decrypts and authenticates ciphertext, authenticates the
@@ -64,21 +68,22 @@ func (s *AEADStream) Seal(dst, plaintext, additionalData []byte) []byte {
 // to dst, returning the updated slice. The additional data must match the
 // value passed to Seal.
 //
+// Setting final to true marks the block to be the final one. Meaning that this call to Open()
+// will be (and must be) the last one. The Nonce used for decrypting this last block will have the finalization bit
+// set to 1.
+//
 // To reuse ciphertext's storage for the decrypted output, use ciphertext[:0]
 // as dst. Otherwise, the remaining capacity of dst must not overlap plaintext.
 //
 // Even if the function fails, the contents of dst, up to its capacity,
 // may be overwritten.
-func (s *AEADStream) Open(dst, ciphertext, additionalData []byte) ([]byte, error) {
-	return s.inner.Open(dst, s.seq.Next(), ciphertext, additionalData)
+func (s *AEADStream) Open(dst, ciphertext, additionalData []byte, final bool) ([]byte, error) {
+	return s.inner.Open(dst, s.seq.Next(final), ciphertext, additionalData)
 }
 
 // Finalize marks the next block to be the final one. Meaning that the next call to Open() or Seal()
 // will be (and must be) the last one. The Nonce used for encrypting the last block will have the finalization bit
 // set to 1.
-func (s *AEADStream) Finalize() {
-	s.seq.Finalize()
-}
 
 // AEADStreamReader wraps a [AEADStream] and an [io.Reader] into another [io.Reader], decrypting data on the fly.
 type AEADStreamReader struct {
@@ -130,6 +135,8 @@ func (aes *AEADStreamReader) Read(b []byte) (int, error) {
 	n += off
 	aes.hasMore = false
 
+	final := false
+
 	// Verify if we got the first byte of the next block, just to check if there is another block
 	// so that if it's the last block, it will be marked cryptographically as the last.
 	// It prevents truncate attacks.
@@ -142,11 +149,11 @@ func (aes *AEADStreamReader) Read(b []byte) (int, error) {
 	} else {
 		// If we could not read a full block + 1 byte, it means that this one is the last one
 		// so we can make the finalization.
-		aes.aead.Finalize()
+		final = true
 	}
 
 	// Decrypt the block in place
-	buf, err = aes.aead.Open(buf[:0], buf[:n], aes.aad)
+	buf, err = aes.aead.Open(buf[:0], buf[:n], aes.aad, final)
 	if err != nil {
 		return 0, err
 	}
@@ -194,7 +201,7 @@ func (aes *AEADStreamWriter) Write(b []byte) (int, error) {
 		// If we have buffered at least a full block of data + the first byte of the next block (indicating this is not the final block)
 		// encrypt the block and flush it.
 		if aes.buffer.Len() > aes.blockSize {
-			if err := aes.flush(); err != nil {
+			if err := aes.flush(false); err != nil {
 				return 0, err
 			}
 		}
@@ -206,7 +213,7 @@ func (aes *AEADStreamWriter) Seed() []byte {
 	return aes.aead.Seed()
 }
 
-func (aes *AEADStreamWriter) flush() error {
+func (aes *AEADStreamWriter) flush(final bool) error {
 	if aes.buffer.Len() == 0 {
 		return nil
 	}
@@ -225,7 +232,7 @@ func (aes *AEADStreamWriter) flush() error {
 	}
 
 	// Encrypt in place
-	blob := aes.aead.Seal(aes.buffer.Bytes()[:0], aes.buffer.Bytes(), aes.aad)
+	blob := aes.aead.Seal(aes.buffer.Bytes()[:0], aes.buffer.Bytes(), aes.aad, final)
 	// Write the encrypted data block to the underlying writer
 	if _, err := aes.dest.Write(blob); err != nil {
 		return err
@@ -245,8 +252,7 @@ func (aes *AEADStreamWriter) Close() error {
 	}
 	aes.closed = true
 	// Mark the block as the final one.
-	aes.aead.Finalize()
-	if err := aes.flush(); err != nil {
+	if err := aes.flush(true); err != nil {
 		return err
 	}
 	// Check if underlying stream can be flushed, and flush it

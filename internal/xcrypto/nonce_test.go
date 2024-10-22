@@ -47,14 +47,13 @@ var (
 func TestNonceSequencer(t *testing.T) {
 	seq := NewNonceSequence(nonceLen, seed)
 	for _, nonce := range nonces {
-		// println(hex.EncodeToString(seq.Next()))
-		assert.Equal(t, nonce, seq.Next())
+		assert.Equal(t, nonce, seq.Next(false))
 	}
 	assert.Equal(t, nonceLen, seq.NonceLength())
 
 	seq = NewNonceSequence(nonceLen, hexbyte("479247a088ab28"))
 	for _, nonce := range nonces {
-		assert.NotEqual(t, nonce, seq.Next())
+		assert.NotEqual(t, nonce, seq.Next(false))
 	}
 
 	seq1 := NewNonceSequence(nonceLen, nil)
@@ -64,13 +63,13 @@ func TestNonceSequencer(t *testing.T) {
 	assert.NotEmpty(t, seq2.Seed())
 
 	for i := 0; i < 1000; i++ {
-		assert.NotEqual(t, seq1.Next(), seq2.Next())
+		assert.NotEqual(t, seq1.Next(false), seq2.Next(false))
 	}
 
 	seq = NewNonceSequence(42, nil)
 	assert.Equal(t, 42, seq.NonceLength())
 	for i := 0; i < 1000; i++ {
-		assert.Len(t, seq.Next(), 42)
+		assert.Len(t, seq.Next(false), 42)
 	}
 
 	assert.Panics(t, func() { NewNonceSequence(nonceLen, hexbyte("1234567890abcdef1234567890abcdef")) })
@@ -79,29 +78,28 @@ func TestNonceSequencer(t *testing.T) {
 
 	seq = NewNonceSequence(nonceLen, seed)
 	bytes := make([]byte, seq.NonceLength())
-	seq.NextInto(bytes)
+	seq.NextInto(bytes, false)
 	assert.Equal(t, nonces[0], bytes)
 
-	assert.Panics(t, func() { seq.NextInto(nil) })
-	assert.Panics(t, func() { seq.NextInto([]byte{1, 2, 3}) })
+	assert.Panics(t, func() { seq.NextInto(nil, false) })
+	assert.Panics(t, func() { seq.NextInto([]byte{1, 2, 3}, false) })
 }
 
 func TestNonceFinalize(t *testing.T) {
 	seq := NewNonceSequence(nonceLen, seed)
-	assert.Equal(t, nonces[0], seq.Next())
+	assert.Equal(t, nonces[0], seq.Next(false))
 
-	seq.Finalize()
 	nonce := nonces[1]
 	nonce[len(nonce)-1] = 1
-	assert.Equal(t, nonce, seq.Next())
+	assert.Equal(t, nonce, seq.Next(true))
 
-	assert.Panics(t, func() { seq.Next() })
-	assert.Panics(t, func() { seq.Finalize() })
+	assert.Panics(t, func() { seq.Next(false) })
+	assert.Panics(t, func() { seq.Next(true) })
 }
 
 func TestNonceMaximum(t *testing.T) {
 	seq := NewNonceSequence(nonceLen, seed)
 	seq.count = math.MaxUint32 - 1 // Force the count to be almost at the end
-	seq.Next()
-	assert.Panics(t, func() { seq.Next() })
+	seq.Next(false)
+	assert.Panics(t, func() { seq.Next(false) })
 }

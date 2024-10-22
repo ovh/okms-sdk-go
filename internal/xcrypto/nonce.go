@@ -29,10 +29,9 @@ type NonceSequence struct {
 	prefix   []byte
 	nonceLen int
 	count    uint32
-	// 0: not final
-	// 1: final nonce
-	// >=2: must not be used (already finalized)
-	final byte
+	// finalized will be set to true if last/final nonce
+	// has been used (ie: Marked as being for the last block).
+	finalized bool
 	// Buffer used to store and generate the next nonce.
 	// This buffer is returned as is on each call to Next().
 	buf []byte
@@ -76,41 +75,38 @@ func (sq *NonceSequence) NonceLength() int {
 
 // NextInto generate a new nonce and put it in the provided buffer.
 // The buffer len must be >= than NonceLength().
-func (sq *NonceSequence) NextInto(nonce []byte) {
+// If final is set to true, the nonce will be marked as being the last one,
+// and not other nonce can be generated. Subsequent calls to NextInto() will panic.
+func (sq *NonceSequence) NextInto(nonce []byte, final bool) {
 	if len(nonce) < sq.nonceLen {
 		panic("Provided buffer is too small for a nonce")
 	}
 	if sq.count == math.MaxUint32 {
 		panic("nonce limit reached")
 	}
-	if sq.final > 1 {
+	if sq.finalized {
 		panic("nonce sequence has been finalized")
 	}
 
 	// The nonce is derived from the prefix and its position in the sequence
 	copy(nonce, sq.prefix)
 	binary.BigEndian.PutUint32(nonce[len(sq.prefix):], sq.count)
-	nonce[len(sq.prefix)+4] = sq.final
-	sq.count++
-	if sq.final == 1 {
+	if final {
+		nonce[len(sq.prefix)+4] = 1
 		// Make it impossible to generate future nonces
-		sq.final = 2
+		sq.finalized = true
 	}
+	sq.count++
 }
 
 // Next generates and returns a nonce.
 // The returned buffer must not be used after another call to Next().
-func (sq *NonceSequence) Next() []byte {
+// If final is set to true, the nonce will be marked as being the last one,
+// and not other nonce can be generated. Subsequent calls to Next() will panic.
+func (sq *NonceSequence) Next(final bool) []byte {
 	if len(sq.buf) < sq.nonceLen {
 		sq.buf = make([]byte, sq.nonceLen)
 	}
-	sq.NextInto(sq.buf)
+	sq.NextInto(sq.buf, final)
 	return sq.buf[:sq.nonceLen]
-}
-
-func (sq *NonceSequence) Finalize() {
-	if sq.final > 1 {
-		panic("nonce sequence has already been finalized")
-	}
-	sq.final = 1
 }

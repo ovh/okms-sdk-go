@@ -28,12 +28,12 @@ func TestNewAesGcmStream_EncryptDecrypt(t *testing.T) {
 	seq2, err := NewAesGcmStream(key[:], seq1.Seed())
 	require.NoError(t, err)
 
-	encrypted := seq1.Seal(nil, data, nil)
-	decrypted, err := seq2.Open(nil, encrypted, nil)
+	encrypted := seq1.Seal(nil, data, nil, false)
+	decrypted, err := seq2.Open(nil, encrypted, nil, false)
 	require.NoError(t, err)
 	assert.Equal(t, data, decrypted)
 
-	_, err = seq2.Open(nil, encrypted, nil)
+	_, err = seq2.Open(nil, encrypted, nil, false)
 	require.Error(t, err)
 }
 
@@ -135,7 +135,7 @@ func TestAesGcm_Truncate_Protect(t *testing.T) {
 	_, err = io.ReadAll(reader)
 	// Message last block is removed, but truncation is detected when reading the whole message
 	require.ErrorContains(t, err, "cipher: message authentication failed")
-	require.EqualValues(t, 2, reader.aead.seq.final) // Ensure we went through finalization
+	require.True(t, reader.aead.seq.finalized) // Ensure we went through finalization
 }
 
 func TestAesGcm_Unexpected_EOF(t *testing.T) {
