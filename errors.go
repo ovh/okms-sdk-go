@@ -14,6 +14,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/ovh/okms-sdk-go/internal/utils"
 	"github.com/ovh/okms-sdk-go/types"
 )
 
@@ -204,7 +205,7 @@ func newKmsErrorFromRestResponse(resp types.ErrorResponse) *KmsError {
 		kmsErr.ErrorId = *resp.ErrorId
 	}
 	if resp.ErrorCode != nil {
-		kmsErr.ErrorCode = ErrorCode(*resp.ErrorCode)
+		kmsErr.ErrorCode = ErrorCode(utils.ToUint32(*resp.ErrorCode))
 	}
 	if resp.Errors != nil {
 		for _, er := range *resp.Errors {

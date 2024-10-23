@@ -7,6 +7,7 @@
 // ANY KIND, either express or implied. See the License for the specific language
 // governing permissions and limitations under the License.
 
+// Package types holds the REST API type definitions, including requests, responses, and enums.
 package types
 
 import (

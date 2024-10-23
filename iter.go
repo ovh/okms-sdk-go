@@ -16,6 +16,16 @@ import (
 	"github.com/ovh/okms-sdk-go/types"
 )
 
+// ListAllServiceKeys returns an iterator to go through all the keys without having to deal with pagination.
+func (client *Client) ListAllServiceKeys(pageSize *int32, state *types.KeyStates) KeyIter {
+	return KeyIter{
+		client:   client.API,
+		pageSize: pageSize,
+		buf:      nil,
+		state:    state,
+	}
+}
+
 // KeyIter is an iterator for service keys. It helps in iterating efficiently over multiple pages
 // without having to deal with the pagination.
 type KeyIter struct {

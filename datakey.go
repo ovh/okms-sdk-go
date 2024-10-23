@@ -20,8 +20,14 @@ import (
 	"math"
 
 	"github.com/google/uuid"
+	"github.com/ovh/okms-sdk-go/internal/utils"
 	"github.com/ovh/okms-sdk-go/internal/xcrypto"
 )
+
+// DataKeys creates a new datakey provider for the given service key.
+func (client *Client) DataKeys(serviceKeyID uuid.UUID) *DataKeyProvider {
+	return newDataKeyProvider(client, serviceKeyID)
+}
 
 // DataKeyProvider is a helper provider that wraps an API client
 // and provides helpers functions to repeatedly generate or decrypt datakeys
@@ -33,9 +39,9 @@ type DataKeyProvider struct {
 	keyId uuid.UUID
 }
 
-// NewDataKeyProvider creates a new datakey provider for the given service key,
+// newDataKeyProvider creates a new datakey provider for the given service key,
 // using the given [DataKeyApi] api client.
-func NewDataKeyProvider(api DataKeyApi, keyId uuid.UUID) *DataKeyProvider {
+func newDataKeyProvider(api DataKeyApi, keyId uuid.UUID) *DataKeyProvider {
 	return &DataKeyProvider{
 		api:   api,
 		keyId: keyId,
@@ -52,8 +58,7 @@ func (sk *DataKeyProvider) GenerateDataKey(ctx context.Context, name string, siz
 		return nil, nil, errors.New("key size is out of bound")
 	}
 	// Let's first ask the KMS to generate a new DK
-	//nolint:gosec // integer bounds are checked right before
-	plain, encryptedKey, err := sk.api.GenerateDataKey(ctx, sk.keyId, name, int32(size))
+	plain, encryptedKey, err := sk.api.GenerateDataKey(ctx, sk.keyId, name, utils.ToInt32(size))
 	if err != nil {
 		return nil, nil, err
 	}

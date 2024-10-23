@@ -18,6 +18,16 @@ type Integer interface {
 		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
 }
 
+// ToInt32 safely casts the given integer to int32
+// by checking bounds and panicking if overflow occures.
+// It's used to avoid unexpected issues when casting integers.
+func ToInt32[N Integer](n N) int32 {
+	if (n > 0 && uint64(n) > math.MaxInt32) || (n < 0 && int64(n) < math.MinInt32) {
+		panic("Integer overflow")
+	}
+	return int32(n)
+}
+
 // ToUint32 safely casts the given integer to uint32
 // by checking bounds and panicking if overflow occures.
 // It's used to avoid unexpected issues when casting integers.

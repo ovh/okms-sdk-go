@@ -21,14 +21,9 @@ import (
 	"github.com/ovh/okms-sdk-go/types"
 )
 
-func signVerify(ctx context.Context, kmsClient okms.Client) {
+func signVerify(ctx context.Context, kmsClient *okms.Client) {
 	// Create a new ECDSA P-256 key-pair. Sign / Verify also works with RSA keys
-	respECDSA, err := kmsClient.CreateImportServiceKey(ctx, nil, types.CreateImportServiceKeyRequest{
-		Name:       "ECDSA key-pair example",
-		Type:       ptrTo(types.EC),
-		Curve:      ptrTo(types.P256),
-		Operations: ptrTo([]types.CryptographicUsages{types.Sign, types.Verify}),
-	})
+	respECDSA, err := kmsClient.GenerateECKeyPair(ctx, types.P256, "ECDSA key-pair example", "", types.Sign, types.Verify)
 	if err != nil {
 		panic(err)
 	}
@@ -47,15 +42,10 @@ func signVerify(ctx context.Context, kmsClient okms.Client) {
 	fmt.Println("Is valid:", result)
 
 	// You can also instantiate an stdlib crypto.Signer
-	pubKey, err := kmsClient.GetServiceKey(ctx, respECDSA.Id, ptrTo(types.Jwk))
+	signer, err := kmsClient.NewSigner(ctx, respECDSA.Id)
 	if err != nil {
 		panic(err)
 	}
-	signer, err := okms.NewSigner(kmsClient, (*pubKey.Keys)[0])
-	if err != nil {
-		panic(err)
-	}
-
 	digest := sha256.Sum256([]byte(data))
 	signature, err := signer.Sign(rand.Reader, digest[:], crypto.SHA256)
 	if err != nil {
