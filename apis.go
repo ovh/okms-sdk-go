@@ -7,6 +7,7 @@
 // ANY KIND, either express or implied. See the License for the specific language
 // governing permissions and limitations under the License.
 
+// Package okms is a client for interacting with OVHcloud KMS REST-API.
 package okms
 
 import (
@@ -16,10 +17,10 @@ import (
 	"github.com/ovh/okms-sdk-go/types"
 )
 
-var _ Client = (*RestAPIClient)(nil)
+var _ API = (*Client)(nil)
 
-// Client is the interface abstracting the KMS clients methods.
-type Client interface {
+// API is the interface abstracting the KMS clients methods.
+type API interface {
 	// RandomApi
 	DataKeyApi
 	SignatureApi
@@ -27,6 +28,7 @@ type Client interface {
 	ServiceKeyApi
 	// SecretApi
 	// Ping(ctx context.Context) error
+	SetCustomHeader(key, value string)
 }
 
 // type RandomApi interface {
@@ -74,17 +76,9 @@ type ServiceKeyApi interface {
 	// ListServiceKeys returns a page of service keys. The response contains a continuationToken that must be passed to the
 	// subsequent calls in order to get the next page. The state parameter when no nil is used to query keys having a specific state.
 	ListServiceKeys(ctx context.Context, continuationToken *string, maxKey *int32, state *types.KeyStates) (*types.ListServiceKeysResponse, error)
-	// ListAllServiceKeys returns an iterator to go through all the keys without having to deal with pagination.
-	ListAllServiceKeys(pageSize *int32, state *types.KeyStates) KeyIter
 	// UpdateServiceKey updates some service key metadata.
 	UpdateServiceKey(ctx context.Context, keyId uuid.UUID, body types.PatchServiceKeyRequest) (*types.GetServiceKeyResponse, error)
 }
-
-// type ServiceKeyApi2 interface {
-// 	GenerateSymmetricKey(ctx context.Context, name string, size types.KeySizes, usage ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error)
-// 	GenerateRSAKeyPair(ctx context.Context, name string, size types.KeySizes, usage ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error)
-// 	GenerateECDSAKeyPair(ctx context.Context, name string, curve types.Curves, usage ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error)
-// }
 
 // type SecretApi interface {
 // 	GetSecretsMetadata(ctx context.Context, path string, list bool) (*types.GetMetadataResponse, error)

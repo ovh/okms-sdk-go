@@ -16,6 +16,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestToInt32(t *testing.T) {
+	assert.Equal(t, int32(12), ToInt32(int8(12)))
+	assert.Equal(t, int32(-12), ToInt32(int8(-12)))
+	assert.Equal(t, int32(12), ToInt32(uint8(12)))
+	assert.Equal(t, int32(12), ToInt32(int64(12)))
+	assert.Equal(t, int32(12), ToInt32(uint64(12)))
+	assert.Equal(t, int32(0), ToInt32(int64(0)))
+	assert.Equal(t, int32(0), ToInt32(uint64(0)))
+
+	assert.Panics(t, func() {
+		ToInt32(uint32(math.MaxInt32 + 1))
+	})
+
+	assert.Panics(t, func() {
+		ToInt32(int64(math.MinInt32 - 1))
+	})
+}
+
 func TestToUint32(t *testing.T) {
 	assert.Equal(t, uint32(12), ToUint32(int8(12)))
 	assert.Equal(t, uint32(12), ToUint32(uint8(12)))

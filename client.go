@@ -11,7 +11,10 @@ package okms
 
 import (
 	"context"
+	"crypto"
 	"crypto/tls"
+	"crypto/x509"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"io"
@@ -26,12 +29,172 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/ovh/okms-sdk-go/internal"
 	"github.com/ovh/okms-sdk-go/types"
+	"golang.org/x/crypto/ssh"
 )
 
 const DefaultHTTPClientTimeout = 30 * time.Second
 
-// RestAPIClient is the main client to the KMS rest api.
-type RestAPIClient struct {
+type Client struct {
+	API
+}
+
+// WithCustomHeader adds additional HTTP headers that will be sent with every outgoing requests.
+func (client *Client) WithCustomHeader(key, value string) *Client {
+	client.SetCustomHeader(key, value)
+	return client
+}
+
+// GenerateSymmetricKey asks the KMS to generate a symmetric key with the given bits length, name and usage. The keyCtx parameter can be left empty if not needed.
+func (client *Client) GenerateSymmetricKey(ctx context.Context, bitSize types.KeySizes, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+	var keyContext *string
+	if keyCtx != "" {
+		keyContext = &keyCtx
+	}
+	kTy := types.Oct
+	body := types.CreateImportServiceKeyRequest{
+		Context:    keyContext,
+		Name:       name,
+		Type:       &kTy,
+		Operations: &ops,
+		Size:       &bitSize,
+		Keys:       nil,
+	}
+	return client.CreateImportServiceKey(ctx, nil, body)
+}
+
+// GenerateRSAKeyPair asks the KMS to generate an RSA asymmetric key-pair with the given bits length, name and usage. The keyCtx parameter can be left empty if not needed.
+func (client *Client) GenerateRSAKeyPair(ctx context.Context, bitSize types.KeySizes, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+	var keyContext *string
+	if keyCtx != "" {
+		keyContext = &keyCtx
+	}
+	kTy := types.RSA
+	body := types.CreateImportServiceKeyRequest{
+		Context:    keyContext,
+		Name:       name,
+		Type:       &kTy,
+		Operations: &ops,
+		Size:       &bitSize,
+		Keys:       nil,
+	}
+	return client.CreateImportServiceKey(ctx, nil, body)
+}
+
+// GenerateECKeyPair asks the KMS to generate an EC asymmetric key-pair with the given elliptic curve, name and usage. The keyCtx parameter can be left empty if not needed.
+func (client *Client) GenerateECKeyPair(ctx context.Context, curve types.Curves, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+	var keyContext *string
+	if keyCtx != "" {
+		keyContext = &keyCtx
+	}
+	kTy := types.EC
+	body := types.CreateImportServiceKeyRequest{
+		Context:    keyContext,
+		Name:       name,
+		Type:       &kTy,
+		Operations: &ops,
+		Curve:      &curve,
+		Keys:       nil,
+	}
+	return client.CreateImportServiceKey(ctx, nil, body)
+}
+
+func (client *Client) importJWK(ctx context.Context, jwk types.JsonWebKey, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+	var keyContext *string
+	if keyCtx != "" {
+		keyContext = &keyCtx
+	}
+	req := types.CreateImportServiceKeyRequest{
+		Context:    keyContext,
+		Name:       name,
+		Operations: &ops,
+		Keys:       &[]types.JsonWebKey{jwk},
+	}
+	format := types.Jwk
+	return client.CreateImportServiceKey(ctx, &format, req)
+}
+
+// ImportKey imports a key into the KMS. keyCtx can be left empty if not needed.
+//
+// The accepted types of the key parameter are
+//   - *rsa.PrivateKey
+//   - *ecdsa.PrivateKey
+//   - types.JsonWebKey and *types.JsonWebKey
+//   - []byte for importing symmetric keys.
+func (client *Client) ImportKey(ctx context.Context, key any, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+	switch k := key.(type) {
+	case types.JsonWebKey:
+		return client.importJWK(ctx, k, name, keyCtx, ops...)
+	case *types.JsonWebKey:
+		return client.importJWK(ctx, *k, name, keyCtx, ops...)
+	}
+	jwk, err := types.NewJsonWebKey(key, ops, name)
+	if err != nil {
+		return nil, err
+	}
+	return client.importJWK(ctx, jwk, name, keyCtx, ops...)
+}
+
+// ImportKeyPairPEM imports a PEM formated key into the KMS. keyCtx can be left empty if not needed.
+//
+// Supported PEM types are:
+//   - PKCS8
+//   - PKCS1 private keys
+//   - SEC1
+//   - OpenSSH private keys
+func (client *Client) ImportKeyPairPEM(ctx context.Context, privateKeyPem []byte, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+	block, _ := pem.Decode(privateKeyPem)
+	if block == nil {
+		return nil, errors.New("No key to import")
+	}
+	var k any
+	var err error
+	switch block.Type {
+	case "PRIVATE KEY":
+		k, err = x509.ParsePKCS8PrivateKey(block.Bytes)
+	case "EC PRIVATE KEY":
+		k, err = x509.ParseECPrivateKey(block.Bytes)
+	case "RSA PRIVATE KEY":
+		k, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+	case "OPENSSH PRIVATE KEY":
+		k, err = ssh.ParseRawPrivateKey(privateKeyPem)
+	default:
+		return nil, fmt.Errorf("Unsupported PEM type: %q", block.Type)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return client.ImportKey(ctx, k, name, keyCtx, ops...)
+}
+
+// ExportJwkPublicKey returns the public part of a key pair ans a Json Web Key.
+func (client *Client) ExportJwkPublicKey(ctx context.Context, keyID uuid.UUID) (*types.JsonWebKey, error) {
+	format := types.Jwk
+	k, err := client.GetServiceKey(ctx, keyID, &format)
+	if err != nil {
+		return nil, err
+	}
+	if k.Attributes != nil && (*k.Attributes)["state"] != "active" {
+		return nil, fmt.Errorf("The key is not active (state is %q)", (*k.Attributes)["state"])
+	}
+	if k.Keys == nil || len(*k.Keys) == 0 {
+		return nil, errors.New("The server returned no public key")
+	}
+	return &(*k.Keys)[0], nil
+}
+
+// ExportPublicKey returns the public part of a key pair as a [crypto.PublicKey].
+//
+// The returned key can then be cast into *rsa.PublicKey or *ecdsa.PublicKey.
+func (client *Client) ExportPublicKey(ctx context.Context, keyID uuid.UUID) (crypto.PublicKey, error) {
+	k, err := client.ExportJwkPublicKey(ctx, keyID)
+	if err != nil {
+		return nil, err
+	}
+	return k.PublicKey()
+}
+
+// apiClient is the main implementation of KMS rest api http client.
+type apiClient struct {
 	inner         internal.ClientWithResponsesInterface
 	customHeaders map[string]string
 }
@@ -91,7 +254,7 @@ func DebugTransport(out io.Writer) func(http.RoundTripper) http.RoundTripper {
 
 // NewRestAPIClient creates and initializes a new HTTP connection to the KMS at url `endpoint`
 // using the provided client configuration. It allows configuring retries, timeouts and loggers.
-func NewRestAPIClient(endpoint string, clientCfg ClientConfig) (*RestAPIClient, error) {
+func NewRestAPIClient(endpoint string, clientCfg ClientConfig) (*Client, error) {
 	client := retryablehttp.NewClient()
 	client.HTTPClient.Timeout = DefaultHTTPClientTimeout
 	client.Logger = nil
@@ -127,8 +290,8 @@ func NewRestAPIClient(endpoint string, clientCfg ClientConfig) (*RestAPIClient, 
 // connection to the KMS at url `endpoint` using the provided [http.Client].
 //
 // The client must be configured with an appropriate tls.Config using client TLS certificates for authentication.
-func NewRestAPIClientWithHttp(endpoint string, c *http.Client) (*RestAPIClient, error) {
-	restClient := &RestAPIClient{}
+func NewRestAPIClientWithHttp(endpoint string, c *http.Client) (*Client, error) {
+	restClient := &apiClient{}
 	baseUrl := strings.TrimRight(endpoint, "/")
 	client, err := internal.NewClientWithResponses(baseUrl, internal.WithHTTPClient(c), internal.WithRequestEditorFn(restClient.addRequestHeaders))
 
@@ -136,7 +299,7 @@ func NewRestAPIClientWithHttp(endpoint string, c *http.Client) (*RestAPIClient, 
 		return nil, fmt.Errorf("Failed to initialize KMS REST client: %w", err)
 	}
 	restClient.inner = client
-	return restClient, nil
+	return &Client{restClient}, nil
 }
 
 // InternalHttpClient is the low level, internal http client generated by oapi-codegen.
@@ -145,21 +308,19 @@ type InternalHttpClient = internal.Client
 
 // GetInternalClient returns the internal client wrapped.
 // It is an escape hatch to some low level features. Use at your own risk.
-func (client *RestAPIClient) GetInternalClient() *InternalHttpClient {
+func (client *apiClient) GetInternalClient() *InternalHttpClient {
 	c := client.inner.(*internal.ClientWithResponses)
 	return c.ClientInterface.(*internal.Client)
 }
 
-// WithCustomHeader adds additional HTTP headers that will be sent with every outgoing requests.
-func (client *RestAPIClient) WithCustomHeader(key, value string) *RestAPIClient {
+func (client *apiClient) SetCustomHeader(key, value string) {
 	if client.customHeaders == nil {
 		client.customHeaders = make(map[string]string)
 	}
 	client.customHeaders[key] = value
-	return client
 }
 
-func (client *RestAPIClient) addRequestHeaders(ctx context.Context, req *http.Request) error {
+func (client *apiClient) addRequestHeaders(ctx context.Context, req *http.Request) error {
 	for k, v := range client.customHeaders {
 		req.Header.Set(k, v)
 	}
@@ -171,12 +332,12 @@ func (client *RestAPIClient) addRequestHeaders(ctx context.Context, req *http.Re
 	return nil
 }
 
-// func (client *RestAPIClient) Ping(ctx context.Context) error {
+// func (client *apiClient) Ping(ctx context.Context) error {
 // 	_, err := client.GenerateRandomBytes(ctx, 1)
 // 	return err
 // }
 
-// func (client *RestAPIClient) GenerateRandomBytes(ctx context.Context, length int) (*types.GetRandomResponse, error) {
+// func (client *apiClient) GenerateRandomBytes(ctx context.Context, length int) (*types.GetRandomResponse, error) {
 // 	l := int32(length)
 // 	r, err := mapRestErr(client.inner.GenerateRandomBytesWithResponse(ctx, &types.GenerateRandomBytesParams{Length: &l}))
 // 	if err != nil {
@@ -186,7 +347,7 @@ func (client *RestAPIClient) addRequestHeaders(ctx context.Context, req *http.Re
 // }
 
 // GetServiceKey returns a key metadata. If format is not nil, then the public key material is also returned.
-func (client *RestAPIClient) GetServiceKey(ctx context.Context, keyId uuid.UUID, format *types.KeyFormats) (*types.GetServiceKeyResponse, error) {
+func (client *apiClient) GetServiceKey(ctx context.Context, keyId uuid.UUID, format *types.KeyFormats) (*types.GetServiceKeyResponse, error) {
 	params := &types.GetServiceKeyParams{Format: format}
 	r, err := mapRestErr(client.inner.GetServiceKeyWithResponse(ctx, keyId, params))
 	if err != nil {
@@ -197,7 +358,7 @@ func (client *RestAPIClient) GetServiceKey(ctx context.Context, keyId uuid.UUID,
 
 // ListServiceKeys returns a page of service keys. The response contains a continuationToken that must be passed to the
 // subsequent calls in order to get the next page. The state parameter when no nil is used to query keys having a specific state.
-func (client *RestAPIClient) ListServiceKeys(ctx context.Context, continuationToken *string, maxKeys *int32, state *types.KeyStates) (*types.ListServiceKeysResponse, error) {
+func (client *apiClient) ListServiceKeys(ctx context.Context, continuationToken *string, maxKeys *int32, state *types.KeyStates) (*types.ListServiceKeysResponse, error) {
 	params := &types.ListServiceKeysParams{ContinuationToken: continuationToken, Max: maxKeys, State: state}
 	r, err := mapRestErr(client.inner.ListServiceKeysWithResponse(ctx, params))
 	if err != nil {
@@ -206,24 +367,14 @@ func (client *RestAPIClient) ListServiceKeys(ctx context.Context, continuationTo
 	return r.JSON200, err
 }
 
-// ListAllServiceKeys returns an iterator to go through all the keys without having to deal with pagination.
-func (client *RestAPIClient) ListAllServiceKeys(pageSize *int32, state *types.KeyStates) KeyIter {
-	return KeyIter{
-		client:   client,
-		pageSize: pageSize,
-		buf:      nil,
-		state:    state,
-	}
-}
-
 // ActivateServiceKey activates or re-activates a service key.
-func (client *RestAPIClient) ActivateServiceKey(ctx context.Context, keyId uuid.UUID) error {
+func (client *apiClient) ActivateServiceKey(ctx context.Context, keyId uuid.UUID) error {
 	_, err := mapRestErr(client.inner.ActivateServiceKeyWithResponse(ctx, keyId))
 	return err
 }
 
 // UpdateServiceKey updates some service key metadata.
-func (client *RestAPIClient) UpdateServiceKey(ctx context.Context, keyId uuid.UUID, body types.PatchServiceKeyRequest) (*types.GetServiceKeyResponse, error) {
+func (client *apiClient) UpdateServiceKey(ctx context.Context, keyId uuid.UUID, body types.PatchServiceKeyRequest) (*types.GetServiceKeyResponse, error) {
 	r, err := mapRestErr(client.inner.PatchServiceKeyWithResponse(ctx, keyId, body))
 	if err != nil {
 		return nil, err
@@ -231,8 +382,8 @@ func (client *RestAPIClient) UpdateServiceKey(ctx context.Context, keyId uuid.UU
 	return r.JSON200, err
 }
 
-// CreateImportServiceKey is used to either generate a new key securely in the KMS, or to import a plain key into the KMS domain.
-func (client *RestAPIClient) CreateImportServiceKey(ctx context.Context, format *types.KeyFormats, body types.CreateImportServiceKeyRequest) (*types.GetServiceKeyResponse, error) {
+// CreateImportServiceKey is the low level API used to either generate a new key securely in the KMS, or to import a plain key into the KMS domain.
+func (client *apiClient) CreateImportServiceKey(ctx context.Context, format *types.KeyFormats, body types.CreateImportServiceKeyRequest) (*types.GetServiceKeyResponse, error) {
 	r, err := mapRestErr(client.inner.CreateImportServiceKeyWithResponse(ctx, &types.CreateImportServiceKeyParams{Format: format}, body))
 	if err != nil {
 		return nil, err
@@ -241,20 +392,20 @@ func (client *RestAPIClient) CreateImportServiceKey(ctx context.Context, format 
 }
 
 // DeactivateServiceKey deactivates a service key with the given deactivation reason.
-func (client *RestAPIClient) DeactivateServiceKey(ctx context.Context, keyId uuid.UUID, reason types.RevocationReasons) error {
+func (client *apiClient) DeactivateServiceKey(ctx context.Context, keyId uuid.UUID, reason types.RevocationReasons) error {
 	_, err := mapRestErr(client.inner.DeactivateServiceKeyWithResponse(ctx, keyId, types.DeactivateServicekeyRequest{Reason: reason}))
 	return err
 }
 
 // DeleteServiceKey deletes a deactivated service key. The key cannot be recovered after deletion.
 // It will fail if the key is not deactivated.
-func (client *RestAPIClient) DeleteServiceKey(ctx context.Context, keyId uuid.UUID) error {
+func (client *apiClient) DeleteServiceKey(ctx context.Context, keyId uuid.UUID) error {
 	_, err := mapRestErr(client.inner.DeleteServiceKeyWithResponse(ctx, keyId))
 	return err
 }
 
 // DecryptDataKey decrypts a JWE encrypted data key protected by the service key with the ID `keyId`.
-func (client *RestAPIClient) DecryptDataKey(ctx context.Context, keyId uuid.UUID, encryptedKey string) ([]byte, error) {
+func (client *apiClient) DecryptDataKey(ctx context.Context, keyId uuid.UUID, encryptedKey string) ([]byte, error) {
 	r, err := mapRestErr(client.inner.DecryptDataKeyWithResponse(ctx, keyId, types.DecryptDataKeyRequest{Key: encryptedKey}))
 	if err != nil {
 		return nil, err
@@ -267,7 +418,7 @@ func (client *RestAPIClient) DecryptDataKey(ctx context.Context, keyId uuid.UUID
 
 // GenerateDataKey creates a new data key of the given size, protected by the service key with the ID `keyId`.
 // It returns the plain datakey, and the JWE encrypted version of it, which can be decrypted by calling the DecryptDataKey method.
-func (client *RestAPIClient) GenerateDataKey(ctx context.Context, keyId uuid.UUID, name string, size int32) (plain []byte, encrypted string, err error) {
+func (client *apiClient) GenerateDataKey(ctx context.Context, keyId uuid.UUID, name string, size int32) (plain []byte, encrypted string, err error) {
 	req := types.GenerateDataKeyRequest{Size: size}
 	if name != "" {
 		req.Name = &name
@@ -283,7 +434,7 @@ func (client *RestAPIClient) GenerateDataKey(ctx context.Context, keyId uuid.UUI
 }
 
 // Decrypt decrypts JWE `data` previously encrypted with the remote symmetric key having the ID `keyId`.
-func (client *RestAPIClient) Decrypt(ctx context.Context, keyId uuid.UUID, keyCtx, data string) ([]byte, error) {
+func (client *apiClient) Decrypt(ctx context.Context, keyId uuid.UUID, keyCtx, data string) ([]byte, error) {
 	req := types.DecryptRequest{Ciphertext: data}
 	if keyCtx != "" {
 		req.Context = &keyCtx
@@ -296,7 +447,7 @@ func (client *RestAPIClient) Decrypt(ctx context.Context, keyId uuid.UUID, keyCt
 }
 
 // Encrypt encrypts `data` with the remote symmetric key having the ID `keyId`. Returns a JWE (Json Web Encryption) string.
-func (client *RestAPIClient) Encrypt(ctx context.Context, keyId uuid.UUID, keyCtx string, data []byte) (string, error) {
+func (client *apiClient) Encrypt(ctx context.Context, keyId uuid.UUID, keyCtx string, data []byte) (string, error) {
 	req := types.EncryptRequest{Plaintext: data}
 	if keyCtx != "" {
 		req.Context = &keyCtx
@@ -309,7 +460,7 @@ func (client *RestAPIClient) Encrypt(ctx context.Context, keyId uuid.UUID, keyCt
 }
 
 // Sign signs the given message with the remote private key having the ID `keyId`. The message can be pre-hashed or not.
-func (client *RestAPIClient) Sign(ctx context.Context, keyId uuid.UUID, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte) (string, error) {
+func (client *apiClient) Sign(ctx context.Context, keyId uuid.UUID, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte) (string, error) {
 	req := types.SignRequest{
 		Alg:      alg,
 		Isdigest: &preHashed,
@@ -326,7 +477,7 @@ func (client *RestAPIClient) Sign(ctx context.Context, keyId uuid.UUID, alg type
 }
 
 // Verify checks the signature of given message against the remote public key having the ID `keyId`. The message can be pre-hashed or not.
-func (client *RestAPIClient) Verify(ctx context.Context, keyId uuid.UUID, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte, sig string) (bool, error) {
+func (client *apiClient) Verify(ctx context.Context, keyId uuid.UUID, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte, sig string) (bool, error) {
 	req := types.VerifyRequest{
 		Alg:       alg,
 		Isdigest:  &preHashed,
@@ -340,22 +491,22 @@ func (client *RestAPIClient) Verify(ctx context.Context, keyId uuid.UUID, alg ty
 	return r.JSON200.Result, nil
 }
 
-// func (client *RestAPIClient) DeleteSecretMetadata(ctx context.Context, path string) error {
+// func (client *apiClient) DeleteSecretMetadata(ctx context.Context, path string) error {
 // 	_, err := mapRestErr(client.inner.DeleteSecretMetadataWithResponse(ctx, path))
 // 	return err
 // }
 
-// func (client *RestAPIClient) DeleteSecretRequest(ctx context.Context, path string) error {
+// func (client *apiClient) DeleteSecretRequest(ctx context.Context, path string) error {
 // 	_, err := mapRestErr(client.inner.DeleteSecretRequestWithResponse(ctx, path))
 // 	return err
 // }
 
-// func (client *RestAPIClient) DeleteSecretVersions(ctx context.Context, path string, versions []int32) error {
+// func (client *apiClient) DeleteSecretVersions(ctx context.Context, path string, versions []int32) error {
 // 	_, err := mapRestErr(client.inner.DeleteSecretVersionsWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
 // 	return err
 // }
 
-// func (client *RestAPIClient) GetSecretConfig(ctx context.Context) (*types.GetConfigResponse, error) {
+// func (client *apiClient) GetSecretConfig(ctx context.Context) (*types.GetConfigResponse, error) {
 // 	r, err := mapRestErr(client.inner.GetSecretConfigWithResponse(ctx))
 // 	if err != nil {
 // 		return nil, err
@@ -363,7 +514,7 @@ func (client *RestAPIClient) Verify(ctx context.Context, keyId uuid.UUID, alg ty
 // 	return r.JSON200, err
 // }
 
-// func (client *RestAPIClient) GetSecretRequest(ctx context.Context, path string, version *int32) (*types.GetSecretResponse, error) {
+// func (client *apiClient) GetSecretRequest(ctx context.Context, path string, version *int32) (*types.GetSecretResponse, error) {
 // 	r, err := mapRestErr(client.inner.GetSecretRequestWithResponse(ctx, path, &types.GetSecretRequestParams{Version: version}))
 // 	if err != nil {
 // 		return nil, err
@@ -371,7 +522,7 @@ func (client *RestAPIClient) Verify(ctx context.Context, keyId uuid.UUID, alg ty
 // 	return r.JSON200, err
 // }
 
-// func (client *RestAPIClient) GetSecretSubkeys(ctx context.Context, path string, depth, version *int32) (*types.GetSecretSubkeysResponse, error) {
+// func (client *apiClient) GetSecretSubkeys(ctx context.Context, path string, depth, version *int32) (*types.GetSecretSubkeysResponse, error) {
 // 	r, err := mapRestErr(client.inner.GetSecretSubkeysWithResponse(ctx, path, &types.GetSecretSubkeysParams{Depth: depth, Version: version}))
 // 	if err != nil {
 // 		return nil, err
@@ -379,7 +530,7 @@ func (client *RestAPIClient) Verify(ctx context.Context, keyId uuid.UUID, alg ty
 // 	return r.JSON200, err
 // }
 
-// func (client *RestAPIClient) GetSecretsMetadata(ctx context.Context, path string, list bool) (*types.GetMetadataResponse, error) {
+// func (client *apiClient) GetSecretsMetadata(ctx context.Context, path string, list bool) (*types.GetMetadataResponse, error) {
 // 	r, err := mapRestErr(client.inner.GetSecretsMetadataWithResponse(ctx, path, &types.GetSecretsMetadataParams{List: &list}))
 // 	if err != nil {
 // 		return nil, err
@@ -387,12 +538,12 @@ func (client *RestAPIClient) Verify(ctx context.Context, keyId uuid.UUID, alg ty
 // 	return r.JSON200, err
 // }
 
-// func (client *RestAPIClient) PatchSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error {
+// func (client *apiClient) PatchSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error {
 // 	_, err := mapRestErr(client.inner.PatchSecretMetadataWithResponse(ctx, path, body))
 // 	return err
 // }
 
-// func (client *RestAPIClient) PatchSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PatchSecretResponse, error) {
+// func (client *apiClient) PatchSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PatchSecretResponse, error) {
 // 	r, err := mapRestErr(client.inner.PatchSecretRequestWithResponse(ctx, path, body))
 // 	if err != nil {
 // 		return nil, err
@@ -400,22 +551,22 @@ func (client *RestAPIClient) Verify(ctx context.Context, keyId uuid.UUID, alg ty
 // 	return r.JSON200, err
 // }
 
-// func (client *RestAPIClient) PostSecretConfig(ctx context.Context, body types.PostConfigRequest) error {
+// func (client *apiClient) PostSecretConfig(ctx context.Context, body types.PostConfigRequest) error {
 // 	_, err := mapRestErr(client.inner.PostSecretConfigWithResponse(ctx, body))
 // 	return err
 // }
 
-// func (client *RestAPIClient) PostSecretDestroy(ctx context.Context, path string, versions []int32) error {
+// func (client *apiClient) PostSecretDestroy(ctx context.Context, path string, versions []int32) error {
 // 	_, err := mapRestErr(client.inner.PostSecretDestroyWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
 // 	return err
 // }
 
-// func (client *RestAPIClient) PostSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error {
+// func (client *apiClient) PostSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error {
 // 	_, err := mapRestErr(client.inner.PostSecretMetadataWithResponse(ctx, path, body))
 // 	return err
 // }
 
-// func (client *RestAPIClient) PostSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PostSecretResponse, error) {
+// func (client *apiClient) PostSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PostSecretResponse, error) {
 // 	r, err := mapRestErr(client.inner.PostSecretRequestWithResponse(ctx, path, body))
 // 	if err != nil {
 // 		return nil, err
@@ -423,7 +574,7 @@ func (client *RestAPIClient) Verify(ctx context.Context, keyId uuid.UUID, alg ty
 // 	return r.JSON200, err
 // }
 
-// func (client *RestAPIClient) PostSecretUndelete(ctx context.Context, path string, versions []int32) error {
+// func (client *apiClient) PostSecretUndelete(ctx context.Context, path string, versions []int32) error {
 // 	_, err := mapRestErr(client.inner.PostSecretUndeleteWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
 // 	return err
 // }

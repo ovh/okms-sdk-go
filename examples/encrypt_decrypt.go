@@ -17,14 +17,9 @@ import (
 	"github.com/ovh/okms-sdk-go/types"
 )
 
-func encryptDecrypt(ctx context.Context, kmsClient okms.Client) {
+func encryptDecrypt(ctx context.Context, kmsClient *okms.Client) {
 	// Create a new AES 256 key
-	respAes, err := kmsClient.CreateImportServiceKey(ctx, nil, types.CreateImportServiceKeyRequest{
-		Name:       "AES key example",
-		Type:       ptrTo(types.Oct),
-		Size:       ptrTo(types.N256),
-		Operations: ptrTo([]types.CryptographicUsages{types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey}),
-	})
+	respAes, err := kmsClient.GenerateSymmetricKey(ctx, types.N256, "AES key example", "", types.Encrypt, types.Decrypt)
 	if err != nil {
 		panic(err)
 	}

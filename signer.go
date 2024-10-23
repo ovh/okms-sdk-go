@@ -24,11 +24,22 @@ import (
 	"golang.org/x/crypto/cryptobyte/asn1"
 )
 
-// NewSigner creates a new [crypto.Signer] using the given public JsonWebKey and
-// its remote private key.
+// NewSigner creates a new [crypto.Signer] for the given key-pair.
 //
 // NewSigner cannot be used with symetric keys.
-func NewSigner(api SignatureApi, jwk types.JsonWebKey) (crypto.Signer, error) {
+func (client *Client) NewSigner(ctx context.Context, serviceKeyID uuid.UUID) (crypto.Signer, error) {
+	k, err := client.ExportJwkPublicKey(ctx, serviceKeyID)
+	if err != nil {
+		return nil, err
+	}
+	return newSigner(client, k)
+}
+
+// newSigner creates a new [crypto.Signer] using the given public JsonWebKey and
+// its remote private key.
+//
+// newSigner cannot be used with symetric keys.
+func newSigner(api SignatureApi, jwk *types.JsonWebKey) (crypto.Signer, error) {
 	pubKey, err := jwk.PublicKey()
 	if err != nil {
 		return nil, err
@@ -42,7 +53,7 @@ func NewSigner(api SignatureApi, jwk types.JsonWebKey) (crypto.Signer, error) {
 }
 
 type jwkSigner struct {
-	types.JsonWebKey
+	*types.JsonWebKey
 	api    SignatureApi
 	pubKey crypto.PublicKey
 }
@@ -88,7 +99,7 @@ func (sign *jwkSigner) signRsaPkcs15(digest []byte, hash crypto.Hash) ([]byte, e
 
 func (sign *jwkSigner) signRsaPss(digest []byte, opts *rsa.PSSOptions) ([]byte, error) {
 	// The size of the salt value is the same size as the hash function output as defined in https://www.rfc-editor.org/rfc/rfc7518#section-3.5
-	if opts.SaltLength != opts.Hash.Size() {
+	if opts.SaltLength != rsa.PSSSaltLengthAuto && opts.SaltLength != rsa.PSSSaltLengthEqualsHash && opts.SaltLength != opts.Hash.Size() {
 		return nil, errors.New("Invalid PSS salt length")
 	}
 	return sign.doSign(digest, opts.HashFunc(), "PS")
