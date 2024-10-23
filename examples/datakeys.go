@@ -10,11 +10,14 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
 	"fmt"
+	"io"
+	"os"
 
 	"github.com/ovh/okms-sdk-go"
 	"github.com/ovh/okms-sdk-go/types"
@@ -103,4 +106,78 @@ func dataKeyEncryptDecrypt(ctx context.Context, kmsClient okms.Client) {
 		panic(err)
 	}
 	fmt.Println("Decrypted:", string(plainData))
+}
+
+func dataKeyEncryptStream(ctx context.Context, kmsClient okms.Client) {
+	// Create a new AES 256 key
+	respAes, err := kmsClient.CreateImportServiceKey(ctx, nil, types.CreateImportServiceKeyRequest{
+		Name:       "AES key example",
+		Type:       ptrTo(types.Oct),
+		Size:       ptrTo(types.N256),
+		Operations: ptrTo([]types.CryptographicUsages{types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey}),
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	dkProvider := okms.NewDataKeyProvider(kmsClient, respAes.Id)
+
+	sourceFile, err := os.Open("10GB_Plain_File.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer sourceFile.Close()
+	targetFile, err := os.Create("Encrypted_File.bin")
+	if err != nil {
+		panic(err)
+	}
+	defer targetFile.Close()
+
+	stream, err := dkProvider.EncryptStream(context.Background(), targetFile, []byte("Optional Additional Authenticated Data"), okms.BlockSize4MB)
+	if err != nil {
+		panic(err)
+	}
+	// Encryption stream must be closed to ensure the last encrypted block is written
+	defer stream.Close()
+
+	_, err = io.Copy(stream, bufio.NewReader(sourceFile))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func dataKeyDecryptStream(ctx context.Context, kmsClient okms.Client) {
+	// Create a new AES 256 key
+	respAes, err := kmsClient.CreateImportServiceKey(ctx, nil, types.CreateImportServiceKeyRequest{
+		Name:       "AES key example",
+		Type:       ptrTo(types.Oct),
+		Size:       ptrTo(types.N256),
+		Operations: ptrTo([]types.CryptographicUsages{types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey}),
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	dkProvider := okms.NewDataKeyProvider(kmsClient, respAes.Id)
+
+	sourceFile, err := os.Create("Encrypted_File.bin")
+	if err != nil {
+		panic(err)
+	}
+	defer sourceFile.Close()
+	targetFile, err := os.Open("10GB_Plain_File.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer targetFile.Close()
+
+	stream, err := dkProvider.DecryptStream(context.Background(), sourceFile, []byte("Optional Additional Authenticated Data"))
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = io.Copy(targetFile, stream)
+	if err != nil {
+		panic(err)
+	}
 }

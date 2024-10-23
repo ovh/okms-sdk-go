@@ -15,14 +15,16 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"errors"
+	"io"
 	"log/slog"
 	"math"
 
 	"github.com/google/uuid"
+	"github.com/ovh/okms-sdk-go/internal/xcrypto"
 )
 
 // DataKeyProvider is a helper provider that wraps an API client
-// and provides hlpers functions to repeatedly generate or decrypt datakeys
+// and provides helpers functions to repeatedly generate or decrypt datakeys
 // protected by the same service key.
 //
 // It also provide helper functions to directly encrypt or decrypt data with a datakey.
@@ -126,4 +128,32 @@ func (sk *DataKeyProvider) DecryptGCM(ctx context.Context, cipherKey, cipherText
 		return nil, err
 	}
 	return data, nil
+}
+
+// BlockSize enumerates recommended size of blocks for streaming encryption.
+type BlockSize int
+
+const (
+	BlockSize32kB    BlockSize = 32 * 1024
+	BlockSize4MB     BlockSize = 4096 * 1024
+	BlockSizeDefault BlockSize = xcrypto.DEFAULT_BLOCK_SIZE
+)
+
+// EncryptStream wraps the given io.Writer into an io.WriteCloser that encrypts the data written to it with a fresh new datakey.
+// A 256 bits datakey is generated for every new stream, is used to perform an AES-GCM encryption of successive blocks of data.
+// The encrypted stream will start with a header containing the encrypted datakey and a random initialization vector.
+//
+// The returned io.WriteCloser must be closed to finalize the encryption, but please note that doing so won't close the underlying stream
+// which must also be closed but can be reused first.
+func (sk *DataKeyProvider) EncryptStream(ctx context.Context, w io.Writer, aad []byte, blockSize BlockSize) (io.WriteCloser, error) {
+	return xcrypto.NewDatakeyAEADStream(sk).SealTo(ctx, w, aad, int(blockSize))
+}
+
+// DecryptStream wraps the given io.Reader into another io.Reader that decrypts the data read from it. The initialization vector
+// and the encrypted datakey are read from the header. The datakey is then decrypted on KMS and used to decrypt successive blocks of encrypted data
+// using AES-GCM.
+//
+// The data to decrypt must have been encrypted using DataKeyProvider.EncryptStream.
+func (sk *DataKeyProvider) DecryptStream(ctx context.Context, r io.Reader, aad []byte) (io.Reader, error) {
+	return xcrypto.NewDatakeyAEADStream(sk).OpenFrom(ctx, r, aad)
 }
