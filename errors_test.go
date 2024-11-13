@@ -52,7 +52,7 @@ func TestErrorParsing(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(strconv.Itoa(int(tc.code)), func(t *testing.T) {
 			if tc.major != tc.code.Major() {
-				t.Errorf("Invalid Major. Whants %d, got %d", tc.major, tc.code.Major())
+				t.Errorf("Invalid Major. Wants %d, got %d", tc.major, tc.code.Major())
 			}
 			if tc.minor != tc.code.Minor() {
 				t.Errorf("Invalid Minor. Wants %d, got %d", tc.minor, tc.code.Minor())

@@ -1,6 +1,6 @@
 # okms-sdk-go
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/ovh/okms-sdk-go.svg)](https://pkg.go.dev/github.com/ovh/okms-sdk-go) [![license](https://img.shields.io/badge/license-Apache%202.0-red.svg?style=flat)](https://raw.githubusercontent.com/ovh/okms-sdk-go/master/LICENSE) [![test](https://github.com/ovh/okms-sdk-go/actions/workflows/test.yaml/badge.svg)](https://github.com/ovh/okms-sdk-go/actions/workflows/test.yaml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/ovh/okms-sdk-go.svg)](https://pkg.go.dev/github.com/ovh/okms-sdk-go) [![license](https://img.shields.io/badge/license-Apache%202.0-red.svg?style=flat)](https://raw.githubusercontent.com/ovh/okms-sdk-go/master/LICENSE) [![test](https://github.com/ovh/okms-sdk-go/actions/workflows/test.yaml/badge.svg)](https://github.com/ovh/okms-sdk-go/actions/workflows/test.yaml) [![Go Report Card](https://goreportcard.com/badge/github.com/ovh/okms-sdk-go)](https://goreportcard.com/report/github.com/ovh/okms-sdk-go)
 
 The Golang SDK to interact with your [OVHcloud KMS](https://help.ovhcloud.com/csm/en-ie-kms-quick-start?id=kb_article_view&sysparm_article=KB0063362) services.
 
