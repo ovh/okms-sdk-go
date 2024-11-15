@@ -7,9 +7,9 @@ packages:
   github.com/ovh/okms-sdk-go:
     interfaces:
       # RandomApi:
-      DataKeyApi:
-      SignatureApi:
-      EncryptionApi:
-      ServiceKeyApi:
+      # DataKeyApi:
+      # SignatureApi:
+      # EncryptionApi:
+      # ServiceKeyApi:
       # SecretApi:
-      Client:
+      API:
