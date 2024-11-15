@@ -40,6 +40,9 @@ type KeyIter struct {
 // It returns true if there is another key to get, false otherwise.
 // Once the cursor has advanced, the newt key can be retrieved with a call to Value().
 func (it *KeyIter) Next(ctx context.Context) bool {
+	if it.err != nil {
+		return false
+	}
 	if it.buf == nil {
 		it.buf, it.err = it.client.ListServiceKeys(ctx, nil, it.pageSize, it.state)
 		if it.err != nil {
@@ -53,7 +56,7 @@ func (it *KeyIter) Next(ctx context.Context) bool {
 	}
 	if it.buf.IsTruncated {
 		it.buf, it.err = it.client.ListServiceKeys(ctx, it.buf.ContinuationToken, it.pageSize, it.state)
-		return len(it.buf.ObjectsList) > 0
+		return it.err != nil || len(it.buf.ObjectsList) > 0
 	}
 	return false
 }
