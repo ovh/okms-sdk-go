@@ -1212,6 +1212,7 @@ type ListServiceKeysHTTPResponse struct {
 	JSON200      *ListServiceKeysResponse
 	JSON400      *ErrorResponse
 	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
 	JSON502      *ErrorResponse
 }
@@ -1238,6 +1239,8 @@ type CreateImportServiceKeyHTTPResponse struct {
 	JSON201      *GetServiceKeyResponse
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
 	JSON502      *ErrorResponse
 }
@@ -1264,6 +1267,7 @@ type DeleteServiceKeyHTTPResponse struct {
 	JSON200      *StatusCodes
 	JSON400      *ErrorResponse
 	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
 	JSON502      *ErrorResponse
 }
@@ -1290,6 +1294,7 @@ type GetServiceKeyHTTPResponse struct {
 	JSON200      *GetServiceKeyResponse
 	JSON400      *ErrorResponse
 	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
 	JSON502      *ErrorResponse
 }
@@ -1316,6 +1321,7 @@ type PatchServiceKeyHTTPResponse struct {
 	JSON200      *GetServiceKeyResponse
 	JSON400      *ErrorResponse
 	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
 	JSON502      *ErrorResponse
 }
@@ -1342,6 +1348,7 @@ type ActivateServiceKeyHTTPResponse struct {
 	JSON200      *StatusCodes
 	JSON400      *ErrorResponse
 	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
 	JSON502      *ErrorResponse
 }
@@ -1368,6 +1375,7 @@ type GenerateDataKeyHTTPResponse struct {
 	JSON201      *GenerateDataKeyResponse
 	JSON400      *ErrorResponse
 	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
 	JSON502      *ErrorResponse
 }
@@ -1394,6 +1402,7 @@ type DecryptDataKeyHTTPResponse struct {
 	JSON200      *DecryptDataKeyResponse
 	JSON400      *ErrorResponse
 	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
 	JSON502      *ErrorResponse
 }
@@ -1420,6 +1429,7 @@ type DeactivateServiceKeyHTTPResponse struct {
 	JSON200      *StatusCodes
 	JSON400      *ErrorResponse
 	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
 	JSON502      *ErrorResponse
 }
@@ -1446,6 +1456,7 @@ type DecryptHTTPResponse struct {
 	JSON200      *DecryptResponse
 	JSON400      *ErrorResponse
 	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
 	JSON502      *ErrorResponse
 }
@@ -1472,6 +1483,7 @@ type EncryptHTTPResponse struct {
 	JSON200      *EncryptResponse
 	JSON400      *ErrorResponse
 	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
 	JSON502      *ErrorResponse
 }
@@ -1498,6 +1510,7 @@ type SignHTTPResponse struct {
 	JSON200      *SignResponse
 	JSON400      *ErrorResponse
 	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
 	JSON502      *ErrorResponse
 }
@@ -1524,6 +1537,7 @@ type VerifyHTTPResponse struct {
 	JSON200      *VerifyResponse
 	JSON400      *ErrorResponse
 	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
 	JSON502      *ErrorResponse
 }
@@ -1776,6 +1790,13 @@ func ParseListServiceKeysHTTPResponse(rsp *http.Response) (*ListServiceKeysHTTPR
 		}
 		response.JSON404 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -1829,6 +1850,20 @@ func ParseCreateImportServiceKeyHTTPResponse(rsp *http.Response) (*CreateImportS
 			return nil, err
 		}
 		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ErrorResponse
@@ -1884,6 +1919,13 @@ func ParseDeleteServiceKeyHTTPResponse(rsp *http.Response) (*DeleteServiceKeyHTT
 		}
 		response.JSON404 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -1937,6 +1979,13 @@ func ParseGetServiceKeyHTTPResponse(rsp *http.Response) (*GetServiceKeyHTTPRespo
 			return nil, err
 		}
 		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ErrorResponse
@@ -1992,6 +2041,13 @@ func ParsePatchServiceKeyHTTPResponse(rsp *http.Response) (*PatchServiceKeyHTTPR
 		}
 		response.JSON404 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -2045,6 +2101,13 @@ func ParseActivateServiceKeyHTTPResponse(rsp *http.Response) (*ActivateServiceKe
 			return nil, err
 		}
 		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ErrorResponse
@@ -2100,6 +2163,13 @@ func ParseGenerateDataKeyHTTPResponse(rsp *http.Response) (*GenerateDataKeyHTTPR
 		}
 		response.JSON404 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -2153,6 +2223,13 @@ func ParseDecryptDataKeyHTTPResponse(rsp *http.Response) (*DecryptDataKeyHTTPRes
 			return nil, err
 		}
 		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ErrorResponse
@@ -2208,6 +2285,13 @@ func ParseDeactivateServiceKeyHTTPResponse(rsp *http.Response) (*DeactivateServi
 		}
 		response.JSON404 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -2261,6 +2345,13 @@ func ParseDecryptHTTPResponse(rsp *http.Response) (*DecryptHTTPResponse, error) 
 			return nil, err
 		}
 		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ErrorResponse
@@ -2316,6 +2407,13 @@ func ParseEncryptHTTPResponse(rsp *http.Response) (*EncryptHTTPResponse, error) 
 		}
 		response.JSON404 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -2370,6 +2468,13 @@ func ParseSignHTTPResponse(rsp *http.Response) (*SignHTTPResponse, error) {
 		}
 		response.JSON404 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -2423,6 +2528,13 @@ func ParseVerifyHTTPResponse(rsp *http.Response) (*VerifyHTTPResponse, error) {
 			return nil, err
 		}
 		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ErrorResponse

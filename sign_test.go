@@ -33,11 +33,12 @@ func TestSigner_RSA(t *testing.T) {
 	api.EXPECT().GetServiceKey(mock.Anything, keyId, &format).
 		Return(&types.GetServiceKeyResponse{
 			Attributes: &map[string]interface{}{"state": "active"},
-			Keys:       &[]types.JsonWebKey{jwk},
+			Keys:       &[]types.JsonWebKeyResponse{jwk},
 		}, nil).
 		Once()
 
-	signer, err := client.NewSigner(context.Background(), keyId)
+	signFormat := types.Raw
+	signer, err := client.NewSigner(context.Background(), keyId, &signFormat)
 	require.NoError(t, err)
 	require.Equal(t, pKey.Public(), signer.Public())
 
@@ -68,7 +69,8 @@ func TestSigner_RSA(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			api.EXPECT().Sign(mock.Anything, keyId, tc.alg, true, mock.Anything).
+			rawFormat := types.Raw
+			api.EXPECT().Sign(mock.Anything, keyId, &rawFormat, tc.alg, true, mock.Anything).
 				Return(base64.StdEncoding.EncodeToString(rawsig), nil).
 				Once()
 			sig, err := signer.Sign(rand.Reader, digest, tc.hash)
@@ -93,11 +95,11 @@ func TestSigner_ECDSA(t *testing.T) {
 	api.EXPECT().GetServiceKey(mock.Anything, keyId, &format).
 		Return(&types.GetServiceKeyResponse{
 			Attributes: &map[string]interface{}{"state": "active"},
-			Keys:       &[]types.JsonWebKey{jwk},
+			Keys:       &[]types.JsonWebKeyResponse{jwk},
 		}, nil).
 		Once()
 
-	signer, err := client.NewSigner(context.Background(), keyId)
+	signer, err := client.NewSigner(context.Background(), keyId, nil)
 	require.NoError(t, err)
 	require.Equal(t, pKey.Public(), signer.Public())
 
@@ -121,7 +123,8 @@ func TestSigner_ECDSA(t *testing.T) {
 			rawsig := r.Bytes()
 			rawsig = append(rawsig, s.Bytes()...)
 
-			api.EXPECT().Sign(mock.Anything, keyId, tc.alg, true, digest).
+			signFormat := types.Raw
+			api.EXPECT().Sign(mock.Anything, keyId, &signFormat, tc.alg, true, digest).
 				Return(base64.StdEncoding.EncodeToString(rawsig), nil).
 				Once()
 
