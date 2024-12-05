@@ -87,6 +87,13 @@ const (
 	Unspecified          RevocationReasons = "unspecified"
 )
 
+// Defines values for SignatureFormats.
+const (
+	Jws SignatureFormats = "jws"
+	Jwt SignatureFormats = "jwt"
+	Raw SignatureFormats = "raw"
+)
+
 // CreateImportServiceKeyRequest Create domain key model
 type CreateImportServiceKeyRequest struct {
 	// Context Optional key context, utf8 text string
@@ -94,7 +101,7 @@ type CreateImportServiceKeyRequest struct {
 	Curve   *Curves `json:"curve,omitempty"`
 
 	// Keys Json Web Key Set representing keys in request
-	Keys *[]JsonWebKey `json:"keys"`
+	Keys *[]JsonWebKeyRequest `json:"keys"`
 
 	// Name Key friendly name
 	Name string `json:"name"`
@@ -204,7 +211,7 @@ type GetServiceKeyResponse struct {
 	Id openapi_types.UUID `json:"id"`
 
 	// Keys Json Web Key Set representing keys in request
-	Keys *[]JsonWebKey `json:"keys"`
+	Keys *[]JsonWebKeyResponse `json:"keys"`
 
 	// Name Key friendly name
 	Name string `json:"name"`
@@ -215,8 +222,60 @@ type GetServiceKeyResponse struct {
 	Type       KeyTypes               `json:"type"`
 }
 
-// JsonWebKey Json Web Key model
-type JsonWebKey struct {
+// JsonWebKeyRequest defines model for JsonWebKeyRequest.
+type JsonWebKeyRequest struct {
+	Alg *DigitalSignatureAlgorithms `json:"alg,omitempty"`
+	Crv *Curves                     `json:"crv,omitempty"`
+
+	// D The "d" parameter of EC key or RSA private exponent
+	D *string `json:"d"`
+
+	// Dp "dp" RSA private key parameter (first factor CRT exponent)
+	Dp *string `json:"dp"`
+
+	// Dq "dq" RSA private key parameter (second factor CRT exponent)
+	Dq *string `json:"dq"`
+
+	// E The "e" (exponent) parameter contains the exponent value for the RSA public key. It is represented as a Base64urlUInt-encoded value.
+	// Required for RSA public key
+	E *string `json:"e"`
+
+	// K The "k" (key value) parameter contains the value of the symmetric (or other single-valued) key.
+	// It is represented as the base64url encoding of the octet sequence containing the key value.
+	K *string `json:"k"`
+
+	// KeyOps The "key_ops" (key operations) parameter identifies the operation(s) for which the key is intended to be used.
+	KeyOps *[]CryptographicUsages `json:"key_ops"`
+
+	// Kid The "kid" (key ID) parameter is used to match a specific key.
+	Kid *string  `json:"kid"`
+	Kty KeyTypes `json:"kty"`
+
+	// N The "n" (modulus) parameter contains the modulus value for the RSA public key. It is represented as a Base64urlUInt-encoded value.
+	// Required for RSA public key
+	N *string `json:"n"`
+
+	// P "p" RSA private key parameter (first prime factor)
+	P *string `json:"p"`
+
+	// Q "q" RSA private key parameter (second prime factor)
+	Q *string `json:"q"`
+
+	// Qi "qi" RSA private key parameter (first CRT coefficient)
+	Qi  *string  `json:"qi"`
+	Use *JwkUses `json:"use,omitempty"`
+
+	// X The "x" (x coordinate) parameter contains the x coordinate for the Elliptic Curve point.
+	// It is represented as the base64url encoding of the octet string representation of the coordinate
+	X *string `json:"x"`
+
+	// Y The "y" (y coordinate) parameter contains the y coordinate for the Elliptic Curve point.
+	// It is represented as the base64url encoding of the octet string representation of the coordinate
+	Y *string `json:"y"`
+}
+
+// JsonWebKeyResponse defines model for JsonWebKeyResponse.
+type JsonWebKeyResponse struct {
 	Alg *DigitalSignatureAlgorithms `json:"alg,omitempty"`
 	Crv *Curves                     `json:"crv,omitempty"`
 
@@ -285,7 +344,7 @@ type KeyTypes string
 // ListServiceKeysResponse List domain keys response
 type ListServiceKeysResponse struct {
 	// ContinuationToken continuation token if list is not complete
-	ContinuationToken *string `json:"continuation_token,omitempty"`
+	ContinuationToken string `json:"continuation_token"`
 
 	// IsTruncated Is the list complete
 	IsTruncated bool `json:"is_truncated"`
@@ -316,24 +375,27 @@ type SignRequest struct {
 
 // SignResponse Sign response model
 type SignResponse struct {
-	// Signature Base64 encoded signature
+	// Signature Signature data
 	Signature string `json:"signature"`
 }
+
+// SignatureFormats Formats for digital signature result.
+type SignatureFormats string
 
 // StatusCodes defines model for StatusCodes.
 type StatusCodes = map[string]interface{}
 
 // VerifyRequest Verify signature request model
 type VerifyRequest struct {
-	Alg DigitalSignatureAlgorithms `json:"alg"`
+	Alg *DigitalSignatureAlgorithms `json:"alg,omitempty"`
 
 	// Isdigest Is the message already hashed
 	Isdigest *bool `json:"isdigest,omitempty"`
 
-	// Message Initial message
-	Message []byte `json:"message"`
+	// Message Signed message to be verified
+	Message *[]byte `json:"message"`
 
-	// Signature Base64 encoded signature
+	// Signature String token containing signature for verification
 	Signature string `json:"signature"`
 }
 
@@ -345,26 +407,32 @@ type VerifyResponse struct {
 
 // ListServiceKeysParams defines parameters for ListServiceKeys.
 type ListServiceKeysParams struct {
-	// State Returns objects with specified state
+	// State Returns objects with specified state.
 	State *KeyStates `form:"state,omitempty" json:"state,omitempty"`
 
-	// ContinuationToken Continuation token from previous incomplete call
+	// ContinuationToken Continuation token from previous incomplete call.
 	ContinuationToken *string `form:"continuation-token,omitempty" json:"continuation-token,omitempty"`
 
-	// Max Maximum number of keys returned in one call
+	// Max Maximum number of keys returned in one call.
 	Max *int32 `form:"max,omitempty" json:"max,omitempty"`
 }
 
 // CreateImportServiceKeyParams defines parameters for CreateImportServiceKey.
 type CreateImportServiceKeyParams struct {
-	// Format Formatting options for key representation
+	// Format Formatting options for key representation.
 	Format *KeyFormats `form:"format,omitempty" json:"format,omitempty"`
 }
 
 // GetServiceKeyParams defines parameters for GetServiceKey.
 type GetServiceKeyParams struct {
-	// Format Formatting options for key representation
+	// Format Formatting options for key representation.
 	Format *KeyFormats `form:"format,omitempty" json:"format,omitempty"`
+}
+
+// SignParams defines parameters for Sign.
+type SignParams struct {
+	// Format Signature format.
+	Format *SignatureFormats `form:"format,omitempty" json:"format,omitempty"`
 }
 
 // CreateImportServiceKeyJSONRequestBody defines body for CreateImportServiceKey for application/json ContentType.

@@ -55,7 +55,7 @@ func (it *KeyIter) Next(ctx context.Context) bool {
 		return true
 	}
 	if it.buf.IsTruncated {
-		it.buf, it.err = it.client.ListServiceKeys(ctx, it.buf.ContinuationToken, it.pageSize, it.state)
+		it.buf, it.err = it.client.ListServiceKeys(ctx, &it.buf.ContinuationToken, it.pageSize, it.state)
 		return it.err != nil || len(it.buf.ObjectsList) > 0
 	}
 	return false
