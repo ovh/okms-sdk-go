@@ -141,9 +141,9 @@ type ClientInterface interface {
 	Encrypt(ctx context.Context, id openapi_types.UUID, body EncryptJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SignWithBody request with any body
-	SignWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	SignWithBody(ctx context.Context, id openapi_types.UUID, params *SignParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	Sign(ctx context.Context, id openapi_types.UUID, body SignJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	Sign(ctx context.Context, id openapi_types.UUID, params *SignParams, body SignJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// VerifyWithBody request with any body
 	VerifyWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -379,8 +379,8 @@ func (c *Client) Encrypt(ctx context.Context, id openapi_types.UUID, body Encryp
 	return c.Client.Do(req)
 }
 
-func (c *Client) SignWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSignRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) SignWithBody(ctx context.Context, id openapi_types.UUID, params *SignParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSignRequestWithBody(c.Server, id, params, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -391,8 +391,8 @@ func (c *Client) SignWithBody(ctx context.Context, id openapi_types.UUID, conten
 	return c.Client.Do(req)
 }
 
-func (c *Client) Sign(ctx context.Context, id openapi_types.UUID, body SignJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSignRequest(c.Server, id, body)
+func (c *Client) Sign(ctx context.Context, id openapi_types.UUID, params *SignParams, body SignJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSignRequest(c.Server, id, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -988,18 +988,18 @@ func NewEncryptRequestWithBody(server string, id openapi_types.UUID, contentType
 }
 
 // NewSignRequest calls the generic Sign builder with application/json body
-func NewSignRequest(server string, id openapi_types.UUID, body SignJSONRequestBody) (*http.Request, error) {
+func NewSignRequest(server string, id openapi_types.UUID, params *SignParams, body SignJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewSignRequestWithBody(server, id, "application/json", bodyReader)
+	return NewSignRequestWithBody(server, id, params, "application/json", bodyReader)
 }
 
 // NewSignRequestWithBody generates requests for Sign with any type of body
-func NewSignRequestWithBody(server string, id openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
+func NewSignRequestWithBody(server string, id openapi_types.UUID, params *SignParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1022,6 +1022,28 @@ func NewSignRequestWithBody(server string, id openapi_types.UUID, contentType st
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Format != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "format", runtime.ParamLocationQuery, *params.Format); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("POST", queryURL.String(), body)
@@ -1174,9 +1196,9 @@ type ClientWithResponsesInterface interface {
 	EncryptWithResponse(ctx context.Context, id openapi_types.UUID, body EncryptJSONRequestBody, reqEditors ...RequestEditorFn) (*EncryptHTTPResponse, error)
 
 	// SignWithBodyWithResponse request with any body
-	SignWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SignHTTPResponse, error)
+	SignWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, params *SignParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SignHTTPResponse, error)
 
-	SignWithResponse(ctx context.Context, id openapi_types.UUID, body SignJSONRequestBody, reqEditors ...RequestEditorFn) (*SignHTTPResponse, error)
+	SignWithResponse(ctx context.Context, id openapi_types.UUID, params *SignParams, body SignJSONRequestBody, reqEditors ...RequestEditorFn) (*SignHTTPResponse, error)
 
 	// VerifyWithBodyWithResponse request with any body
 	VerifyWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*VerifyHTTPResponse, error)
@@ -1686,16 +1708,16 @@ func (c *ClientWithResponses) EncryptWithResponse(ctx context.Context, id openap
 }
 
 // SignWithBodyWithResponse request with arbitrary body returning *SignHTTPResponse
-func (c *ClientWithResponses) SignWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SignHTTPResponse, error) {
-	rsp, err := c.SignWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) SignWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, params *SignParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SignHTTPResponse, error) {
+	rsp, err := c.SignWithBody(ctx, id, params, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseSignHTTPResponse(rsp)
 }
 
-func (c *ClientWithResponses) SignWithResponse(ctx context.Context, id openapi_types.UUID, body SignJSONRequestBody, reqEditors ...RequestEditorFn) (*SignHTTPResponse, error) {
-	rsp, err := c.Sign(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) SignWithResponse(ctx context.Context, id openapi_types.UUID, params *SignParams, body SignJSONRequestBody, reqEditors ...RequestEditorFn) (*SignHTTPResponse, error) {
+	rsp, err := c.Sign(ctx, id, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}

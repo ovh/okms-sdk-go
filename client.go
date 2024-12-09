@@ -466,7 +466,7 @@ func (client *apiClient) Sign(ctx context.Context, keyId uuid.UUID, alg types.Di
 		Isdigest: &preHashed,
 		Message:  msg,
 	}
-	r, err := mapRestErr(client.inner.SignWithResponse(ctx, keyId, req))
+	r, err := mapRestErr(client.inner.SignWithResponse(ctx, keyId, nil, req)) // TODO: Make the format param customizable
 	if err != nil {
 		return "", err
 	}
@@ -479,9 +479,9 @@ func (client *apiClient) Sign(ctx context.Context, keyId uuid.UUID, alg types.Di
 // Verify checks the signature of given message against the remote public key having the ID `keyId`. The message can be pre-hashed or not.
 func (client *apiClient) Verify(ctx context.Context, keyId uuid.UUID, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte, sig string) (bool, error) {
 	req := types.VerifyRequest{
-		Alg:       alg,
+		Alg:       &alg,
 		Isdigest:  &preHashed,
-		Message:   msg,
+		Message:   &msg,
 		Signature: sig,
 	}
 	r, err := mapRestErr(client.inner.VerifyWithResponse(ctx, keyId, req))

@@ -87,6 +87,13 @@ const (
 	Unspecified          RevocationReasons = "unspecified"
 )
 
+// Defines values for SignatureFormats.
+const (
+	Jws SignatureFormats = "jws"
+	Jwt SignatureFormats = "jwt"
+	Raw SignatureFormats = "raw"
+)
+
 // CreateImportServiceKeyRequest Create domain key model
 type CreateImportServiceKeyRequest struct {
 	// Context Optional key context, utf8 text string
@@ -316,24 +323,27 @@ type SignRequest struct {
 
 // SignResponse Sign response model
 type SignResponse struct {
-	// Signature Base64 encoded signature
+	// Signature Signature data
 	Signature string `json:"signature"`
 }
+
+// SignatureFormats Formats for digital signature result.
+type SignatureFormats string
 
 // StatusCodes defines model for StatusCodes.
 type StatusCodes = map[string]interface{}
 
 // VerifyRequest Verify signature request model
 type VerifyRequest struct {
-	Alg DigitalSignatureAlgorithms `json:"alg"`
+	Alg *DigitalSignatureAlgorithms `json:"alg,omitempty"`
 
 	// Isdigest Is the message already hashed
 	Isdigest *bool `json:"isdigest,omitempty"`
 
-	// Message Initial message
-	Message []byte `json:"message"`
+	// Message Signed message to be verified
+	Message *[]byte `json:"message"`
 
-	// Signature Base64 encoded signature
+	// Signature String token containing signature for verification
 	Signature string `json:"signature"`
 }
 
@@ -345,26 +355,32 @@ type VerifyResponse struct {
 
 // ListServiceKeysParams defines parameters for ListServiceKeys.
 type ListServiceKeysParams struct {
-	// State Returns objects with specified state
+	// State Returns objects with specified state.
 	State *KeyStates `form:"state,omitempty" json:"state,omitempty"`
 
-	// ContinuationToken Continuation token from previous incomplete call
+	// ContinuationToken Continuation token from previous incomplete call.
 	ContinuationToken *string `form:"continuation-token,omitempty" json:"continuation-token,omitempty"`
 
-	// Max Maximum number of keys returned in one call
+	// Max Maximum number of keys returned in one call.
 	Max *int32 `form:"max,omitempty" json:"max,omitempty"`
 }
 
 // CreateImportServiceKeyParams defines parameters for CreateImportServiceKey.
 type CreateImportServiceKeyParams struct {
-	// Format Formatting options for key representation
+	// Format Formatting options for key representation.
 	Format *KeyFormats `form:"format,omitempty" json:"format,omitempty"`
 }
 
 // GetServiceKeyParams defines parameters for GetServiceKey.
 type GetServiceKeyParams struct {
-	// Format Formatting options for key representation
+	// Format Formatting options for key representation.
 	Format *KeyFormats `form:"format,omitempty" json:"format,omitempty"`
+}
+
+// SignParams defines parameters for Sign.
+type SignParams struct {
+	// Format Signature format.
+	Format *SignatureFormats `form:"format,omitempty" json:"format,omitempty"`
 }
 
 // CreateImportServiceKeyJSONRequestBody defines body for CreateImportServiceKey for application/json ContentType.
