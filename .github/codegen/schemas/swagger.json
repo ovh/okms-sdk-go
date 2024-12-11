@@ -1133,20 +1133,20 @@
           "ServicekeyApi"
         ],
         "summary": "Create or imports customer service key",
-        "description": "/v1/servicekey",
+        "description": "/v1/servicekey.",
         "operationId": "CreateImportServiceKey",
         "parameters": [
           {
             "name": "format",
             "in": "query",
-            "description": "Formatting options for key representation",
+            "description": "Formatting options for key representation.",
             "schema": {
               "$ref": "#/components/schemas/KeyFormats"
             }
           }
         ],
         "requestBody": {
-          "description": "Request payload",
+          "description": "Request payload.",
           "content": {
             "application/json": {
               "schema": {
@@ -1158,7 +1158,7 @@
         },
         "responses": {
           "201": {
-            "description": "Returns id of a key created or imported",
+            "description": "Returns id of a key created or imported.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1168,7 +1168,7 @@
             }
           },
           "400": {
-            "description": "Bad request error",
+            "description": "Bad request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1178,7 +1178,7 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1188,7 +1188,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized",
+            "description": "Unauthorized.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1198,7 +1198,7 @@
             }
           },
           "502": {
-            "description": "Ccm error",
+            "description": "Ccm error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1214,13 +1214,13 @@
           "ServicekeyApi"
         ],
         "summary": "List service keys, returns continuation token if result is not complete, returns max 100 values by default",
-        "description": "/v1/servicekey",
+        "description": "/v1/servicekey.",
         "operationId": "ListServiceKeys",
         "parameters": [
           {
             "name": "state",
             "in": "query",
-            "description": "Returns objects with specified state",
+            "description": "Returns objects with specified state.",
             "schema": {
               "$ref": "#/components/schemas/KeyStates"
             }
@@ -1228,7 +1228,7 @@
           {
             "name": "continuation-token",
             "in": "query",
-            "description": "Continuation token from previous incomplete call",
+            "description": "Continuation token from previous incomplete call.",
             "schema": {
               "maxLength": 50,
               "type": "string"
@@ -1237,7 +1237,7 @@
           {
             "name": "max",
             "in": "query",
-            "description": "Maximum number of keys returned in one call",
+            "description": "Maximum number of keys returned in one call.",
             "schema": {
               "maximum": 100,
               "minimum": 10,
@@ -1249,7 +1249,7 @@
         ],
         "responses": {
           "200": {
-            "description": "List of service keys",
+            "description": "List of service keys.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1259,7 +1259,7 @@
             }
           },
           "400": {
-            "description": "Bad request error",
+            "description": "Bad request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1269,7 +1269,7 @@
             }
           },
           "404": {
-            "description": "Not found error",
+            "description": "Not found error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1279,7 +1279,7 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1289,7 +1289,7 @@
             }
           },
           "502": {
-            "description": "Ccm error",
+            "description": "Ccm error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1299,7 +1299,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized."
           }
         }
       }
@@ -1310,13 +1310,13 @@
           "ServicekeyApi"
         ],
         "summary": "Encrypts data, up to 4Kb in size, using service key provided",
-        "description": "/v1/servicekey/{id}/encrypt",
+        "description": "/v1/servicekey/{id}/encrypt.",
         "operationId": "Encrypt",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Id of a key used for operation",
+            "description": "Id of a key used for operation.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1325,7 +1325,7 @@
           }
         ],
         "requestBody": {
-          "description": "Body of a request",
+          "description": "Body of a request.",
           "content": {
             "application/json": {
               "schema": {
@@ -1337,7 +1337,7 @@
         },
         "responses": {
           "200": {
-            "description": "Ciphertext produced by encryption",
+            "description": "Ciphertext produced by encryption.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1347,7 +1347,7 @@
             }
           },
           "400": {
-            "description": "Bad request error",
+            "description": "Bad request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1357,7 +1357,7 @@
             }
           },
           "404": {
-            "description": "Not found error",
+            "description": "Not found error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1367,7 +1367,7 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1377,7 +1377,7 @@
             }
           },
           "502": {
-            "description": "Ccm error",
+            "description": "Ccm error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1387,7 +1387,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized."
           }
         }
       }
@@ -1398,13 +1398,13 @@
           "ServicekeyApi"
         ],
         "summary": "Decrypt data previously encrypted by Encrypt operation",
-        "description": "/v1/servicekey/{id}/decrypt",
+        "description": "/v1/servicekey/{id}/decrypt.",
         "operationId": "Decrypt",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Id of a key used for operation",
+            "description": "Id of a key used for operation.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1413,7 +1413,7 @@
           }
         ],
         "requestBody": {
-          "description": "Body payload",
+          "description": "Body payload.",
           "content": {
             "application/json": {
               "schema": {
@@ -1425,7 +1425,7 @@
         },
         "responses": {
           "200": {
-            "description": "Plaintext produced by decryption",
+            "description": "Plaintext produced by decryption.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1435,7 +1435,7 @@
             }
           },
           "400": {
-            "description": "Bad request error",
+            "description": "Bad request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1445,7 +1445,7 @@
             }
           },
           "404": {
-            "description": "Not found error",
+            "description": "Not found error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1455,7 +1455,7 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1475,7 +1475,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized."
           }
         }
       }
@@ -1486,13 +1486,13 @@
           "ServicekeyApi"
         ],
         "summary": "Generate data key enveloped by servicekey",
-        "description": "/v1/servicekey/{id}/datakey",
+        "description": "/v1/servicekey/{id}/datakey.",
         "operationId": "GenerateDataKey",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Service key id used for operation",
+            "description": "Service key id used for operation.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1501,7 +1501,7 @@
           }
         ],
         "requestBody": {
-          "description": "Data key generation request",
+          "description": "Data key generation request.",
           "content": {
             "application/json": {
               "schema": {
@@ -1513,7 +1513,7 @@
         },
         "responses": {
           "201": {
-            "description": "New data key encrypted blob and plaintext copy",
+            "description": "New data key encrypted blob and plaintext copy.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1523,7 +1523,7 @@
             }
           },
           "400": {
-            "description": "Bad request error",
+            "description": "Bad request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1533,7 +1533,7 @@
             }
           },
           "404": {
-            "description": "Not found error",
+            "description": "Not found error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1543,7 +1543,7 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1553,7 +1553,7 @@
             }
           },
           "502": {
-            "description": "Ccm error",
+            "description": "Ccm error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1563,7 +1563,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized."
           }
         }
       }
@@ -1574,13 +1574,13 @@
           "ServicekeyApi"
         ],
         "summary": "Decrypt data key encrypted by service key",
-        "description": "/v1/servicekey/{id}/datakey/decrypt",
+        "description": "/v1/servicekey/{id}/datakey/decrypt.",
         "operationId": "DecryptDataKey",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Service key id used for operation",
+            "description": "Service key id used for operation.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1589,7 +1589,7 @@
           }
         ],
         "requestBody": {
-          "description": "Body payload containing data key blob",
+          "description": "Body payload containing data key blob.",
           "content": {
             "application/json": {
               "schema": {
@@ -1601,7 +1601,7 @@
         },
         "responses": {
           "200": {
-            "description": "Plaintext data key, base64 encoded",
+            "description": "Plaintext data key, base64 encoded.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1611,7 +1611,7 @@
             }
           },
           "400": {
-            "description": "Bad request error",
+            "description": "Bad request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1621,7 +1621,7 @@
             }
           },
           "404": {
-            "description": "Not found error",
+            "description": "Not found error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1631,7 +1631,7 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1641,7 +1641,7 @@
             }
           },
           "502": {
-            "description": "Ccm error",
+            "description": "Ccm error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1651,7 +1651,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized."
           }
         }
       }
@@ -1662,13 +1662,21 @@
           "ServicekeyApi"
         ],
         "summary": "Sign digest with service key",
-        "description": "/v1/servicekey/{id}/sign",
+        "description": "/v1/servicekey/{id}/sign.",
         "operationId": "Sign",
         "parameters": [
           {
+            "name": "format",
+            "in": "query",
+            "description": "Signature format.",
+            "schema": {
+              "$ref": "#/components/schemas/SignatureFormats"
+            }
+          },
+          {
             "name": "id",
             "in": "path",
-            "description": "Service key id used for operation",
+            "description": "Service key id used for operation.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1677,7 +1685,7 @@
           }
         ],
         "requestBody": {
-          "description": "Body payload containing digest and algorithm spec",
+          "description": "Body payload containing digest and algorithm spec.",
           "content": {
             "application/json": {
               "schema": {
@@ -1699,7 +1707,7 @@
             }
           },
           "400": {
-            "description": "Bad request error",
+            "description": "Bad request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1709,7 +1717,7 @@
             }
           },
           "404": {
-            "description": "Not found error",
+            "description": "Not found error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1719,7 +1727,7 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1739,7 +1747,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized."
           }
         }
       }
@@ -1750,7 +1758,7 @@
           "ServicekeyApi"
         ],
         "summary": "Verify signature",
-        "description": "/v1/servicekey/{id}/verify",
+        "description": "/v1/servicekey/{id}/verify.",
         "operationId": "Verify",
         "parameters": [
           {
@@ -1785,7 +1793,7 @@
             }
           },
           "400": {
-            "description": "Bad request error",
+            "description": "Bad request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1795,7 +1803,7 @@
             }
           },
           "404": {
-            "description": "Not found error",
+            "description": "Not found error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1805,7 +1813,7 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1815,7 +1823,7 @@
             }
           },
           "502": {
-            "description": "Ccm error",
+            "description": "Ccm error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1825,7 +1833,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized."
           }
         }
       }
@@ -1836,13 +1844,13 @@
           "ServicekeyApi"
         ],
         "summary": "Delete service key",
-        "description": "/v1/servicekey/{id}",
+        "description": "/v1/servicekey/{id}.",
         "operationId": "DeleteServiceKey",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Id of a service key",
+            "description": "Id of a service key.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1862,7 +1870,7 @@
             }
           },
           "400": {
-            "description": "Bad request error",
+            "description": "Bad request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1872,7 +1880,7 @@
             }
           },
           "404": {
-            "description": "Not found error",
+            "description": "Not found error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1882,7 +1890,7 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1892,7 +1900,7 @@
             }
           },
           "502": {
-            "description": "Ccm error",
+            "description": "Ccm error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1902,10 +1910,10 @@
             }
           },
           "204": {
-            "description": "Object is deleted"
+            "description": "Object is deleted."
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized."
           }
         }
       },
@@ -1914,13 +1922,13 @@
           "ServicekeyApi"
         ],
         "summary": "Get service key metadata",
-        "description": "/v1/servicekey/{id}",
+        "description": "/v1/servicekey/{id}.",
         "operationId": "GetServiceKey",
         "parameters": [
           {
             "name": "format",
             "in": "query",
-            "description": "Formatting options for key representation",
+            "description": "Formatting options for key representation.",
             "schema": {
               "$ref": "#/components/schemas/KeyFormats"
             }
@@ -1928,7 +1936,7 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Id of a service key",
+            "description": "Id of a service key.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1938,7 +1946,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Service key metadata",
+            "description": "Service key metadata.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1948,7 +1956,7 @@
             }
           },
           "400": {
-            "description": "Bad request error",
+            "description": "Bad request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1958,7 +1966,7 @@
             }
           },
           "404": {
-            "description": "Not found error",
+            "description": "Not found error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1968,7 +1976,7 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1978,7 +1986,7 @@
             }
           },
           "502": {
-            "description": "Ccm error",
+            "description": "Ccm error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1988,7 +1996,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized."
           }
         }
       },
@@ -1997,13 +2005,13 @@
           "ServicekeyApi"
         ],
         "summary": "Patch service key metadata",
-        "description": "/v1/servicekey/{id}",
+        "description": "/v1/servicekey/{id}.",
         "operationId": "PatchServiceKey",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Id of a service key",
+            "description": "Id of a service key.",
             "required": true,
             "schema": {
               "type": "string",
@@ -2012,7 +2020,7 @@
           }
         ],
         "requestBody": {
-          "description": "Request payload",
+          "description": "Request payload.",
           "content": {
             "application/json": {
               "schema": {
@@ -2034,7 +2042,7 @@
         },
         "responses": {
           "200": {
-            "description": "Service key metadata",
+            "description": "Service key metadata.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2044,7 +2052,7 @@
             }
           },
           "400": {
-            "description": "Bad request error",
+            "description": "Bad request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2054,7 +2062,7 @@
             }
           },
           "404": {
-            "description": "Not found error",
+            "description": "Not found error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2064,7 +2072,7 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2074,7 +2082,7 @@
             }
           },
           "502": {
-            "description": "Ccm error",
+            "description": "Ccm error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2084,7 +2092,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized."
           }
         }
       }
@@ -2095,13 +2103,13 @@
           "ServicekeyApi"
         ],
         "summary": "Activate service key",
-        "description": "/v1/servicekey/{id}/activate",
+        "description": "/v1/servicekey/{id}/activate.",
         "operationId": "ActivateServiceKey",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Id of a service key",
+            "description": "Id of a service key.",
             "required": true,
             "schema": {
               "type": "string",
@@ -2121,7 +2129,7 @@
             }
           },
           "400": {
-            "description": "Bad request error",
+            "description": "Bad request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2131,7 +2139,7 @@
             }
           },
           "404": {
-            "description": "Not found error",
+            "description": "Not found error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2141,7 +2149,7 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2151,7 +2159,7 @@
             }
           },
           "502": {
-            "description": "Ccm error",
+            "description": "Ccm error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2161,7 +2169,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized."
           }
         }
       }
@@ -2172,13 +2180,13 @@
           "ServicekeyApi"
         ],
         "summary": "Deactivate service key",
-        "description": "/v1/servicekey/{id}/deactivate",
+        "description": "/v1/servicekey/{id}/deactivate.",
         "operationId": "DeactivateServiceKey",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Id of a service key",
+            "description": "Id of a service key.",
             "required": true,
             "schema": {
               "type": "string",
@@ -2187,7 +2195,7 @@
           }
         ],
         "requestBody": {
-          "description": "Request body",
+          "description": "Request body.",
           "content": {
             "application/json": {
               "schema": {
@@ -2209,7 +2217,7 @@
             }
           },
           "400": {
-            "description": "Bad request error",
+            "description": "Bad request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2219,7 +2227,7 @@
             }
           },
           "404": {
-            "description": "Not found error",
+            "description": "Not found error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2229,7 +2237,7 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2239,7 +2247,7 @@
             }
           },
           "502": {
-            "description": "Ccm error",
+            "description": "Ccm error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2249,7 +2257,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized."
           }
         }
       }
@@ -2260,13 +2268,13 @@
           "ServicekeyApi"
         ],
         "summary": "Generate random bytes sequence",
-        "description": "/v1/random",
+        "description": "/v1/random.",
         "operationId": "GenerateRandomBytes",
         "parameters": [
           {
             "name": "length",
             "in": "query",
-            "description": "Number of bytes to generate",
+            "description": "Number of bytes to generate.",
             "schema": {
               "maximum": 4096,
               "minimum": 1,
@@ -2278,7 +2286,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Random bytes sequence",
+            "description": "Random bytes sequence.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2288,7 +2296,7 @@
             }
           },
           "400": {
-            "description": "Bad request error",
+            "description": "Bad request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2298,7 +2306,7 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2308,7 +2316,7 @@
             }
           },
           "502": {
-            "description": "Ccm error",
+            "description": "Ccm error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2318,10 +2326,10 @@
             }
           },
           "404": {
-            "description": "Not found error"
+            "description": "Not found error."
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized."
           }
         }
       }
@@ -3409,11 +3417,21 @@
           "signature": {
             "minLength": 1,
             "type": "string",
-            "description": "Base64 encoded signature"
+            "description": "Signature data",
+            "format": "string"
           }
         },
         "additionalProperties": false,
         "description": "Sign response model"
+      },
+      "SignatureFormats": {
+        "enum": [
+          "raw",
+          "jws",
+          "jwt"
+        ],
+        "type": "string",
+        "description": "Formats for digital signature result."
       },
       "StatusCodes": {
         "type": "object",
@@ -3421,23 +3439,22 @@
       },
       "VerifyRequest": {
         "required": [
-          "alg",
-          "message",
           "signature"
         ],
         "type": "object",
         "properties": {
           "message": {
             "maxLength": 4094,
-            "minLength": 1,
             "type": "string",
-            "description": "Initial message",
-            "format": "byte"
+            "description": "Signed message to be verified",
+            "format": "byte",
+            "nullable": true
           },
           "signature": {
             "minLength": 1,
             "type": "string",
-            "description": "Base64 encoded signature"
+            "description": "String token containing signature for verification",
+            "format": "string"
           },
           "alg": {
             "$ref": "#/components/schemas/DigitalSignatureAlgorithms"
