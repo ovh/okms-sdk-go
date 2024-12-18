@@ -1,1 +1,1 @@
-0.9.18 (manually patched)
+1.0.0 (manually patched)

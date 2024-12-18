@@ -29,7 +29,8 @@ func signVerify(ctx context.Context, kmsClient *okms.Client) {
 	}
 
 	data := "Hello World !!!" // Data to sign
-	signResponse, err := kmsClient.Sign(context.Background(), respECDSA.Id, types.ES256, false, []byte(data))
+	format := types.Jws
+	signResponse, err := kmsClient.Sign(context.Background(), respECDSA.Id, &format, types.ES256, false, []byte(data))
 	if err != nil {
 		panic(err)
 	}
@@ -42,7 +43,7 @@ func signVerify(ctx context.Context, kmsClient *okms.Client) {
 	fmt.Println("Is valid:", result)
 
 	// You can also instantiate an stdlib crypto.Signer
-	signer, err := kmsClient.NewSigner(ctx, respECDSA.Id)
+	signer, err := kmsClient.NewSigner(ctx, respECDSA.Id, &format)
 	if err != nil {
 		panic(err)
 	}

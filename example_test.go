@@ -107,7 +107,8 @@ func ExampleClient_CreateImportServiceKey_generateECDSA() {
 func ExampleClient_Sign() {
 	var kmsClient *okms.Client // Initialize client
 	data := "Hello World !!!"  // Data to sign
-	signResponse, err := kmsClient.Sign(context.Background(), uuid.MustParse("2dab95dc-d7d3-482b-a07b-6b4dfae89d58"), types.ES256, false, []byte(data))
+	format := types.Raw
+	signResponse, err := kmsClient.Sign(context.Background(), uuid.MustParse("2dab95dc-d7d3-482b-a07b-6b4dfae89d58"), &format, types.ES256, false, []byte(data))
 	if err != nil {
 		panic(err)
 	}

@@ -98,7 +98,7 @@ func (client *Client) GenerateECKeyPair(ctx context.Context, curve types.Curves,
 	return client.CreateImportServiceKey(ctx, nil, body)
 }
 
-func (client *Client) importJWK(ctx context.Context, jwk types.JsonWebKey, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+func (client *Client) importJWK(ctx context.Context, jwk types.JsonWebKeyRequest, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
 	var keyContext *string
 	if keyCtx != "" {
 		keyContext = &keyCtx
@@ -107,7 +107,7 @@ func (client *Client) importJWK(ctx context.Context, jwk types.JsonWebKey, name,
 		Context:    keyContext,
 		Name:       name,
 		Operations: &ops,
-		Keys:       &[]types.JsonWebKey{jwk},
+		Keys:       &[]types.JsonWebKeyRequest{jwk},
 	}
 	format := types.Jwk
 	return client.CreateImportServiceKey(ctx, &format, req)
@@ -122,16 +122,33 @@ func (client *Client) importJWK(ctx context.Context, jwk types.JsonWebKey, name,
 //   - []byte for importing symmetric keys.
 func (client *Client) ImportKey(ctx context.Context, key any, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
 	switch k := key.(type) {
-	case types.JsonWebKey:
+	case types.JsonWebKeyRequest:
 		return client.importJWK(ctx, k, name, keyCtx, ops...)
-	case *types.JsonWebKey:
+	case *types.JsonWebKeyRequest:
 		return client.importJWK(ctx, *k, name, keyCtx, ops...)
 	}
 	jwk, err := types.NewJsonWebKey(key, ops, name)
 	if err != nil {
 		return nil, err
 	}
-	return client.importJWK(ctx, jwk, name, keyCtx, ops...)
+	jwkRequest := types.JsonWebKeyRequest{
+		Kid:    &jwk.Kid,
+		KeyOps: jwk.KeyOps,
+		Kty:    jwk.Kty,
+		D:      jwk.D,
+		E:      jwk.E,
+		N:      jwk.N,
+		P:      jwk.P,
+		Q:      jwk.Q,
+		Dp:     jwk.Dp,
+		Dq:     jwk.Dq,
+		Qi:     jwk.Qi,
+		X:      jwk.X,
+		Y:      jwk.Y,
+		Crv:    jwk.Crv,
+		K:      jwk.K,
+	}
+	return client.importJWK(ctx, jwkRequest, name, keyCtx, ops...)
 }
 
 // ImportKeyPairPEM imports a PEM formated key into the KMS. keyCtx can be left empty if not needed.
@@ -166,8 +183,8 @@ func (client *Client) ImportKeyPairPEM(ctx context.Context, privateKeyPem []byte
 	return client.ImportKey(ctx, k, name, keyCtx, ops...)
 }
 
-// ExportJwkPublicKey returns the public part of a key pair ans a Json Web Key.
-func (client *Client) ExportJwkPublicKey(ctx context.Context, keyID uuid.UUID) (*types.JsonWebKey, error) {
+// ExportJwkPublicKey returns the public part of a key pair as a Json Web Key.
+func (client *Client) ExportJwkPublicKey(ctx context.Context, keyID uuid.UUID) (*types.JsonWebKeyResponse, error) {
 	format := types.Jwk
 	k, err := client.GetServiceKey(ctx, keyID, &format)
 	if err != nil {
@@ -460,13 +477,16 @@ func (client *apiClient) Encrypt(ctx context.Context, keyId uuid.UUID, keyCtx st
 }
 
 // Sign signs the given message with the remote private key having the ID `keyId`. The message can be pre-hashed or not.
-func (client *apiClient) Sign(ctx context.Context, keyId uuid.UUID, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte) (string, error) {
+func (client *apiClient) Sign(ctx context.Context, keyId uuid.UUID, format *types.SignatureFormats, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte) (string, error) {
 	req := types.SignRequest{
 		Alg:      alg,
 		Isdigest: &preHashed,
 		Message:  msg,
 	}
-	r, err := mapRestErr(client.inner.SignWithResponse(ctx, keyId, nil, req)) // TODO: Make the format param customizable
+	param := &types.SignParams{
+		Format: format,
+	}
+	r, err := mapRestErr(client.inner.SignWithResponse(ctx, keyId, param, req))
 	if err != nil {
 		return "", err
 	}

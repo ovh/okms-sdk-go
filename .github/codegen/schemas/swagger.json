@@ -34,6 +34,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -64,8 +74,15 @@
               }
             }
           },
-          "404": {
-            "description": "Not found error"
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -108,6 +125,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -138,8 +165,15 @@
               }
             }
           },
-          "404": {
-            "description": "Not found error"
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -195,6 +229,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -225,8 +269,15 @@
               }
             }
           },
-          "404": {
-            "description": "Not found error"
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -280,7 +331,24 @@
             }
           },
           "404": {
-            "description": "Not found error"
+            "description": "Not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal server error"
@@ -343,6 +411,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -373,8 +451,15 @@
               }
             }
           },
-          "404": {
-            "description": "Not found error"
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -417,6 +502,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -447,8 +542,15 @@
               }
             }
           },
-          "404": {
-            "description": "Not found error"
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -511,6 +613,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -541,8 +653,15 @@
               }
             }
           },
-          "404": {
-            "description": "Not found error"
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -597,6 +716,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -627,8 +756,15 @@
               }
             }
           },
-          "404": {
-            "description": "Not found error"
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -682,6 +818,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -712,8 +858,15 @@
               }
             }
           },
-          "404": {
-            "description": "Not found error"
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -767,6 +920,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -797,8 +960,15 @@
               }
             }
           },
-          "404": {
-            "description": "Not found error"
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -851,6 +1021,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -881,8 +1061,15 @@
               }
             }
           },
-          "404": {
-            "description": "Not found error"
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -935,6 +1122,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -965,8 +1162,15 @@
               }
             }
           },
-          "404": {
-            "description": "Not found error"
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -1018,6 +1222,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -1048,8 +1262,15 @@
               }
             }
           },
-          "404": {
-            "description": "Not found error"
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -1091,6 +1312,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -1121,8 +1352,15 @@
               }
             }
           },
-          "404": {
-            "description": "Not found error"
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -1177,6 +1415,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not found error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error.",
             "content": {
@@ -1199,6 +1447,16 @@
           },
           "502": {
             "description": "Ccm error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit error",
             "content": {
               "application/json": {
                 "schema": {
@@ -1298,6 +1556,16 @@
               }
             }
           },
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized."
           }
@@ -1378,6 +1646,16 @@
           },
           "502": {
             "description": "Ccm error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit error",
             "content": {
               "application/json": {
                 "schema": {
@@ -1474,6 +1752,16 @@
               }
             }
           },
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized."
           }
@@ -1562,6 +1850,16 @@
               }
             }
           },
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized."
           }
@@ -1642,6 +1940,16 @@
           },
           "502": {
             "description": "Ccm error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit error",
             "content": {
               "application/json": {
                 "schema": {
@@ -1746,6 +2054,16 @@
               }
             }
           },
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized."
           }
@@ -1832,6 +2150,16 @@
               }
             }
           },
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized."
           }
@@ -1901,6 +2229,16 @@
           },
           "502": {
             "description": "Ccm error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit error",
             "content": {
               "application/json": {
                 "schema": {
@@ -1987,6 +2325,16 @@
           },
           "502": {
             "description": "Ccm error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit error",
             "content": {
               "application/json": {
                 "schema": {
@@ -2091,6 +2439,16 @@
               }
             }
           },
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized."
           }
@@ -2160,6 +2518,16 @@
           },
           "502": {
             "description": "Ccm error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit error",
             "content": {
               "application/json": {
                 "schema": {
@@ -2256,6 +2624,16 @@
               }
             }
           },
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized."
           }
@@ -2326,7 +2704,24 @@
             }
           },
           "404": {
-            "description": "Not found error."
+            "description": "Not found error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized."
@@ -2375,7 +2770,7 @@
           "keys": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/JsonWebKey"
+              "$ref": "#/components/schemas/JsonWebKeyRequest"
             },
             "description": "Json Web Key Set representing keys in request",
             "nullable": true
@@ -2841,14 +3236,14 @@
           },
           "attributes": {
             "type": "object",
-            "additionalProperties": {},
+            "additionalProperties": { },
             "description": "Additional key metadata",
             "nullable": true
           },
           "keys": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/JsonWebKey"
+              "$ref": "#/components/schemas/JsonWebKeyResponse"
             },
             "description": "Json Web Key Set representing keys in request",
             "nullable": true
@@ -2857,18 +3252,12 @@
         "additionalProperties": false,
         "description": "Get service key response"
       },
-      "JsonWebKey": {
+      "JsonWebKeyRequest": {
         "required": [
-          "kid",
           "kty"
         ],
         "type": "object",
         "properties": {
-          "kid": {
-            "minLength": 1,
-            "type": "string",
-            "description": "The \"kid\" (key ID) parameter is used to match a specific key."
-          },
           "use": {
             "$ref": "#/components/schemas/JwkUses"
           },
@@ -2954,10 +3343,115 @@
             "description": "\"qi\" RSA private key parameter (first CRT coefficient)",
             "format": "base64url",
             "nullable": true
+          },
+          "kid": {
+            "type": "string",
+            "description": "The \"kid\" (key ID) parameter is used to match a specific key.",
+            "nullable": true
           }
         },
-        "additionalProperties": false,
-        "description": "Json Web Key model"
+        "additionalProperties": false
+      },
+      "JsonWebKeyResponse": {
+        "required": [
+          "kid",
+          "kty"
+        ],
+        "type": "object",
+        "properties": {
+          "use": {
+            "$ref": "#/components/schemas/JwkUses"
+          },
+          "key_ops": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CryptographicUsages"
+            },
+            "description": "The \"key_ops\" (key operations) parameter identifies the operation(s) for which the key is intended to be used.",
+            "nullable": true
+          },
+          "alg": {
+            "$ref": "#/components/schemas/DigitalSignatureAlgorithms"
+          },
+          "kty": {
+            "$ref": "#/components/schemas/KeyTypes"
+          },
+          "n": {
+            "type": "string",
+            "description": "The \"n\" (modulus) parameter contains the modulus value for the RSA public key. It is represented as a Base64urlUInt-encoded value.\r\nRequired for RSA public key",
+            "format": "base64url",
+            "nullable": true
+          },
+          "e": {
+            "type": "string",
+            "description": "The \"e\" (exponent) parameter contains the exponent value for the RSA public key. It is represented as a Base64urlUInt-encoded value.\r\nRequired for RSA public key",
+            "format": "base64url",
+            "nullable": true
+          },
+          "k": {
+            "type": "string",
+            "description": "The \"k\" (key value) parameter contains the value of the symmetric (or other single-valued) key.\r\nIt is represented as the base64url encoding of the octet sequence containing the key value.",
+            "format": "base64url",
+            "nullable": true
+          },
+          "crv": {
+            "$ref": "#/components/schemas/Curves"
+          },
+          "x": {
+            "type": "string",
+            "description": "The \"x\" (x coordinate) parameter contains the x coordinate for the Elliptic Curve point.\r\nIt is represented as the base64url encoding of the octet string representation of the coordinate",
+            "format": "base64url",
+            "nullable": true
+          },
+          "y": {
+            "type": "string",
+            "description": "The \"y\" (y coordinate) parameter contains the y coordinate for the Elliptic Curve point.\r\nIt is represented as the base64url encoding of the octet string representation of the coordinate",
+            "format": "base64url",
+            "nullable": true
+          },
+          "d": {
+            "type": "string",
+            "description": "The \"d\" parameter of EC key or RSA private exponent",
+            "format": "base64url",
+            "nullable": true
+          },
+          "dp": {
+            "type": "string",
+            "description": "\"dp\" RSA private key parameter (first factor CRT exponent)",
+            "format": "base64url",
+            "nullable": true
+          },
+          "dq": {
+            "type": "string",
+            "description": "\"dq\" RSA private key parameter (second factor CRT exponent)",
+            "format": "base64url",
+            "nullable": true
+          },
+          "p": {
+            "type": "string",
+            "description": "\"p\" RSA private key parameter (first prime factor)",
+            "format": "base64url",
+            "nullable": true
+          },
+          "q": {
+            "type": "string",
+            "description": "\"q\" RSA private key parameter (second prime factor)",
+            "format": "base64url",
+            "nullable": true
+          },
+          "qi": {
+            "type": "string",
+            "description": "\"qi\" RSA private key parameter (first CRT coefficient)",
+            "format": "base64url",
+            "nullable": true
+          },
+          "kid": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The \"kid\" (key ID) parameter is used to match a specific key."
+          }
+        },
+        "additionalProperties": false
       },
       "JwkUses": {
         "enum": [
@@ -3005,6 +3499,7 @@
       },
       "ListServiceKeysResponse": {
         "required": [
+          "continuation_token",
           "is_truncated",
           "objects_list"
         ],
