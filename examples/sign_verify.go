@@ -43,7 +43,7 @@ func signVerify(ctx context.Context, kmsClient *okms.Client) {
 	fmt.Println("Is valid:", result)
 
 	// You can also instantiate an stdlib crypto.Signer
-	signer, err := kmsClient.NewSigner(ctx, respECDSA.Id, &format)
+	signer, err := kmsClient.NewSigner(ctx, respECDSA.Id)
 	if err != nil {
 		panic(err)
 	}

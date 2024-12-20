@@ -37,8 +37,7 @@ func TestSigner_RSA(t *testing.T) {
 		}, nil).
 		Once()
 
-	signFormat := types.Raw
-	signer, err := client.NewSigner(context.Background(), keyId, &signFormat)
+	signer, err := client.NewSigner(context.Background(), keyId)
 	require.NoError(t, err)
 	require.Equal(t, pKey.Public(), signer.Public())
 
@@ -99,7 +98,7 @@ func TestSigner_ECDSA(t *testing.T) {
 		}, nil).
 		Once()
 
-	signer, err := client.NewSigner(context.Background(), keyId, nil)
+	signer, err := client.NewSigner(context.Background(), keyId)
 	require.NoError(t, err)
 	require.Equal(t, pKey.Public(), signer.Public())
 

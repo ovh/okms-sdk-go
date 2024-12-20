@@ -27,19 +27,19 @@ import (
 // NewSigner creates a new [crypto.Signer] for the given key-pair.
 //
 // NewSigner cannot be used with symetric keys.
-func (client *Client) NewSigner(ctx context.Context, serviceKeyID uuid.UUID, format *types.SignatureFormats) (crypto.Signer, error) {
+func (client *Client) NewSigner(ctx context.Context, serviceKeyID uuid.UUID) (crypto.Signer, error) {
 	k, err := client.ExportJwkPublicKey(ctx, serviceKeyID)
 	if err != nil {
 		return nil, err
 	}
-	return newSigner(client, k, format)
+	return newSigner(client, k)
 }
 
 // newSigner creates a new [crypto.Signer] using the given public JsonWebKey and
 // its remote private key.
 //
 // newSigner cannot be used with symetric keys.
-func newSigner(api SignatureApi, jwk *types.JsonWebKeyResponse, format *types.SignatureFormats) (crypto.Signer, error) {
+func newSigner(api SignatureApi, jwk *types.JsonWebKeyResponse) (crypto.Signer, error) {
 	pubKey, err := jwk.PublicKey()
 	if err != nil {
 		return nil, err
@@ -49,7 +49,6 @@ func newSigner(api SignatureApi, jwk *types.JsonWebKeyResponse, format *types.Si
 		JsonWebKeyResponse: jwk,
 		api:                api,
 		pubKey:             pubKey,
-		format:             format,
 	}, nil
 }
 
@@ -57,7 +56,6 @@ type jwkSigner struct {
 	*types.JsonWebKeyResponse
 	api    SignatureApi
 	pubKey crypto.PublicKey
-	format *types.SignatureFormats
 }
 
 // Public returns the public key corresponding to the opaque,
@@ -130,12 +128,8 @@ func (sign *jwkSigner) doSign(digest []byte, hash crypto.Hash, algPrefix string)
 	if err != nil {
 		return nil, fmt.Errorf("Key ID %q is not a valid UUID", sign.Kid)
 	}
-	format := sign.format
-	if format == nil {
-		rawFormat := types.Raw
-		format = &rawFormat
-	}
-	resp, err := sign.api.Sign(context.Background(), keyId, format, alg, true, digest)
+	rawFormat := types.Raw
+	resp, err := sign.api.Sign(context.Background(), keyId, &rawFormat, alg, true, digest)
 	if err != nil {
 		return nil, err
 	}
