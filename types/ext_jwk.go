@@ -22,7 +22,7 @@ import (
 
 // PublicKey convert the JWK public key into a go stdlib [crypto.PublicKey].
 // It will be either a [*rsa.PublicKey] or a [*ecdsa.PublicKey].
-func (key JsonWebKey) PublicKey() (crypto.PublicKey, error) {
+func (key JsonWebKeyResponse) PublicKey() (crypto.PublicKey, error) {
 	switch key.Kty {
 	case RSA:
 		e, err := parseBase64BigInt(key.E, "e")
@@ -54,11 +54,11 @@ func (key JsonWebKey) PublicKey() (crypto.PublicKey, error) {
 }
 
 // NewJsonWebKey creates a new JWK private key from either a [*rsa.PrivateKey], a [*ecdsa.PrivateKey] or a []byte symmetric key.
-func NewJsonWebKey(privateKey any, ops []CryptographicUsages, id string) (JsonWebKey, error) {
+func NewJsonWebKey(privateKey any, ops []CryptographicUsages, id string) (JsonWebKeyResponse, error) {
 	switch key := privateKey.(type) {
 	case *rsa.PrivateKey:
 		key.Precompute()
-		return JsonWebKey{
+		return JsonWebKeyResponse{
 			Kid:    id,
 			KeyOps: &ops,
 			Kty:    RSA,
@@ -73,7 +73,7 @@ func NewJsonWebKey(privateKey any, ops []CryptographicUsages, id string) (JsonWe
 		}, nil
 	case *ecdsa.PrivateKey:
 		curve := Curves(key.Curve.Params().Name)
-		return JsonWebKey{
+		return JsonWebKeyResponse{
 			Kid:    id,
 			KeyOps: &ops,
 			Kty:    EC,
@@ -83,14 +83,14 @@ func NewJsonWebKey(privateKey any, ops []CryptographicUsages, id string) (JsonWe
 			Crv:    &curve,
 		}, nil
 	case []byte:
-		return JsonWebKey{
+		return JsonWebKeyResponse{
 			Kid:    id,
 			KeyOps: &ops,
 			Kty:    Oct,
 			K:      toBase64(new(big.Int).SetBytes(key)),
 		}, nil
 	default:
-		return JsonWebKey{}, fmt.Errorf("Unsupported key type: %T", privateKey)
+		return JsonWebKeyResponse{}, fmt.Errorf("Unsupported key type: %T", privateKey)
 	}
 }
 

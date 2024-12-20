@@ -26,11 +26,11 @@ func TestKeyIter(t *testing.T) {
 	}
 
 	mc.EXPECT().ListServiceKeys(mock.Anything, (*string)(nil), (*int32)(nil), (*types.KeyStates)(nil)).
-		Return(&types.ListServiceKeysResponse{IsTruncated: true, ContinuationToken: &contToken, ObjectsList: keys[:2]}, nil).
+		Return(&types.ListServiceKeysResponse{IsTruncated: true, ContinuationToken: contToken, ObjectsList: keys[:2]}, nil).
 		Once()
 
 	mc.EXPECT().ListServiceKeys(mock.Anything, &contToken, (*int32)(nil), (*types.KeyStates)(nil)).
-		Return(&types.ListServiceKeysResponse{IsTruncated: false, ContinuationToken: nil, ObjectsList: keys[2:]}, nil).
+		Return(&types.ListServiceKeysResponse{IsTruncated: false, ContinuationToken: "", ObjectsList: keys[2:]}, nil).
 		Once()
 
 	i := 0
@@ -56,7 +56,7 @@ func TestKeyIter_error(t *testing.T) {
 	}
 
 	mc.EXPECT().ListServiceKeys(mock.Anything, (*string)(nil), (*int32)(nil), (*types.KeyStates)(nil)).
-		Return(&types.ListServiceKeysResponse{IsTruncated: true, ContinuationToken: &contToken, ObjectsList: keys[:2]}, nil).
+		Return(&types.ListServiceKeysResponse{IsTruncated: true, ContinuationToken: contToken, ObjectsList: keys[:2]}, nil).
 		Once()
 
 	mc.EXPECT().ListServiceKeys(mock.Anything, &contToken, (*int32)(nil), (*types.KeyStates)(nil)).

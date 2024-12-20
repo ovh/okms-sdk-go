@@ -630,9 +630,9 @@ func (_c *APIMock_SetCustomHeader_Call) RunAndReturn(run func(string, string)) *
 	return _c
 }
 
-// Sign provides a mock function with given fields: ctx, keyId, alg, preHashed, msg
-func (_m *APIMock) Sign(ctx context.Context, keyId uuid.UUID, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte) (string, error) {
-	ret := _m.Called(ctx, keyId, alg, preHashed, msg)
+// Sign provides a mock function with given fields: ctx, keyId, format, alg, preHashed, msg
+func (_m *APIMock) Sign(ctx context.Context, keyId uuid.UUID, format *types.SignatureFormats, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte) (string, error) {
+	ret := _m.Called(ctx, keyId, format, alg, preHashed, msg)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Sign")
@@ -640,17 +640,17 @@ func (_m *APIMock) Sign(ctx context.Context, keyId uuid.UUID, alg types.DigitalS
 
 	var r0 string
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, types.DigitalSignatureAlgorithms, bool, []byte) (string, error)); ok {
-		return rf(ctx, keyId, alg, preHashed, msg)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *types.SignatureFormats, types.DigitalSignatureAlgorithms, bool, []byte) (string, error)); ok {
+		return rf(ctx, keyId, format, alg, preHashed, msg)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, types.DigitalSignatureAlgorithms, bool, []byte) string); ok {
-		r0 = rf(ctx, keyId, alg, preHashed, msg)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *types.SignatureFormats, types.DigitalSignatureAlgorithms, bool, []byte) string); ok {
+		r0 = rf(ctx, keyId, format, alg, preHashed, msg)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, types.DigitalSignatureAlgorithms, bool, []byte) error); ok {
-		r1 = rf(ctx, keyId, alg, preHashed, msg)
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, *types.SignatureFormats, types.DigitalSignatureAlgorithms, bool, []byte) error); ok {
+		r1 = rf(ctx, keyId, format, alg, preHashed, msg)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -666,16 +666,17 @@ type APIMock_Sign_Call struct {
 // Sign is a helper method to define mock.On call
 //   - ctx context.Context
 //   - keyId uuid.UUID
+//   - format *types.SignatureFormats
 //   - alg types.DigitalSignatureAlgorithms
 //   - preHashed bool
 //   - msg []byte
-func (_e *APIMock_Expecter) Sign(ctx interface{}, keyId interface{}, alg interface{}, preHashed interface{}, msg interface{}) *APIMock_Sign_Call {
-	return &APIMock_Sign_Call{Call: _e.mock.On("Sign", ctx, keyId, alg, preHashed, msg)}
+func (_e *APIMock_Expecter) Sign(ctx interface{}, keyId interface{}, format interface{}, alg interface{}, preHashed interface{}, msg interface{}) *APIMock_Sign_Call {
+	return &APIMock_Sign_Call{Call: _e.mock.On("Sign", ctx, keyId, format, alg, preHashed, msg)}
 }
 
-func (_c *APIMock_Sign_Call) Run(run func(ctx context.Context, keyId uuid.UUID, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte)) *APIMock_Sign_Call {
+func (_c *APIMock_Sign_Call) Run(run func(ctx context.Context, keyId uuid.UUID, format *types.SignatureFormats, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte)) *APIMock_Sign_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(types.DigitalSignatureAlgorithms), args[3].(bool), args[4].([]byte))
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*types.SignatureFormats), args[3].(types.DigitalSignatureAlgorithms), args[4].(bool), args[5].([]byte))
 	})
 	return _c
 }
@@ -685,7 +686,7 @@ func (_c *APIMock_Sign_Call) Return(_a0 string, _a1 error) *APIMock_Sign_Call {
 	return _c
 }
 
-func (_c *APIMock_Sign_Call) RunAndReturn(run func(context.Context, uuid.UUID, types.DigitalSignatureAlgorithms, bool, []byte) (string, error)) *APIMock_Sign_Call {
+func (_c *APIMock_Sign_Call) RunAndReturn(run func(context.Context, uuid.UUID, *types.SignatureFormats, types.DigitalSignatureAlgorithms, bool, []byte) (string, error)) *APIMock_Sign_Call {
 	_c.Call.Return(run)
 	return _c
 }

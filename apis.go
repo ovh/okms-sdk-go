@@ -47,7 +47,7 @@ type DataKeyApi interface {
 // SignatureApi is the client interface used to sign data and verify signatures using a remote asymmetric key-pair.
 type SignatureApi interface {
 	// Sign signs the given message with the remote private key having the ID `keyId`. The message can be pre-hashed or not.
-	Sign(ctx context.Context, keyId uuid.UUID, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte) (string, error)
+	Sign(ctx context.Context, keyId uuid.UUID, format *types.SignatureFormats, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte) (string, error)
 	// Verify checks the signature of given message against the remote public key having the ID `keyId`. The message can be pre-hashed or not.
 	Verify(ctx context.Context, keyId uuid.UUID, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte, sig string) (bool, error)
 }
