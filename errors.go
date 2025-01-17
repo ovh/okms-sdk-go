@@ -193,7 +193,7 @@ type KmsError struct {
 
 func NewKmsErrorFromBytes(sbody []byte) *KmsError {
 	var errResp types.ErrorResponse
-	if e := json.Unmarshal(sbody, &errResp); e == nil && errResp.Errors != nil {
+	if e := json.Unmarshal(sbody, &errResp); e == nil {
 		return newKmsErrorFromRestResponse(errResp)
 	}
 	return nil
