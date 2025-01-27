@@ -91,6 +91,64 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// GetSecretConfig request
+	GetSecretConfig(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostSecretConfigWithBody request with any body
+	PostSecretConfigWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostSecretConfig(ctx context.Context, body PostSecretConfigJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteSecretRequest request
+	DeleteSecretRequest(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetSecretRequest request
+	GetSecretRequest(ctx context.Context, path string, params *GetSecretRequestParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PatchSecretRequestWithBody request with any body
+	PatchSecretRequestWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PatchSecretRequest(ctx context.Context, path string, body PatchSecretRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostSecretRequestWithBody request with any body
+	PostSecretRequestWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostSecretRequest(ctx context.Context, path string, body PostSecretRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteSecretVersionsWithBody request with any body
+	DeleteSecretVersionsWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteSecretVersions(ctx context.Context, path string, body DeleteSecretVersionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostSecretDestroyWithBody request with any body
+	PostSecretDestroyWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostSecretDestroy(ctx context.Context, path string, body PostSecretDestroyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteSecretMetadata request
+	DeleteSecretMetadata(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetSecretsMetadata request
+	GetSecretsMetadata(ctx context.Context, path string, params *GetSecretsMetadataParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PatchSecretMetadataWithBody request with any body
+	PatchSecretMetadataWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PatchSecretMetadata(ctx context.Context, path string, body PatchSecretMetadataJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostSecretMetadataWithBody request with any body
+	PostSecretMetadataWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostSecretMetadata(ctx context.Context, path string, body PostSecretMetadataJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetSecretSubkeys request
+	GetSecretSubkeys(ctx context.Context, path string, params *GetSecretSubkeysParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostSecretUndeleteWithBody request with any body
+	PostSecretUndeleteWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostSecretUndelete(ctx context.Context, path string, body PostSecretUndeleteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ListServiceKeys request
 	ListServiceKeys(ctx context.Context, params *ListServiceKeysParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -149,6 +207,270 @@ type ClientInterface interface {
 	VerifyWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	Verify(ctx context.Context, id openapi_types.UUID, body VerifyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+func (c *Client) GetSecretConfig(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSecretConfigRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSecretConfigWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretConfigRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSecretConfig(ctx context.Context, body PostSecretConfigJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretConfigRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteSecretRequest(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSecretRequestRequest(c.Server, path)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetSecretRequest(ctx context.Context, path string, params *GetSecretRequestParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSecretRequestRequest(c.Server, path, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchSecretRequestWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchSecretRequestRequestWithBody(c.Server, path, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchSecretRequest(ctx context.Context, path string, body PatchSecretRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchSecretRequestRequest(c.Server, path, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSecretRequestWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretRequestRequestWithBody(c.Server, path, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSecretRequest(ctx context.Context, path string, body PostSecretRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretRequestRequest(c.Server, path, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteSecretVersionsWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSecretVersionsRequestWithBody(c.Server, path, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteSecretVersions(ctx context.Context, path string, body DeleteSecretVersionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSecretVersionsRequest(c.Server, path, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSecretDestroyWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretDestroyRequestWithBody(c.Server, path, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSecretDestroy(ctx context.Context, path string, body PostSecretDestroyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretDestroyRequest(c.Server, path, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteSecretMetadata(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSecretMetadataRequest(c.Server, path)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetSecretsMetadata(ctx context.Context, path string, params *GetSecretsMetadataParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSecretsMetadataRequest(c.Server, path, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchSecretMetadataWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchSecretMetadataRequestWithBody(c.Server, path, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchSecretMetadata(ctx context.Context, path string, body PatchSecretMetadataJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchSecretMetadataRequest(c.Server, path, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSecretMetadataWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretMetadataRequestWithBody(c.Server, path, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSecretMetadata(ctx context.Context, path string, body PostSecretMetadataJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretMetadataRequest(c.Server, path, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetSecretSubkeys(ctx context.Context, path string, params *GetSecretSubkeysParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSecretSubkeysRequest(c.Server, path, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSecretUndeleteWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretUndeleteRequestWithBody(c.Server, path, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSecretUndelete(ctx context.Context, path string, body PostSecretUndeleteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretUndeleteRequest(c.Server, path, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) ListServiceKeys(ctx context.Context, params *ListServiceKeysParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -425,6 +747,654 @@ func (c *Client) Verify(ctx context.Context, id openapi_types.UUID, body VerifyJ
 		return nil, err
 	}
 	return c.Client.Do(req)
+}
+
+// NewGetSecretConfigRequest generates requests for GetSecretConfig
+func NewGetSecretConfigRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/secret/config")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostSecretConfigRequest calls the generic PostSecretConfig builder with application/json body
+func NewPostSecretConfigRequest(server string, body PostSecretConfigJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostSecretConfigRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostSecretConfigRequestWithBody generates requests for PostSecretConfig with any type of body
+func NewPostSecretConfigRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/secret/config")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteSecretRequestRequest generates requests for DeleteSecretRequest
+func NewDeleteSecretRequestRequest(server string, path string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/secret/data/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetSecretRequestRequest generates requests for GetSecretRequest
+func NewGetSecretRequestRequest(server string, path string, params *GetSecretRequestParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/secret/data/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Version != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "version", runtime.ParamLocationQuery, *params.Version); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPatchSecretRequestRequest calls the generic PatchSecretRequest builder with application/json body
+func NewPatchSecretRequestRequest(server string, path string, body PatchSecretRequestJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPatchSecretRequestRequestWithBody(server, path, "application/json", bodyReader)
+}
+
+// NewPatchSecretRequestRequestWithBody generates requests for PatchSecretRequest with any type of body
+func NewPatchSecretRequestRequestWithBody(server string, path string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/secret/data/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostSecretRequestRequest calls the generic PostSecretRequest builder with application/json body
+func NewPostSecretRequestRequest(server string, path string, body PostSecretRequestJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostSecretRequestRequestWithBody(server, path, "application/json", bodyReader)
+}
+
+// NewPostSecretRequestRequestWithBody generates requests for PostSecretRequest with any type of body
+func NewPostSecretRequestRequestWithBody(server string, path string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/secret/data/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteSecretVersionsRequest calls the generic DeleteSecretVersions builder with application/json body
+func NewDeleteSecretVersionsRequest(server string, path string, body DeleteSecretVersionsJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteSecretVersionsRequestWithBody(server, path, "application/json", bodyReader)
+}
+
+// NewDeleteSecretVersionsRequestWithBody generates requests for DeleteSecretVersions with any type of body
+func NewDeleteSecretVersionsRequestWithBody(server string, path string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/secret/delete/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostSecretDestroyRequest calls the generic PostSecretDestroy builder with application/json body
+func NewPostSecretDestroyRequest(server string, path string, body PostSecretDestroyJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostSecretDestroyRequestWithBody(server, path, "application/json", bodyReader)
+}
+
+// NewPostSecretDestroyRequestWithBody generates requests for PostSecretDestroy with any type of body
+func NewPostSecretDestroyRequestWithBody(server string, path string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/secret/destroy/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteSecretMetadataRequest generates requests for DeleteSecretMetadata
+func NewDeleteSecretMetadataRequest(server string, path string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/secret/metadata/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetSecretsMetadataRequest generates requests for GetSecretsMetadata
+func NewGetSecretsMetadataRequest(server string, path string, params *GetSecretsMetadataParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/secret/metadata/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.List != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "list", runtime.ParamLocationQuery, *params.List); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPatchSecretMetadataRequest calls the generic PatchSecretMetadata builder with application/json body
+func NewPatchSecretMetadataRequest(server string, path string, body PatchSecretMetadataJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPatchSecretMetadataRequestWithBody(server, path, "application/json", bodyReader)
+}
+
+// NewPatchSecretMetadataRequestWithBody generates requests for PatchSecretMetadata with any type of body
+func NewPatchSecretMetadataRequestWithBody(server string, path string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/secret/metadata/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostSecretMetadataRequest calls the generic PostSecretMetadata builder with application/json body
+func NewPostSecretMetadataRequest(server string, path string, body PostSecretMetadataJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostSecretMetadataRequestWithBody(server, path, "application/json", bodyReader)
+}
+
+// NewPostSecretMetadataRequestWithBody generates requests for PostSecretMetadata with any type of body
+func NewPostSecretMetadataRequestWithBody(server string, path string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/secret/metadata/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetSecretSubkeysRequest generates requests for GetSecretSubkeys
+func NewGetSecretSubkeysRequest(server string, path string, params *GetSecretSubkeysParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/secret/subkeys/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Depth != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "depth", runtime.ParamLocationQuery, *params.Depth); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Version != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "version", runtime.ParamLocationQuery, *params.Version); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostSecretUndeleteRequest calls the generic PostSecretUndelete builder with application/json body
+func NewPostSecretUndeleteRequest(server string, path string, body PostSecretUndeleteJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostSecretUndeleteRequestWithBody(server, path, "application/json", bodyReader)
+}
+
+// NewPostSecretUndeleteRequestWithBody generates requests for PostSecretUndelete with any type of body
+func NewPostSecretUndeleteRequestWithBody(server string, path string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/secret/undelete/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
 }
 
 // NewListServiceKeysRequest generates requests for ListServiceKeys
@@ -1146,6 +2116,64 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// GetSecretConfigWithResponse request
+	GetSecretConfigWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSecretConfigHTTPResponse, error)
+
+	// PostSecretConfigWithBodyWithResponse request with any body
+	PostSecretConfigWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretConfigHTTPResponse, error)
+
+	PostSecretConfigWithResponse(ctx context.Context, body PostSecretConfigJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretConfigHTTPResponse, error)
+
+	// DeleteSecretRequestWithResponse request
+	DeleteSecretRequestWithResponse(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*DeleteSecretRequestHTTPResponse, error)
+
+	// GetSecretRequestWithResponse request
+	GetSecretRequestWithResponse(ctx context.Context, path string, params *GetSecretRequestParams, reqEditors ...RequestEditorFn) (*GetSecretRequestHTTPResponse, error)
+
+	// PatchSecretRequestWithBodyWithResponse request with any body
+	PatchSecretRequestWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchSecretRequestHTTPResponse, error)
+
+	PatchSecretRequestWithResponse(ctx context.Context, path string, body PatchSecretRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchSecretRequestHTTPResponse, error)
+
+	// PostSecretRequestWithBodyWithResponse request with any body
+	PostSecretRequestWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretRequestHTTPResponse, error)
+
+	PostSecretRequestWithResponse(ctx context.Context, path string, body PostSecretRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretRequestHTTPResponse, error)
+
+	// DeleteSecretVersionsWithBodyWithResponse request with any body
+	DeleteSecretVersionsWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteSecretVersionsHTTPResponse, error)
+
+	DeleteSecretVersionsWithResponse(ctx context.Context, path string, body DeleteSecretVersionsJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteSecretVersionsHTTPResponse, error)
+
+	// PostSecretDestroyWithBodyWithResponse request with any body
+	PostSecretDestroyWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretDestroyHTTPResponse, error)
+
+	PostSecretDestroyWithResponse(ctx context.Context, path string, body PostSecretDestroyJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretDestroyHTTPResponse, error)
+
+	// DeleteSecretMetadataWithResponse request
+	DeleteSecretMetadataWithResponse(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*DeleteSecretMetadataHTTPResponse, error)
+
+	// GetSecretsMetadataWithResponse request
+	GetSecretsMetadataWithResponse(ctx context.Context, path string, params *GetSecretsMetadataParams, reqEditors ...RequestEditorFn) (*GetSecretsMetadataHTTPResponse, error)
+
+	// PatchSecretMetadataWithBodyWithResponse request with any body
+	PatchSecretMetadataWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchSecretMetadataHTTPResponse, error)
+
+	PatchSecretMetadataWithResponse(ctx context.Context, path string, body PatchSecretMetadataJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchSecretMetadataHTTPResponse, error)
+
+	// PostSecretMetadataWithBodyWithResponse request with any body
+	PostSecretMetadataWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretMetadataHTTPResponse, error)
+
+	PostSecretMetadataWithResponse(ctx context.Context, path string, body PostSecretMetadataJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretMetadataHTTPResponse, error)
+
+	// GetSecretSubkeysWithResponse request
+	GetSecretSubkeysWithResponse(ctx context.Context, path string, params *GetSecretSubkeysParams, reqEditors ...RequestEditorFn) (*GetSecretSubkeysHTTPResponse, error)
+
+	// PostSecretUndeleteWithBodyWithResponse request with any body
+	PostSecretUndeleteWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretUndeleteHTTPResponse, error)
+
+	PostSecretUndeleteWithResponse(ctx context.Context, path string, body PostSecretUndeleteJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretUndeleteHTTPResponse, error)
+
 	// ListServiceKeysWithResponse request
 	ListServiceKeysWithResponse(ctx context.Context, params *ListServiceKeysParams, reqEditors ...RequestEditorFn) (*ListServiceKeysHTTPResponse, error)
 
@@ -1206,15 +2234,385 @@ type ClientWithResponsesInterface interface {
 	VerifyWithResponse(ctx context.Context, id openapi_types.UUID, body VerifyJSONRequestBody, reqEditors ...RequestEditorFn) (*VerifyHTTPResponse, error)
 }
 
+type GetSecretConfigHTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GetConfigResponse
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSecretConfigHTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSecretConfigHTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostSecretConfigHTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PostSecretConfigHTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostSecretConfigHTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteSecretRequestHTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteSecretRequestHTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteSecretRequestHTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSecretRequestHTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GetSecretResponse
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSecretRequestHTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSecretRequestHTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PatchSecretRequestHTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *PatchSecretResponse
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PatchSecretRequestHTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PatchSecretRequestHTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostSecretRequestHTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *PostSecretResponse
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PostSecretRequestHTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostSecretRequestHTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteSecretVersionsHTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteSecretVersionsHTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteSecretVersionsHTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostSecretDestroyHTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PostSecretDestroyHTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostSecretDestroyHTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteSecretMetadataHTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteSecretMetadataHTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteSecretMetadataHTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSecretsMetadataHTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GetMetadataResponse
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSecretsMetadataHTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSecretsMetadataHTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PatchSecretMetadataHTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PatchSecretMetadataHTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PatchSecretMetadataHTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostSecretMetadataHTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PostSecretMetadataHTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostSecretMetadataHTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSecretSubkeysHTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GetSecretSubkeysResponse
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSecretSubkeysHTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSecretSubkeysHTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostSecretUndeleteHTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PostSecretUndeleteHTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostSecretUndeleteHTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ListServiceKeysHTTPResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ListServiceKeysResponse
 	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
 	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
-	JSON502      *ErrorResponse
 }
 
 // Status returns HTTPResponse.Status
@@ -1238,11 +2636,9 @@ type CreateImportServiceKeyHTTPResponse struct {
 	HTTPResponse *http.Response
 	JSON201      *GetServiceKeyResponse
 	JSON400      *ErrorResponse
-	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
 	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
-	JSON502      *ErrorResponse
 }
 
 // Status returns HTTPResponse.Status
@@ -1264,12 +2660,11 @@ func (r CreateImportServiceKeyHTTPResponse) StatusCode() int {
 type DeleteServiceKeyHTTPResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *StatusCodes
 	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
 	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
-	JSON502      *ErrorResponse
 }
 
 // Status returns HTTPResponse.Status
@@ -1293,10 +2688,10 @@ type GetServiceKeyHTTPResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *GetServiceKeyResponse
 	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
 	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
-	JSON502      *ErrorResponse
 }
 
 // Status returns HTTPResponse.Status
@@ -1320,10 +2715,10 @@ type PatchServiceKeyHTTPResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *GetServiceKeyResponse
 	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
 	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
-	JSON502      *ErrorResponse
 }
 
 // Status returns HTTPResponse.Status
@@ -1347,10 +2742,10 @@ type ActivateServiceKeyHTTPResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *StatusCodes
 	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
 	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
-	JSON502      *ErrorResponse
 }
 
 // Status returns HTTPResponse.Status
@@ -1374,10 +2769,10 @@ type GenerateDataKeyHTTPResponse struct {
 	HTTPResponse *http.Response
 	JSON201      *GenerateDataKeyResponse
 	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
 	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
-	JSON502      *ErrorResponse
 }
 
 // Status returns HTTPResponse.Status
@@ -1401,10 +2796,10 @@ type DecryptDataKeyHTTPResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *DecryptDataKeyResponse
 	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
 	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
-	JSON502      *ErrorResponse
 }
 
 // Status returns HTTPResponse.Status
@@ -1428,10 +2823,10 @@ type DeactivateServiceKeyHTTPResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *StatusCodes
 	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
 	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
-	JSON502      *ErrorResponse
 }
 
 // Status returns HTTPResponse.Status
@@ -1455,10 +2850,10 @@ type DecryptHTTPResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *DecryptResponse
 	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
 	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
-	JSON502      *ErrorResponse
 }
 
 // Status returns HTTPResponse.Status
@@ -1482,10 +2877,10 @@ type EncryptHTTPResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *EncryptResponse
 	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
 	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
-	JSON502      *ErrorResponse
 }
 
 // Status returns HTTPResponse.Status
@@ -1509,10 +2904,10 @@ type SignHTTPResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *SignResponse
 	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
 	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
-	JSON502      *ErrorResponse
 }
 
 // Status returns HTTPResponse.Status
@@ -1536,10 +2931,10 @@ type VerifyHTTPResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *VerifyResponse
 	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
 	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
-	JSON502      *ErrorResponse
 }
 
 // Status returns HTTPResponse.Status
@@ -1556,6 +2951,196 @@ func (r VerifyHTTPResponse) StatusCode() int {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
+}
+
+// GetSecretConfigWithResponse request returning *GetSecretConfigHTTPResponse
+func (c *ClientWithResponses) GetSecretConfigWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSecretConfigHTTPResponse, error) {
+	rsp, err := c.GetSecretConfig(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSecretConfigHTTPResponse(rsp)
+}
+
+// PostSecretConfigWithBodyWithResponse request with arbitrary body returning *PostSecretConfigHTTPResponse
+func (c *ClientWithResponses) PostSecretConfigWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretConfigHTTPResponse, error) {
+	rsp, err := c.PostSecretConfigWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSecretConfigHTTPResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostSecretConfigWithResponse(ctx context.Context, body PostSecretConfigJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretConfigHTTPResponse, error) {
+	rsp, err := c.PostSecretConfig(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSecretConfigHTTPResponse(rsp)
+}
+
+// DeleteSecretRequestWithResponse request returning *DeleteSecretRequestHTTPResponse
+func (c *ClientWithResponses) DeleteSecretRequestWithResponse(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*DeleteSecretRequestHTTPResponse, error) {
+	rsp, err := c.DeleteSecretRequest(ctx, path, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteSecretRequestHTTPResponse(rsp)
+}
+
+// GetSecretRequestWithResponse request returning *GetSecretRequestHTTPResponse
+func (c *ClientWithResponses) GetSecretRequestWithResponse(ctx context.Context, path string, params *GetSecretRequestParams, reqEditors ...RequestEditorFn) (*GetSecretRequestHTTPResponse, error) {
+	rsp, err := c.GetSecretRequest(ctx, path, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSecretRequestHTTPResponse(rsp)
+}
+
+// PatchSecretRequestWithBodyWithResponse request with arbitrary body returning *PatchSecretRequestHTTPResponse
+func (c *ClientWithResponses) PatchSecretRequestWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchSecretRequestHTTPResponse, error) {
+	rsp, err := c.PatchSecretRequestWithBody(ctx, path, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchSecretRequestHTTPResponse(rsp)
+}
+
+func (c *ClientWithResponses) PatchSecretRequestWithResponse(ctx context.Context, path string, body PatchSecretRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchSecretRequestHTTPResponse, error) {
+	rsp, err := c.PatchSecretRequest(ctx, path, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchSecretRequestHTTPResponse(rsp)
+}
+
+// PostSecretRequestWithBodyWithResponse request with arbitrary body returning *PostSecretRequestHTTPResponse
+func (c *ClientWithResponses) PostSecretRequestWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretRequestHTTPResponse, error) {
+	rsp, err := c.PostSecretRequestWithBody(ctx, path, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSecretRequestHTTPResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostSecretRequestWithResponse(ctx context.Context, path string, body PostSecretRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretRequestHTTPResponse, error) {
+	rsp, err := c.PostSecretRequest(ctx, path, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSecretRequestHTTPResponse(rsp)
+}
+
+// DeleteSecretVersionsWithBodyWithResponse request with arbitrary body returning *DeleteSecretVersionsHTTPResponse
+func (c *ClientWithResponses) DeleteSecretVersionsWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteSecretVersionsHTTPResponse, error) {
+	rsp, err := c.DeleteSecretVersionsWithBody(ctx, path, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteSecretVersionsHTTPResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteSecretVersionsWithResponse(ctx context.Context, path string, body DeleteSecretVersionsJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteSecretVersionsHTTPResponse, error) {
+	rsp, err := c.DeleteSecretVersions(ctx, path, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteSecretVersionsHTTPResponse(rsp)
+}
+
+// PostSecretDestroyWithBodyWithResponse request with arbitrary body returning *PostSecretDestroyHTTPResponse
+func (c *ClientWithResponses) PostSecretDestroyWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretDestroyHTTPResponse, error) {
+	rsp, err := c.PostSecretDestroyWithBody(ctx, path, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSecretDestroyHTTPResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostSecretDestroyWithResponse(ctx context.Context, path string, body PostSecretDestroyJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretDestroyHTTPResponse, error) {
+	rsp, err := c.PostSecretDestroy(ctx, path, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSecretDestroyHTTPResponse(rsp)
+}
+
+// DeleteSecretMetadataWithResponse request returning *DeleteSecretMetadataHTTPResponse
+func (c *ClientWithResponses) DeleteSecretMetadataWithResponse(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*DeleteSecretMetadataHTTPResponse, error) {
+	rsp, err := c.DeleteSecretMetadata(ctx, path, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteSecretMetadataHTTPResponse(rsp)
+}
+
+// GetSecretsMetadataWithResponse request returning *GetSecretsMetadataHTTPResponse
+func (c *ClientWithResponses) GetSecretsMetadataWithResponse(ctx context.Context, path string, params *GetSecretsMetadataParams, reqEditors ...RequestEditorFn) (*GetSecretsMetadataHTTPResponse, error) {
+	rsp, err := c.GetSecretsMetadata(ctx, path, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSecretsMetadataHTTPResponse(rsp)
+}
+
+// PatchSecretMetadataWithBodyWithResponse request with arbitrary body returning *PatchSecretMetadataHTTPResponse
+func (c *ClientWithResponses) PatchSecretMetadataWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchSecretMetadataHTTPResponse, error) {
+	rsp, err := c.PatchSecretMetadataWithBody(ctx, path, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchSecretMetadataHTTPResponse(rsp)
+}
+
+func (c *ClientWithResponses) PatchSecretMetadataWithResponse(ctx context.Context, path string, body PatchSecretMetadataJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchSecretMetadataHTTPResponse, error) {
+	rsp, err := c.PatchSecretMetadata(ctx, path, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchSecretMetadataHTTPResponse(rsp)
+}
+
+// PostSecretMetadataWithBodyWithResponse request with arbitrary body returning *PostSecretMetadataHTTPResponse
+func (c *ClientWithResponses) PostSecretMetadataWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretMetadataHTTPResponse, error) {
+	rsp, err := c.PostSecretMetadataWithBody(ctx, path, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSecretMetadataHTTPResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostSecretMetadataWithResponse(ctx context.Context, path string, body PostSecretMetadataJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretMetadataHTTPResponse, error) {
+	rsp, err := c.PostSecretMetadata(ctx, path, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSecretMetadataHTTPResponse(rsp)
+}
+
+// GetSecretSubkeysWithResponse request returning *GetSecretSubkeysHTTPResponse
+func (c *ClientWithResponses) GetSecretSubkeysWithResponse(ctx context.Context, path string, params *GetSecretSubkeysParams, reqEditors ...RequestEditorFn) (*GetSecretSubkeysHTTPResponse, error) {
+	rsp, err := c.GetSecretSubkeys(ctx, path, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSecretSubkeysHTTPResponse(rsp)
+}
+
+// PostSecretUndeleteWithBodyWithResponse request with arbitrary body returning *PostSecretUndeleteHTTPResponse
+func (c *ClientWithResponses) PostSecretUndeleteWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretUndeleteHTTPResponse, error) {
+	rsp, err := c.PostSecretUndeleteWithBody(ctx, path, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSecretUndeleteHTTPResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostSecretUndeleteWithResponse(ctx context.Context, path string, body PostSecretUndeleteJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretUndeleteHTTPResponse, error) {
+	rsp, err := c.PostSecretUndelete(ctx, path, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSecretUndeleteHTTPResponse(rsp)
 }
 
 // ListServiceKeysWithResponse request returning *ListServiceKeysHTTPResponse
@@ -1755,6 +3340,804 @@ func (c *ClientWithResponses) VerifyWithResponse(ctx context.Context, id openapi
 	return ParseVerifyHTTPResponse(rsp)
 }
 
+// ParseGetSecretConfigHTTPResponse parses an HTTP response from a GetSecretConfigWithResponse call
+func ParseGetSecretConfigHTTPResponse(rsp *http.Response) (*GetSecretConfigHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSecretConfigHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetConfigResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostSecretConfigHTTPResponse parses an HTTP response from a PostSecretConfigWithResponse call
+func ParsePostSecretConfigHTTPResponse(rsp *http.Response) (*PostSecretConfigHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostSecretConfigHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteSecretRequestHTTPResponse parses an HTTP response from a DeleteSecretRequestWithResponse call
+func ParseDeleteSecretRequestHTTPResponse(rsp *http.Response) (*DeleteSecretRequestHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteSecretRequestHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSecretRequestHTTPResponse parses an HTTP response from a GetSecretRequestWithResponse call
+func ParseGetSecretRequestHTTPResponse(rsp *http.Response) (*GetSecretRequestHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSecretRequestHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetSecretResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePatchSecretRequestHTTPResponse parses an HTTP response from a PatchSecretRequestWithResponse call
+func ParsePatchSecretRequestHTTPResponse(rsp *http.Response) (*PatchSecretRequestHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PatchSecretRequestHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PatchSecretResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostSecretRequestHTTPResponse parses an HTTP response from a PostSecretRequestWithResponse call
+func ParsePostSecretRequestHTTPResponse(rsp *http.Response) (*PostSecretRequestHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostSecretRequestHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PostSecretResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteSecretVersionsHTTPResponse parses an HTTP response from a DeleteSecretVersionsWithResponse call
+func ParseDeleteSecretVersionsHTTPResponse(rsp *http.Response) (*DeleteSecretVersionsHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteSecretVersionsHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostSecretDestroyHTTPResponse parses an HTTP response from a PostSecretDestroyWithResponse call
+func ParsePostSecretDestroyHTTPResponse(rsp *http.Response) (*PostSecretDestroyHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostSecretDestroyHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteSecretMetadataHTTPResponse parses an HTTP response from a DeleteSecretMetadataWithResponse call
+func ParseDeleteSecretMetadataHTTPResponse(rsp *http.Response) (*DeleteSecretMetadataHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteSecretMetadataHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSecretsMetadataHTTPResponse parses an HTTP response from a GetSecretsMetadataWithResponse call
+func ParseGetSecretsMetadataHTTPResponse(rsp *http.Response) (*GetSecretsMetadataHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSecretsMetadataHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetMetadataResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePatchSecretMetadataHTTPResponse parses an HTTP response from a PatchSecretMetadataWithResponse call
+func ParsePatchSecretMetadataHTTPResponse(rsp *http.Response) (*PatchSecretMetadataHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PatchSecretMetadataHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostSecretMetadataHTTPResponse parses an HTTP response from a PostSecretMetadataWithResponse call
+func ParsePostSecretMetadataHTTPResponse(rsp *http.Response) (*PostSecretMetadataHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostSecretMetadataHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSecretSubkeysHTTPResponse parses an HTTP response from a GetSecretSubkeysWithResponse call
+func ParseGetSecretSubkeysHTTPResponse(rsp *http.Response) (*GetSecretSubkeysHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSecretSubkeysHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetSecretSubkeysResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostSecretUndeleteHTTPResponse parses an HTTP response from a PostSecretUndeleteWithResponse call
+func ParsePostSecretUndeleteHTTPResponse(rsp *http.Response) (*PostSecretUndeleteHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostSecretUndeleteHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseListServiceKeysHTTPResponse parses an HTTP response from a ListServiceKeysWithResponse call
 func ParseListServiceKeysHTTPResponse(rsp *http.Response) (*ListServiceKeysHTTPResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -1775,6 +4158,67 @@ func ParseListServiceKeysHTTPResponse(rsp *http.Response) (*ListServiceKeysHTTPR
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateImportServiceKeyHTTPResponse parses an HTTP response from a CreateImportServiceKeyWithResponse call
+func ParseCreateImportServiceKeyHTTPResponse(rsp *http.Response) (*CreateImportServiceKeyHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateImportServiceKeyHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest GetServiceKeyResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest ErrorResponse
@@ -1804,34 +4248,264 @@ func ParseListServiceKeysHTTPResponse(rsp *http.Response) (*ListServiceKeysHTTPR
 		}
 		response.JSON500 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON502 = &dest
-
 	}
 
 	return response, nil
 }
 
-// ParseCreateImportServiceKeyHTTPResponse parses an HTTP response from a CreateImportServiceKeyWithResponse call
-func ParseCreateImportServiceKeyHTTPResponse(rsp *http.Response) (*CreateImportServiceKeyHTTPResponse, error) {
+// ParseDeleteServiceKeyHTTPResponse parses an HTTP response from a DeleteServiceKeyWithResponse call
+func ParseDeleteServiceKeyHTTPResponse(rsp *http.Response) (*DeleteServiceKeyHTTPResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CreateImportServiceKeyHTTPResponse{
+	response := &DeleteServiceKeyHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetServiceKeyHTTPResponse parses an HTTP response from a GetServiceKeyWithResponse call
+func ParseGetServiceKeyHTTPResponse(rsp *http.Response) (*GetServiceKeyHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetServiceKeyHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetServiceKeyResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePatchServiceKeyHTTPResponse parses an HTTP response from a PatchServiceKeyWithResponse call
+func ParsePatchServiceKeyHTTPResponse(rsp *http.Response) (*PatchServiceKeyHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PatchServiceKeyHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetServiceKeyResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseActivateServiceKeyHTTPResponse parses an HTTP response from a ActivateServiceKeyWithResponse call
+func ParseActivateServiceKeyHTTPResponse(rsp *http.Response) (*ActivateServiceKeyHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ActivateServiceKeyHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest StatusCodes
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGenerateDataKeyHTTPResponse parses an HTTP response from a GenerateDataKeyWithResponse call
+func ParseGenerateDataKeyHTTPResponse(rsp *http.Response) (*GenerateDataKeyHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GenerateDataKeyHTTPResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest GetServiceKeyResponse
+		var dest GenerateDataKeyResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -1872,318 +4546,6 @@ func ParseCreateImportServiceKeyHTTPResponse(rsp *http.Response) (*CreateImportS
 		}
 		response.JSON500 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON502 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseDeleteServiceKeyHTTPResponse parses an HTTP response from a DeleteServiceKeyWithResponse call
-func ParseDeleteServiceKeyHTTPResponse(rsp *http.Response) (*DeleteServiceKeyHTTPResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &DeleteServiceKeyHTTPResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest StatusCodes
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON429 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON502 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetServiceKeyHTTPResponse parses an HTTP response from a GetServiceKeyWithResponse call
-func ParseGetServiceKeyHTTPResponse(rsp *http.Response) (*GetServiceKeyHTTPResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetServiceKeyHTTPResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetServiceKeyResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON429 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON502 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParsePatchServiceKeyHTTPResponse parses an HTTP response from a PatchServiceKeyWithResponse call
-func ParsePatchServiceKeyHTTPResponse(rsp *http.Response) (*PatchServiceKeyHTTPResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &PatchServiceKeyHTTPResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetServiceKeyResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON429 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON502 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseActivateServiceKeyHTTPResponse parses an HTTP response from a ActivateServiceKeyWithResponse call
-func ParseActivateServiceKeyHTTPResponse(rsp *http.Response) (*ActivateServiceKeyHTTPResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ActivateServiceKeyHTTPResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest StatusCodes
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON429 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON502 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGenerateDataKeyHTTPResponse parses an HTTP response from a GenerateDataKeyWithResponse call
-func ParseGenerateDataKeyHTTPResponse(rsp *http.Response) (*GenerateDataKeyHTTPResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GenerateDataKeyHTTPResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest GenerateDataKeyResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON201 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON429 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON502 = &dest
-
 	}
 
 	return response, nil
@@ -2217,6 +4579,13 @@ func ParseDecryptDataKeyHTTPResponse(rsp *http.Response) (*DecryptDataKeyHTTPRes
 		}
 		response.JSON400 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -2237,13 +4606,6 @@ func ParseDecryptDataKeyHTTPResponse(rsp *http.Response) (*DecryptDataKeyHTTPRes
 			return nil, err
 		}
 		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON502 = &dest
 
 	}
 
@@ -2278,6 +4640,13 @@ func ParseDeactivateServiceKeyHTTPResponse(rsp *http.Response) (*DeactivateServi
 		}
 		response.JSON400 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -2298,13 +4667,6 @@ func ParseDeactivateServiceKeyHTTPResponse(rsp *http.Response) (*DeactivateServi
 			return nil, err
 		}
 		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON502 = &dest
 
 	}
 
@@ -2339,6 +4701,13 @@ func ParseDecryptHTTPResponse(rsp *http.Response) (*DecryptHTTPResponse, error) 
 		}
 		response.JSON400 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -2359,13 +4728,6 @@ func ParseDecryptHTTPResponse(rsp *http.Response) (*DecryptHTTPResponse, error) 
 			return nil, err
 		}
 		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON502 = &dest
 
 	}
 
@@ -2400,6 +4762,13 @@ func ParseEncryptHTTPResponse(rsp *http.Response) (*EncryptHTTPResponse, error) 
 		}
 		response.JSON400 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -2420,13 +4789,6 @@ func ParseEncryptHTTPResponse(rsp *http.Response) (*EncryptHTTPResponse, error) 
 			return nil, err
 		}
 		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON502 = &dest
 
 	}
 
@@ -2461,6 +4823,13 @@ func ParseSignHTTPResponse(rsp *http.Response) (*SignHTTPResponse, error) {
 		}
 		response.JSON400 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -2481,13 +4850,6 @@ func ParseSignHTTPResponse(rsp *http.Response) (*SignHTTPResponse, error) {
 			return nil, err
 		}
 		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON502 = &dest
 
 	}
 
@@ -2522,6 +4884,13 @@ func ParseVerifyHTTPResponse(rsp *http.Response) (*VerifyHTTPResponse, error) {
 		}
 		response.JSON400 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -2542,13 +4911,6 @@ func ParseVerifyHTTPResponse(rsp *http.Response) (*VerifyHTTPResponse, error) {
 			return nil, err
 		}
 		response.JSON500 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
-		var dest ErrorResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON502 = &dest
 
 	}
 

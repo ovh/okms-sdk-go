@@ -301,6 +301,148 @@ func (_c *APIMock_DecryptDataKey_Call) RunAndReturn(run func(context.Context, uu
 	return _c
 }
 
+// DeleteSecretMetadata provides a mock function with given fields: ctx, path
+func (_m *APIMock) DeleteSecretMetadata(ctx context.Context, path string) error {
+	ret := _m.Called(ctx, path)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteSecretMetadata")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(ctx, path)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// APIMock_DeleteSecretMetadata_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteSecretMetadata'
+type APIMock_DeleteSecretMetadata_Call struct {
+	*mock.Call
+}
+
+// DeleteSecretMetadata is a helper method to define mock.On call
+//   - ctx context.Context
+//   - path string
+func (_e *APIMock_Expecter) DeleteSecretMetadata(ctx interface{}, path interface{}) *APIMock_DeleteSecretMetadata_Call {
+	return &APIMock_DeleteSecretMetadata_Call{Call: _e.mock.On("DeleteSecretMetadata", ctx, path)}
+}
+
+func (_c *APIMock_DeleteSecretMetadata_Call) Run(run func(ctx context.Context, path string)) *APIMock_DeleteSecretMetadata_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *APIMock_DeleteSecretMetadata_Call) Return(_a0 error) *APIMock_DeleteSecretMetadata_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *APIMock_DeleteSecretMetadata_Call) RunAndReturn(run func(context.Context, string) error) *APIMock_DeleteSecretMetadata_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteSecretRequest provides a mock function with given fields: ctx, path
+func (_m *APIMock) DeleteSecretRequest(ctx context.Context, path string) error {
+	ret := _m.Called(ctx, path)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteSecretRequest")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(ctx, path)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// APIMock_DeleteSecretRequest_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteSecretRequest'
+type APIMock_DeleteSecretRequest_Call struct {
+	*mock.Call
+}
+
+// DeleteSecretRequest is a helper method to define mock.On call
+//   - ctx context.Context
+//   - path string
+func (_e *APIMock_Expecter) DeleteSecretRequest(ctx interface{}, path interface{}) *APIMock_DeleteSecretRequest_Call {
+	return &APIMock_DeleteSecretRequest_Call{Call: _e.mock.On("DeleteSecretRequest", ctx, path)}
+}
+
+func (_c *APIMock_DeleteSecretRequest_Call) Run(run func(ctx context.Context, path string)) *APIMock_DeleteSecretRequest_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *APIMock_DeleteSecretRequest_Call) Return(_a0 error) *APIMock_DeleteSecretRequest_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *APIMock_DeleteSecretRequest_Call) RunAndReturn(run func(context.Context, string) error) *APIMock_DeleteSecretRequest_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteSecretVersions provides a mock function with given fields: ctx, path, versions
+func (_m *APIMock) DeleteSecretVersions(ctx context.Context, path string, versions []uint32) error {
+	ret := _m.Called(ctx, path, versions)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteSecretVersions")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, []uint32) error); ok {
+		r0 = rf(ctx, path, versions)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// APIMock_DeleteSecretVersions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteSecretVersions'
+type APIMock_DeleteSecretVersions_Call struct {
+	*mock.Call
+}
+
+// DeleteSecretVersions is a helper method to define mock.On call
+//   - ctx context.Context
+//   - path string
+//   - versions []uint32
+func (_e *APIMock_Expecter) DeleteSecretVersions(ctx interface{}, path interface{}, versions interface{}) *APIMock_DeleteSecretVersions_Call {
+	return &APIMock_DeleteSecretVersions_Call{Call: _e.mock.On("DeleteSecretVersions", ctx, path, versions)}
+}
+
+func (_c *APIMock_DeleteSecretVersions_Call) Run(run func(ctx context.Context, path string, versions []uint32)) *APIMock_DeleteSecretVersions_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].([]uint32))
+	})
+	return _c
+}
+
+func (_c *APIMock_DeleteSecretVersions_Call) Return(_a0 error) *APIMock_DeleteSecretVersions_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *APIMock_DeleteSecretVersions_Call) RunAndReturn(run func(context.Context, string, []uint32) error) *APIMock_DeleteSecretVersions_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DeleteServiceKey provides a mock function with given fields: ctx, keyId
 func (_m *APIMock) DeleteServiceKey(ctx context.Context, keyId uuid.UUID) error {
 	ret := _m.Called(ctx, keyId)
@@ -475,6 +617,245 @@ func (_c *APIMock_GenerateDataKey_Call) RunAndReturn(run func(context.Context, u
 	return _c
 }
 
+// GetSecretConfig provides a mock function with given fields: ctx
+func (_m *APIMock) GetSecretConfig(ctx context.Context) (*types.GetConfigResponse, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSecretConfig")
+	}
+
+	var r0 *types.GetConfigResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) (*types.GetConfigResponse, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) *types.GetConfigResponse); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*types.GetConfigResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// APIMock_GetSecretConfig_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSecretConfig'
+type APIMock_GetSecretConfig_Call struct {
+	*mock.Call
+}
+
+// GetSecretConfig is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *APIMock_Expecter) GetSecretConfig(ctx interface{}) *APIMock_GetSecretConfig_Call {
+	return &APIMock_GetSecretConfig_Call{Call: _e.mock.On("GetSecretConfig", ctx)}
+}
+
+func (_c *APIMock_GetSecretConfig_Call) Run(run func(ctx context.Context)) *APIMock_GetSecretConfig_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *APIMock_GetSecretConfig_Call) Return(_a0 *types.GetConfigResponse, _a1 error) *APIMock_GetSecretConfig_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *APIMock_GetSecretConfig_Call) RunAndReturn(run func(context.Context) (*types.GetConfigResponse, error)) *APIMock_GetSecretConfig_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetSecretRequest provides a mock function with given fields: ctx, path, version
+func (_m *APIMock) GetSecretRequest(ctx context.Context, path string, version *uint32) (*types.GetSecretResponse, error) {
+	ret := _m.Called(ctx, path, version)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSecretRequest")
+	}
+
+	var r0 *types.GetSecretResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, *uint32) (*types.GetSecretResponse, error)); ok {
+		return rf(ctx, path, version)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, *uint32) *types.GetSecretResponse); ok {
+		r0 = rf(ctx, path, version)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*types.GetSecretResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, *uint32) error); ok {
+		r1 = rf(ctx, path, version)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// APIMock_GetSecretRequest_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSecretRequest'
+type APIMock_GetSecretRequest_Call struct {
+	*mock.Call
+}
+
+// GetSecretRequest is a helper method to define mock.On call
+//   - ctx context.Context
+//   - path string
+//   - version *uint32
+func (_e *APIMock_Expecter) GetSecretRequest(ctx interface{}, path interface{}, version interface{}) *APIMock_GetSecretRequest_Call {
+	return &APIMock_GetSecretRequest_Call{Call: _e.mock.On("GetSecretRequest", ctx, path, version)}
+}
+
+func (_c *APIMock_GetSecretRequest_Call) Run(run func(ctx context.Context, path string, version *uint32)) *APIMock_GetSecretRequest_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(*uint32))
+	})
+	return _c
+}
+
+func (_c *APIMock_GetSecretRequest_Call) Return(_a0 *types.GetSecretResponse, _a1 error) *APIMock_GetSecretRequest_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *APIMock_GetSecretRequest_Call) RunAndReturn(run func(context.Context, string, *uint32) (*types.GetSecretResponse, error)) *APIMock_GetSecretRequest_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetSecretSubkeys provides a mock function with given fields: ctx, path, depth, version
+func (_m *APIMock) GetSecretSubkeys(ctx context.Context, path string, depth *uint32, version *uint32) (*types.GetSecretSubkeysResponse, error) {
+	ret := _m.Called(ctx, path, depth, version)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSecretSubkeys")
+	}
+
+	var r0 *types.GetSecretSubkeysResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, *uint32, *uint32) (*types.GetSecretSubkeysResponse, error)); ok {
+		return rf(ctx, path, depth, version)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, *uint32, *uint32) *types.GetSecretSubkeysResponse); ok {
+		r0 = rf(ctx, path, depth, version)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*types.GetSecretSubkeysResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, *uint32, *uint32) error); ok {
+		r1 = rf(ctx, path, depth, version)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// APIMock_GetSecretSubkeys_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSecretSubkeys'
+type APIMock_GetSecretSubkeys_Call struct {
+	*mock.Call
+}
+
+// GetSecretSubkeys is a helper method to define mock.On call
+//   - ctx context.Context
+//   - path string
+//   - depth *uint32
+//   - version *uint32
+func (_e *APIMock_Expecter) GetSecretSubkeys(ctx interface{}, path interface{}, depth interface{}, version interface{}) *APIMock_GetSecretSubkeys_Call {
+	return &APIMock_GetSecretSubkeys_Call{Call: _e.mock.On("GetSecretSubkeys", ctx, path, depth, version)}
+}
+
+func (_c *APIMock_GetSecretSubkeys_Call) Run(run func(ctx context.Context, path string, depth *uint32, version *uint32)) *APIMock_GetSecretSubkeys_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(*uint32), args[3].(*uint32))
+	})
+	return _c
+}
+
+func (_c *APIMock_GetSecretSubkeys_Call) Return(_a0 *types.GetSecretSubkeysResponse, _a1 error) *APIMock_GetSecretSubkeys_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *APIMock_GetSecretSubkeys_Call) RunAndReturn(run func(context.Context, string, *uint32, *uint32) (*types.GetSecretSubkeysResponse, error)) *APIMock_GetSecretSubkeys_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetSecretsMetadata provides a mock function with given fields: ctx, path, list
+func (_m *APIMock) GetSecretsMetadata(ctx context.Context, path string, list bool) (*types.GetMetadataResponse, error) {
+	ret := _m.Called(ctx, path, list)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSecretsMetadata")
+	}
+
+	var r0 *types.GetMetadataResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, bool) (*types.GetMetadataResponse, error)); ok {
+		return rf(ctx, path, list)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, bool) *types.GetMetadataResponse); ok {
+		r0 = rf(ctx, path, list)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*types.GetMetadataResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, bool) error); ok {
+		r1 = rf(ctx, path, list)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// APIMock_GetSecretsMetadata_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSecretsMetadata'
+type APIMock_GetSecretsMetadata_Call struct {
+	*mock.Call
+}
+
+// GetSecretsMetadata is a helper method to define mock.On call
+//   - ctx context.Context
+//   - path string
+//   - list bool
+func (_e *APIMock_Expecter) GetSecretsMetadata(ctx interface{}, path interface{}, list interface{}) *APIMock_GetSecretsMetadata_Call {
+	return &APIMock_GetSecretsMetadata_Call{Call: _e.mock.On("GetSecretsMetadata", ctx, path, list)}
+}
+
+func (_c *APIMock_GetSecretsMetadata_Call) Run(run func(ctx context.Context, path string, list bool)) *APIMock_GetSecretsMetadata_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(bool))
+	})
+	return _c
+}
+
+func (_c *APIMock_GetSecretsMetadata_Call) Return(_a0 *types.GetMetadataResponse, _a1 error) *APIMock_GetSecretsMetadata_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *APIMock_GetSecretsMetadata_Call) RunAndReturn(run func(context.Context, string, bool) (*types.GetMetadataResponse, error)) *APIMock_GetSecretsMetadata_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetServiceKey provides a mock function with given fields: ctx, keyId, format
 func (_m *APIMock) GetServiceKey(ctx context.Context, keyId uuid.UUID, format *types.KeyFormats) (*types.GetServiceKeyResponse, error) {
 	ret := _m.Called(ctx, keyId, format)
@@ -536,7 +917,7 @@ func (_c *APIMock_GetServiceKey_Call) RunAndReturn(run func(context.Context, uui
 }
 
 // ListServiceKeys provides a mock function with given fields: ctx, continuationToken, maxKey, state
-func (_m *APIMock) ListServiceKeys(ctx context.Context, continuationToken *string, maxKey *int32, state *types.KeyStates) (*types.ListServiceKeysResponse, error) {
+func (_m *APIMock) ListServiceKeys(ctx context.Context, continuationToken *string, maxKey *uint32, state *types.KeyStates) (*types.ListServiceKeysResponse, error) {
 	ret := _m.Called(ctx, continuationToken, maxKey, state)
 
 	if len(ret) == 0 {
@@ -545,10 +926,10 @@ func (_m *APIMock) ListServiceKeys(ctx context.Context, continuationToken *strin
 
 	var r0 *types.ListServiceKeysResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *string, *int32, *types.KeyStates) (*types.ListServiceKeysResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *string, *uint32, *types.KeyStates) (*types.ListServiceKeysResponse, error)); ok {
 		return rf(ctx, continuationToken, maxKey, state)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *string, *int32, *types.KeyStates) *types.ListServiceKeysResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *string, *uint32, *types.KeyStates) *types.ListServiceKeysResponse); ok {
 		r0 = rf(ctx, continuationToken, maxKey, state)
 	} else {
 		if ret.Get(0) != nil {
@@ -556,7 +937,7 @@ func (_m *APIMock) ListServiceKeys(ctx context.Context, continuationToken *strin
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *string, *int32, *types.KeyStates) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *string, *uint32, *types.KeyStates) error); ok {
 		r1 = rf(ctx, continuationToken, maxKey, state)
 	} else {
 		r1 = ret.Error(1)
@@ -573,15 +954,15 @@ type APIMock_ListServiceKeys_Call struct {
 // ListServiceKeys is a helper method to define mock.On call
 //   - ctx context.Context
 //   - continuationToken *string
-//   - maxKey *int32
+//   - maxKey *uint32
 //   - state *types.KeyStates
 func (_e *APIMock_Expecter) ListServiceKeys(ctx interface{}, continuationToken interface{}, maxKey interface{}, state interface{}) *APIMock_ListServiceKeys_Call {
 	return &APIMock_ListServiceKeys_Call{Call: _e.mock.On("ListServiceKeys", ctx, continuationToken, maxKey, state)}
 }
 
-func (_c *APIMock_ListServiceKeys_Call) Run(run func(ctx context.Context, continuationToken *string, maxKey *int32, state *types.KeyStates)) *APIMock_ListServiceKeys_Call {
+func (_c *APIMock_ListServiceKeys_Call) Run(run func(ctx context.Context, continuationToken *string, maxKey *uint32, state *types.KeyStates)) *APIMock_ListServiceKeys_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*string), args[2].(*int32), args[3].(*types.KeyStates))
+		run(args[0].(context.Context), args[1].(*string), args[2].(*uint32), args[3].(*types.KeyStates))
 	})
 	return _c
 }
@@ -591,7 +972,366 @@ func (_c *APIMock_ListServiceKeys_Call) Return(_a0 *types.ListServiceKeysRespons
 	return _c
 }
 
-func (_c *APIMock_ListServiceKeys_Call) RunAndReturn(run func(context.Context, *string, *int32, *types.KeyStates) (*types.ListServiceKeysResponse, error)) *APIMock_ListServiceKeys_Call {
+func (_c *APIMock_ListServiceKeys_Call) RunAndReturn(run func(context.Context, *string, *uint32, *types.KeyStates) (*types.ListServiceKeysResponse, error)) *APIMock_ListServiceKeys_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// PatchSecretMetadata provides a mock function with given fields: ctx, path, body
+func (_m *APIMock) PatchSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error {
+	ret := _m.Called(ctx, path, body)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PatchSecretMetadata")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, types.SecretUpdatableMetadata) error); ok {
+		r0 = rf(ctx, path, body)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// APIMock_PatchSecretMetadata_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PatchSecretMetadata'
+type APIMock_PatchSecretMetadata_Call struct {
+	*mock.Call
+}
+
+// PatchSecretMetadata is a helper method to define mock.On call
+//   - ctx context.Context
+//   - path string
+//   - body types.SecretUpdatableMetadata
+func (_e *APIMock_Expecter) PatchSecretMetadata(ctx interface{}, path interface{}, body interface{}) *APIMock_PatchSecretMetadata_Call {
+	return &APIMock_PatchSecretMetadata_Call{Call: _e.mock.On("PatchSecretMetadata", ctx, path, body)}
+}
+
+func (_c *APIMock_PatchSecretMetadata_Call) Run(run func(ctx context.Context, path string, body types.SecretUpdatableMetadata)) *APIMock_PatchSecretMetadata_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(types.SecretUpdatableMetadata))
+	})
+	return _c
+}
+
+func (_c *APIMock_PatchSecretMetadata_Call) Return(_a0 error) *APIMock_PatchSecretMetadata_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *APIMock_PatchSecretMetadata_Call) RunAndReturn(run func(context.Context, string, types.SecretUpdatableMetadata) error) *APIMock_PatchSecretMetadata_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// PatchSecretRequest provides a mock function with given fields: ctx, path, body
+func (_m *APIMock) PatchSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PatchSecretResponse, error) {
+	ret := _m.Called(ctx, path, body)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PatchSecretRequest")
+	}
+
+	var r0 *types.PatchSecretResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, types.PostSecretRequest) (*types.PatchSecretResponse, error)); ok {
+		return rf(ctx, path, body)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, types.PostSecretRequest) *types.PatchSecretResponse); ok {
+		r0 = rf(ctx, path, body)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*types.PatchSecretResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, types.PostSecretRequest) error); ok {
+		r1 = rf(ctx, path, body)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// APIMock_PatchSecretRequest_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PatchSecretRequest'
+type APIMock_PatchSecretRequest_Call struct {
+	*mock.Call
+}
+
+// PatchSecretRequest is a helper method to define mock.On call
+//   - ctx context.Context
+//   - path string
+//   - body types.PostSecretRequest
+func (_e *APIMock_Expecter) PatchSecretRequest(ctx interface{}, path interface{}, body interface{}) *APIMock_PatchSecretRequest_Call {
+	return &APIMock_PatchSecretRequest_Call{Call: _e.mock.On("PatchSecretRequest", ctx, path, body)}
+}
+
+func (_c *APIMock_PatchSecretRequest_Call) Run(run func(ctx context.Context, path string, body types.PostSecretRequest)) *APIMock_PatchSecretRequest_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(types.PostSecretRequest))
+	})
+	return _c
+}
+
+func (_c *APIMock_PatchSecretRequest_Call) Return(_a0 *types.PatchSecretResponse, _a1 error) *APIMock_PatchSecretRequest_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *APIMock_PatchSecretRequest_Call) RunAndReturn(run func(context.Context, string, types.PostSecretRequest) (*types.PatchSecretResponse, error)) *APIMock_PatchSecretRequest_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// PostSecretConfig provides a mock function with given fields: ctx, body
+func (_m *APIMock) PostSecretConfig(ctx context.Context, body types.PostConfigRequest) error {
+	ret := _m.Called(ctx, body)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PostSecretConfig")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, types.PostConfigRequest) error); ok {
+		r0 = rf(ctx, body)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// APIMock_PostSecretConfig_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PostSecretConfig'
+type APIMock_PostSecretConfig_Call struct {
+	*mock.Call
+}
+
+// PostSecretConfig is a helper method to define mock.On call
+//   - ctx context.Context
+//   - body types.PostConfigRequest
+func (_e *APIMock_Expecter) PostSecretConfig(ctx interface{}, body interface{}) *APIMock_PostSecretConfig_Call {
+	return &APIMock_PostSecretConfig_Call{Call: _e.mock.On("PostSecretConfig", ctx, body)}
+}
+
+func (_c *APIMock_PostSecretConfig_Call) Run(run func(ctx context.Context, body types.PostConfigRequest)) *APIMock_PostSecretConfig_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(types.PostConfigRequest))
+	})
+	return _c
+}
+
+func (_c *APIMock_PostSecretConfig_Call) Return(_a0 error) *APIMock_PostSecretConfig_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *APIMock_PostSecretConfig_Call) RunAndReturn(run func(context.Context, types.PostConfigRequest) error) *APIMock_PostSecretConfig_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// PostSecretDestroy provides a mock function with given fields: ctx, path, versions
+func (_m *APIMock) PostSecretDestroy(ctx context.Context, path string, versions []uint32) error {
+	ret := _m.Called(ctx, path, versions)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PostSecretDestroy")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, []uint32) error); ok {
+		r0 = rf(ctx, path, versions)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// APIMock_PostSecretDestroy_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PostSecretDestroy'
+type APIMock_PostSecretDestroy_Call struct {
+	*mock.Call
+}
+
+// PostSecretDestroy is a helper method to define mock.On call
+//   - ctx context.Context
+//   - path string
+//   - versions []uint32
+func (_e *APIMock_Expecter) PostSecretDestroy(ctx interface{}, path interface{}, versions interface{}) *APIMock_PostSecretDestroy_Call {
+	return &APIMock_PostSecretDestroy_Call{Call: _e.mock.On("PostSecretDestroy", ctx, path, versions)}
+}
+
+func (_c *APIMock_PostSecretDestroy_Call) Run(run func(ctx context.Context, path string, versions []uint32)) *APIMock_PostSecretDestroy_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].([]uint32))
+	})
+	return _c
+}
+
+func (_c *APIMock_PostSecretDestroy_Call) Return(_a0 error) *APIMock_PostSecretDestroy_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *APIMock_PostSecretDestroy_Call) RunAndReturn(run func(context.Context, string, []uint32) error) *APIMock_PostSecretDestroy_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// PostSecretMetadata provides a mock function with given fields: ctx, path, body
+func (_m *APIMock) PostSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error {
+	ret := _m.Called(ctx, path, body)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PostSecretMetadata")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, types.SecretUpdatableMetadata) error); ok {
+		r0 = rf(ctx, path, body)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// APIMock_PostSecretMetadata_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PostSecretMetadata'
+type APIMock_PostSecretMetadata_Call struct {
+	*mock.Call
+}
+
+// PostSecretMetadata is a helper method to define mock.On call
+//   - ctx context.Context
+//   - path string
+//   - body types.SecretUpdatableMetadata
+func (_e *APIMock_Expecter) PostSecretMetadata(ctx interface{}, path interface{}, body interface{}) *APIMock_PostSecretMetadata_Call {
+	return &APIMock_PostSecretMetadata_Call{Call: _e.mock.On("PostSecretMetadata", ctx, path, body)}
+}
+
+func (_c *APIMock_PostSecretMetadata_Call) Run(run func(ctx context.Context, path string, body types.SecretUpdatableMetadata)) *APIMock_PostSecretMetadata_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(types.SecretUpdatableMetadata))
+	})
+	return _c
+}
+
+func (_c *APIMock_PostSecretMetadata_Call) Return(_a0 error) *APIMock_PostSecretMetadata_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *APIMock_PostSecretMetadata_Call) RunAndReturn(run func(context.Context, string, types.SecretUpdatableMetadata) error) *APIMock_PostSecretMetadata_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// PostSecretRequest provides a mock function with given fields: ctx, path, body
+func (_m *APIMock) PostSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PostSecretResponse, error) {
+	ret := _m.Called(ctx, path, body)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PostSecretRequest")
+	}
+
+	var r0 *types.PostSecretResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, types.PostSecretRequest) (*types.PostSecretResponse, error)); ok {
+		return rf(ctx, path, body)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, types.PostSecretRequest) *types.PostSecretResponse); ok {
+		r0 = rf(ctx, path, body)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*types.PostSecretResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, types.PostSecretRequest) error); ok {
+		r1 = rf(ctx, path, body)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// APIMock_PostSecretRequest_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PostSecretRequest'
+type APIMock_PostSecretRequest_Call struct {
+	*mock.Call
+}
+
+// PostSecretRequest is a helper method to define mock.On call
+//   - ctx context.Context
+//   - path string
+//   - body types.PostSecretRequest
+func (_e *APIMock_Expecter) PostSecretRequest(ctx interface{}, path interface{}, body interface{}) *APIMock_PostSecretRequest_Call {
+	return &APIMock_PostSecretRequest_Call{Call: _e.mock.On("PostSecretRequest", ctx, path, body)}
+}
+
+func (_c *APIMock_PostSecretRequest_Call) Run(run func(ctx context.Context, path string, body types.PostSecretRequest)) *APIMock_PostSecretRequest_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(types.PostSecretRequest))
+	})
+	return _c
+}
+
+func (_c *APIMock_PostSecretRequest_Call) Return(_a0 *types.PostSecretResponse, _a1 error) *APIMock_PostSecretRequest_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *APIMock_PostSecretRequest_Call) RunAndReturn(run func(context.Context, string, types.PostSecretRequest) (*types.PostSecretResponse, error)) *APIMock_PostSecretRequest_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// PostSecretUndelete provides a mock function with given fields: ctx, path, versions
+func (_m *APIMock) PostSecretUndelete(ctx context.Context, path string, versions []uint32) error {
+	ret := _m.Called(ctx, path, versions)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PostSecretUndelete")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, []uint32) error); ok {
+		r0 = rf(ctx, path, versions)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// APIMock_PostSecretUndelete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PostSecretUndelete'
+type APIMock_PostSecretUndelete_Call struct {
+	*mock.Call
+}
+
+// PostSecretUndelete is a helper method to define mock.On call
+//   - ctx context.Context
+//   - path string
+//   - versions []uint32
+func (_e *APIMock_Expecter) PostSecretUndelete(ctx interface{}, path interface{}, versions interface{}) *APIMock_PostSecretUndelete_Call {
+	return &APIMock_PostSecretUndelete_Call{Call: _e.mock.On("PostSecretUndelete", ctx, path, versions)}
+}
+
+func (_c *APIMock_PostSecretUndelete_Call) Run(run func(ctx context.Context, path string, versions []uint32)) *APIMock_PostSecretUndelete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].([]uint32))
+	})
+	return _c
+}
+
+func (_c *APIMock_PostSecretUndelete_Call) Return(_a0 error) *APIMock_PostSecretUndelete_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *APIMock_PostSecretUndelete_Call) RunAndReturn(run func(context.Context, string, []uint32) error) *APIMock_PostSecretUndelete_Call {
 	_c.Call.Return(run)
 	return _c
 }

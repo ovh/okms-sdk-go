@@ -17,7 +17,7 @@ import (
 )
 
 // ListAllServiceKeys returns an iterator to go through all the keys without having to deal with pagination.
-func (client *Client) ListAllServiceKeys(pageSize *int32, state *types.KeyStates) KeyIter {
+func (client *Client) ListAllServiceKeys(pageSize *uint32, state *types.KeyStates) KeyIter {
 	return KeyIter{
 		client:   client.API,
 		pageSize: pageSize,
@@ -30,7 +30,7 @@ func (client *Client) ListAllServiceKeys(pageSize *int32, state *types.KeyStates
 // without having to deal with the pagination.
 type KeyIter struct {
 	client   ServiceKeyApi
-	pageSize *int32
+	pageSize *uint32
 	state    *types.KeyStates
 	buf      *types.ListServiceKeysResponse
 	err      error
