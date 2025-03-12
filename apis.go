@@ -26,7 +26,7 @@ type API interface {
 	SignatureApi
 	EncryptionApi
 	ServiceKeyApi
-	// SecretApi
+	SecretApi
 	// Ping(ctx context.Context) error
 	SetCustomHeader(key, value string)
 }
@@ -75,26 +75,40 @@ type ServiceKeyApi interface {
 	GetServiceKey(ctx context.Context, keyId uuid.UUID, format *types.KeyFormats) (*types.GetServiceKeyResponse, error)
 	// ListServiceKeys returns a page of service keys. The response contains a continuationToken that must be passed to the
 	// subsequent calls in order to get the next page. The state parameter when no nil is used to query keys having a specific state.
-	ListServiceKeys(ctx context.Context, continuationToken *string, maxKey *int32, state *types.KeyStates) (*types.ListServiceKeysResponse, error)
+	ListServiceKeys(ctx context.Context, continuationToken *string, maxKey *uint32, state *types.KeyStates) (*types.ListServiceKeysResponse, error)
 	// UpdateServiceKey updates some service key metadata.
 	UpdateServiceKey(ctx context.Context, keyId uuid.UUID, body types.PatchServiceKeyRequest) (*types.GetServiceKeyResponse, error)
 }
 
-// type SecretApi interface {
-// 	GetSecretsMetadata(ctx context.Context, path string, list bool) (*types.GetMetadataResponse, error)
-// 	PatchSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error
-// 	DeleteSecretMetadata(ctx context.Context, path string) error
-// 	PostSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error
+type SecretApi interface {
+	// GetSecretsMetadata returns a secret metadata or a list of secrets if `list` is set to true.
+	GetSecretsMetadata(ctx context.Context, path string, list bool) (*types.GetMetadataResponse, error)
+	// PatchSecretMetadata updates secret metadata.
+	PatchSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error
+	// DeleteSecretMetadata deletes secret metadata and all versions.
+	DeleteSecretMetadata(ctx context.Context, path string) error
+	// PostSecretMetadata updates secret metadata.
+	PostSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error
 
-// 	GetSecretConfig(ctx context.Context) (*types.GetConfigResponse, error)
-// 	PostSecretConfig(ctx context.Context, body types.PostConfigRequest) error
+	// GetSecretConfig returns secret store configuration.
+	GetSecretConfig(ctx context.Context) (*types.GetConfigResponse, error)
+	// PostSecretConfig configures secret store settings.
+	PostSecretConfig(ctx context.Context, body types.PostConfigRequest) error
 
-// 	GetSecretRequest(ctx context.Context, path string, version *int32) (*types.GetSecretResponse, error)
-// 	GetSecretSubkeys(ctx context.Context, path string, depth, version *int32) (*types.GetSecretSubkeysResponse, error)
-// 	PostSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PostSecretResponse, error)
-// 	PatchSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PatchSecretResponse, error)
-// 	DeleteSecretRequest(ctx context.Context, path string) error
-// 	DeleteSecretVersions(ctx context.Context, path string, versions []int32) error
-// 	PostSecretDestroy(ctx context.Context, path string, versions []int32) error
-// 	PostSecretUndelete(ctx context.Context, path string, versions []int32) error
-// }
+	// GetSecretRequest returns secret version.
+	GetSecretRequest(ctx context.Context, path string, version *uint32) (*types.GetSecretResponse, error)
+	// GetSecretSubkeys returns secret subkeys.
+	GetSecretSubkeys(ctx context.Context, path string, depth, version *uint32) (*types.GetSecretSubkeysResponse, error)
+	// PostSecretRequest creates or updates a secret.
+	PostSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PostSecretResponse, error)
+	// PatchSecretRequest patches a secret.
+	PatchSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PatchSecretResponse, error)
+	// DeleteSecretRequest deletes the latest version of a secret. This marks the version as deleted but the underlying data will not be removed.
+	DeleteSecretRequest(ctx context.Context, path string) error
+	// DeleteSecretVersions deletes the specified secret version. This marks the versions as deleted but the underlying data will not be removed.
+	DeleteSecretVersions(ctx context.Context, path string, versions []uint32) error
+	// PostSecretDestroy permanently removes the data of the specified versions from the secrets store.
+	PostSecretDestroy(ctx context.Context, path string, versions []uint32) error
+	// PostSecretUndelete undeletes the data of the specified versions. The versions will no longer be marked as deleted.
+	PostSecretUndelete(ctx context.Context, path string, versions []uint32) error
+}

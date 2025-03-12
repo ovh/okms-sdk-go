@@ -118,7 +118,7 @@ type CryptographicUsages string
 // Curves defines model for Curves.
 type Curves string
 
-// DeactivateServicekeyRequest defines model for DeactivateServicekeyRequest.
+// DeactivateServicekeyRequest Request to deactivate a service key
 type DeactivateServicekeyRequest struct {
 	Reason RevocationReasons `json:"reason"`
 }
@@ -199,6 +199,34 @@ type GenerateDataKeyResponse struct {
 
 	// Plaintext Plaintext key material (based64 encoded bytes)
 	Plaintext *[]byte `json:"plaintext,omitempty"`
+}
+
+// GetConfigResponse Get engine configuration
+type GetConfigResponse struct {
+	// Data Default settings for secret API backend service
+	Data      *PostConfigRequest `json:"data,omitempty"`
+	RequestId *string            `json:"request_id"`
+}
+
+// GetMetadataResponse Get secret metadata values or list of keys
+type GetMetadataResponse struct {
+	// Data Secret metadata or list of keys
+	Data      *SecretMetadata `json:"data,omitempty"`
+	RequestId *string         `json:"request_id"`
+}
+
+// GetSecretResponse Response to get secret operation
+type GetSecretResponse struct {
+	// Data Secret content model
+	Data      *SecretData `json:"data,omitempty"`
+	RequestId *string     `json:"request_id"`
+}
+
+// GetSecretSubkeysResponse Get subkeys of the secret
+type GetSecretSubkeysResponse struct {
+	// Data Subkey model
+	Data      *SecretDataSubkeys `json:"data,omitempty"`
+	RequestId *string            `json:"request_id"`
 }
 
 // GetServiceKeyResponse Get service key response
@@ -353,14 +381,157 @@ type ListServiceKeysResponse struct {
 	ObjectsList []GetServiceKeyResponse `json:"objects_list"`
 }
 
+// PatchSecretResponse Patch secret operation response
+type PatchSecretResponse struct {
+	// Data Secret version specific metadata fields
+	Data      *SecretVersionMetadata `json:"data,omitempty"`
+	RequestId *string                `json:"request_id"`
+}
+
 // PatchServiceKeyRequest Patch domain key model
 type PatchServiceKeyRequest struct {
 	// Name Key friendly name
 	Name string `json:"name"`
 }
 
+// PostConfigRequest Default settings for secret API backend service
+type PostConfigRequest struct {
+	// CasRequired cas parameter will be required for each write call if set to true
+	CasRequired *bool `json:"cas_required,omitempty"`
+
+	// DeleteVersionAfter The length of time before a version is deleted
+	DeleteVersionAfter *string `json:"delete_version_after"`
+
+	// MaxVersions The number of versions to keep (10 default)
+	MaxVersions *uint32 `json:"max_versions,omitempty"`
+}
+
+// PostSecretOptions Secret request options
+type PostSecretOptions struct {
+	// Cas Version of the current secret
+	Cas *uint32 `json:"cas"`
+}
+
+// PostSecretRequest Secret request model
+type PostSecretRequest struct {
+	// Data The secret data map to store
+	Data *interface{} `json:"data"`
+
+	// Options Secret request options
+	Options *PostSecretOptions `json:"options,omitempty"`
+}
+
+// PostSecretResponse Post secret operation response
+type PostSecretResponse struct {
+	// Data Secret version specific metadata fields
+	Data      *SecretVersionMetadata `json:"data,omitempty"`
+	RequestId *string                `json:"request_id"`
+}
+
 // RevocationReasons defines model for RevocationReasons.
 type RevocationReasons string
+
+// SecretData Secret content model
+type SecretData struct {
+	// Data Data field
+	Data *interface{} `json:"data"`
+
+	// Metadata Secret version specific metadata fields
+	Metadata *SecretVersionMetadata `json:"metadata,omitempty"`
+}
+
+// SecretDataSubkeys Subkey model
+type SecretDataSubkeys struct {
+	// Metadata Secret version specific metadata fields
+	Metadata *SecretVersionMetadata `json:"metadata,omitempty"`
+
+	// Subkeys Subkey element
+	Subkeys *interface{} `json:"subkeys"`
+}
+
+// SecretMetadata Secret metadata or list of keys
+type SecretMetadata struct {
+	// CasRequired is the cas parameter required for each write call
+	CasRequired *bool `json:"cas_required"`
+
+	// CreatedTime Time of creation of the secret version
+	CreatedTime *string `json:"created_time"`
+
+	// CurrentVersion Current version number of the secret
+	CurrentVersion *uint32 `json:"current_version"`
+
+	// CustomMetadata Custom metadata attached to the secret
+	CustomMetadata *map[string]string `json:"custom_metadata"`
+
+	// DeleteVersionAfter The length of time before a version is deleted
+	DeleteVersionAfter *string `json:"delete_version_after"`
+
+	// Keys Keys of the element stored in the secret
+	Keys *[]string `json:"keys"`
+
+	// MaxVersions The number of versions to keep
+	MaxVersions *uint32 `json:"max_versions"`
+
+	// OldestVersion Oldest version kept of the secret
+	OldestVersion *uint32 `json:"oldest_version"`
+
+	// UpdatedTime Time fof the last update of the secret
+	UpdatedTime *string `json:"updated_time"`
+
+	// Versions List of versions of the secret
+	Versions *map[string]SecretVersionMetadataShort `json:"versions"`
+}
+
+// SecretUpdatableMetadata Model of payload to update metadata
+type SecretUpdatableMetadata struct {
+	// CasRequired is the cas parameter required for each write call
+	CasRequired *bool `json:"cas_required"`
+
+	// CustomMetadata Custom metadata attached to the secret
+	CustomMetadata *map[string]string `json:"custom_metadata"`
+
+	// DeleteVersionAfter The length of time before a version is deleted
+	DeleteVersionAfter *string `json:"delete_version_after"`
+
+	// MaxVersions description: The number of versions to keep
+	MaxVersions *uint32 `json:"max_versions"`
+}
+
+// SecretVersionMetadata Secret version specific metadata fields
+type SecretVersionMetadata struct {
+	// CreatedTime Time of creation of the secret version
+	CreatedTime *string `json:"created_time"`
+
+	// CustomMetadata Custom metadata attached to the secret
+	CustomMetadata *map[string]string `json:"custom_metadata"`
+
+	// DeletionTime Time of deletion of the secret version
+	DeletionTime *string `json:"deletion_time"`
+
+	// Destroyed Is the secret destroyed
+	Destroyed *bool `json:"destroyed"`
+
+	// Version Version number of the secret
+	Version *uint32 `json:"version"`
+}
+
+// SecretVersionMetadataShort Secret version specific metadata fields short model
+type SecretVersionMetadataShort struct {
+	// CreatedTime Time of creation of the secret version
+	CreatedTime *string `json:"created_time"`
+
+	// DeletionTime Time of deletion of the secret version
+	DeletionTime *string `json:"deletion_time"`
+
+	// Destroyed Is the secret version destroyed
+	Destroyed *bool `json:"destroyed,omitempty"`
+}
+
+// SecretVersionsRequest List of secrets in scope of operation
+type SecretVersionsRequest struct {
+	// Versions The versions to be soft deleted
+	Versions []uint32 `json:"versions"`
+}
 
 // SignRequest Sign request model
 type SignRequest struct {
@@ -405,6 +576,27 @@ type VerifyResponse struct {
 	Result bool `json:"result"`
 }
 
+// GetSecretRequestParams defines parameters for GetSecretRequest.
+type GetSecretRequestParams struct {
+	// Version Version of the secret requested
+	Version *uint32 `form:"version,omitempty" json:"version,omitempty"`
+}
+
+// GetSecretsMetadataParams defines parameters for GetSecretsMetadata.
+type GetSecretsMetadataParams struct {
+	// List Return a list of secrets instead of metadata if set to true
+	List *bool `form:"list,omitempty" json:"list,omitempty"`
+}
+
+// GetSecretSubkeysParams defines parameters for GetSecretSubkeys.
+type GetSecretSubkeysParams struct {
+	// Depth Location of the secret
+	Depth *uint32 `form:"depth,omitempty" json:"depth,omitempty"`
+
+	// Version Version of the secret requested
+	Version *uint32 `form:"version,omitempty" json:"version,omitempty"`
+}
+
 // ListServiceKeysParams defines parameters for ListServiceKeys.
 type ListServiceKeysParams struct {
 	// State Returns objects with specified state.
@@ -414,7 +606,7 @@ type ListServiceKeysParams struct {
 	ContinuationToken *string `form:"continuation-token,omitempty" json:"continuation-token,omitempty"`
 
 	// Max Maximum number of keys returned in one call.
-	Max *int32 `form:"max,omitempty" json:"max,omitempty"`
+	Max *uint32 `form:"max,omitempty" json:"max,omitempty"`
 }
 
 // CreateImportServiceKeyParams defines parameters for CreateImportServiceKey.
@@ -434,6 +626,30 @@ type SignParams struct {
 	// Format Signature format.
 	Format *SignatureFormats `form:"format,omitempty" json:"format,omitempty"`
 }
+
+// PostSecretConfigJSONRequestBody defines body for PostSecretConfig for application/json ContentType.
+type PostSecretConfigJSONRequestBody = PostConfigRequest
+
+// PatchSecretRequestJSONRequestBody defines body for PatchSecretRequest for application/json ContentType.
+type PatchSecretRequestJSONRequestBody = PostSecretRequest
+
+// PostSecretRequestJSONRequestBody defines body for PostSecretRequest for application/json ContentType.
+type PostSecretRequestJSONRequestBody = PostSecretRequest
+
+// DeleteSecretVersionsJSONRequestBody defines body for DeleteSecretVersions for application/json ContentType.
+type DeleteSecretVersionsJSONRequestBody = SecretVersionsRequest
+
+// PostSecretDestroyJSONRequestBody defines body for PostSecretDestroy for application/json ContentType.
+type PostSecretDestroyJSONRequestBody = SecretVersionsRequest
+
+// PatchSecretMetadataJSONRequestBody defines body for PatchSecretMetadata for application/json ContentType.
+type PatchSecretMetadataJSONRequestBody = SecretUpdatableMetadata
+
+// PostSecretMetadataJSONRequestBody defines body for PostSecretMetadata for application/json ContentType.
+type PostSecretMetadataJSONRequestBody = SecretUpdatableMetadata
+
+// PostSecretUndeleteJSONRequestBody defines body for PostSecretUndelete for application/json ContentType.
+type PostSecretUndeleteJSONRequestBody = SecretVersionsRequest
 
 // CreateImportServiceKeyJSONRequestBody defines body for CreateImportServiceKey for application/json ContentType.
 type CreateImportServiceKeyJSONRequestBody = CreateImportServiceKeyRequest

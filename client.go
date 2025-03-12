@@ -375,7 +375,7 @@ func (client *apiClient) GetServiceKey(ctx context.Context, keyId uuid.UUID, for
 
 // ListServiceKeys returns a page of service keys. The response contains a continuationToken that must be passed to the
 // subsequent calls in order to get the next page. The state parameter when no nil is used to query keys having a specific state.
-func (client *apiClient) ListServiceKeys(ctx context.Context, continuationToken *string, maxKeys *int32, state *types.KeyStates) (*types.ListServiceKeysResponse, error) {
+func (client *apiClient) ListServiceKeys(ctx context.Context, continuationToken *string, maxKeys *uint32, state *types.KeyStates) (*types.ListServiceKeysResponse, error) {
 	params := &types.ListServiceKeysParams{ContinuationToken: continuationToken, Max: maxKeys, State: state}
 	r, err := mapRestErr(client.inner.ListServiceKeysWithResponse(ctx, params))
 	if err != nil {
@@ -511,93 +511,93 @@ func (client *apiClient) Verify(ctx context.Context, keyId uuid.UUID, alg types.
 	return r.JSON200.Result, nil
 }
 
-// func (client *apiClient) DeleteSecretMetadata(ctx context.Context, path string) error {
-// 	_, err := mapRestErr(client.inner.DeleteSecretMetadataWithResponse(ctx, path))
-// 	return err
-// }
+func (client *apiClient) DeleteSecretMetadata(ctx context.Context, path string) error {
+	_, err := mapRestErr(client.inner.DeleteSecretMetadataWithResponse(ctx, path))
+	return err
+}
 
-// func (client *apiClient) DeleteSecretRequest(ctx context.Context, path string) error {
-// 	_, err := mapRestErr(client.inner.DeleteSecretRequestWithResponse(ctx, path))
-// 	return err
-// }
+func (client *apiClient) DeleteSecretRequest(ctx context.Context, path string) error {
+	_, err := mapRestErr(client.inner.DeleteSecretRequestWithResponse(ctx, path))
+	return err
+}
 
-// func (client *apiClient) DeleteSecretVersions(ctx context.Context, path string, versions []int32) error {
-// 	_, err := mapRestErr(client.inner.DeleteSecretVersionsWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
-// 	return err
-// }
+func (client *apiClient) DeleteSecretVersions(ctx context.Context, path string, versions []uint32) error {
+	_, err := mapRestErr(client.inner.DeleteSecretVersionsWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
+	return err
+}
 
-// func (client *apiClient) GetSecretConfig(ctx context.Context) (*types.GetConfigResponse, error) {
-// 	r, err := mapRestErr(client.inner.GetSecretConfigWithResponse(ctx))
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return r.JSON200, err
-// }
+func (client *apiClient) GetSecretConfig(ctx context.Context) (*types.GetConfigResponse, error) {
+	r, err := mapRestErr(client.inner.GetSecretConfigWithResponse(ctx))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
+}
 
-// func (client *apiClient) GetSecretRequest(ctx context.Context, path string, version *int32) (*types.GetSecretResponse, error) {
-// 	r, err := mapRestErr(client.inner.GetSecretRequestWithResponse(ctx, path, &types.GetSecretRequestParams{Version: version}))
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return r.JSON200, err
-// }
+func (client *apiClient) GetSecretRequest(ctx context.Context, path string, version *uint32) (*types.GetSecretResponse, error) {
+	r, err := mapRestErr(client.inner.GetSecretRequestWithResponse(ctx, path, &types.GetSecretRequestParams{Version: version}))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
+}
 
-// func (client *apiClient) GetSecretSubkeys(ctx context.Context, path string, depth, version *int32) (*types.GetSecretSubkeysResponse, error) {
-// 	r, err := mapRestErr(client.inner.GetSecretSubkeysWithResponse(ctx, path, &types.GetSecretSubkeysParams{Depth: depth, Version: version}))
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return r.JSON200, err
-// }
+func (client *apiClient) GetSecretSubkeys(ctx context.Context, path string, depth, version *uint32) (*types.GetSecretSubkeysResponse, error) {
+	r, err := mapRestErr(client.inner.GetSecretSubkeysWithResponse(ctx, path, &types.GetSecretSubkeysParams{Depth: depth, Version: version}))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
+}
 
-// func (client *apiClient) GetSecretsMetadata(ctx context.Context, path string, list bool) (*types.GetMetadataResponse, error) {
-// 	r, err := mapRestErr(client.inner.GetSecretsMetadataWithResponse(ctx, path, &types.GetSecretsMetadataParams{List: &list}))
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return r.JSON200, err
-// }
+func (client *apiClient) GetSecretsMetadata(ctx context.Context, path string, list bool) (*types.GetMetadataResponse, error) {
+	r, err := mapRestErr(client.inner.GetSecretsMetadataWithResponse(ctx, path, &types.GetSecretsMetadataParams{List: &list}))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
+}
 
-// func (client *apiClient) PatchSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error {
-// 	_, err := mapRestErr(client.inner.PatchSecretMetadataWithResponse(ctx, path, body))
-// 	return err
-// }
+func (client *apiClient) PatchSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error {
+	_, err := mapRestErr(client.inner.PatchSecretMetadataWithResponse(ctx, path, body))
+	return err
+}
 
-// func (client *apiClient) PatchSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PatchSecretResponse, error) {
-// 	r, err := mapRestErr(client.inner.PatchSecretRequestWithResponse(ctx, path, body))
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return r.JSON200, err
-// }
+func (client *apiClient) PatchSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PatchSecretResponse, error) {
+	r, err := mapRestErr(client.inner.PatchSecretRequestWithResponse(ctx, path, body))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
+}
 
-// func (client *apiClient) PostSecretConfig(ctx context.Context, body types.PostConfigRequest) error {
-// 	_, err := mapRestErr(client.inner.PostSecretConfigWithResponse(ctx, body))
-// 	return err
-// }
+func (client *apiClient) PostSecretConfig(ctx context.Context, body types.PostConfigRequest) error {
+	_, err := mapRestErr(client.inner.PostSecretConfigWithResponse(ctx, body))
+	return err
+}
 
-// func (client *apiClient) PostSecretDestroy(ctx context.Context, path string, versions []int32) error {
-// 	_, err := mapRestErr(client.inner.PostSecretDestroyWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
-// 	return err
-// }
+func (client *apiClient) PostSecretDestroy(ctx context.Context, path string, versions []uint32) error {
+	_, err := mapRestErr(client.inner.PostSecretDestroyWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
+	return err
+}
 
-// func (client *apiClient) PostSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error {
-// 	_, err := mapRestErr(client.inner.PostSecretMetadataWithResponse(ctx, path, body))
-// 	return err
-// }
+func (client *apiClient) PostSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error {
+	_, err := mapRestErr(client.inner.PostSecretMetadataWithResponse(ctx, path, body))
+	return err
+}
 
-// func (client *apiClient) PostSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PostSecretResponse, error) {
-// 	r, err := mapRestErr(client.inner.PostSecretRequestWithResponse(ctx, path, body))
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return r.JSON200, err
-// }
+func (client *apiClient) PostSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PostSecretResponse, error) {
+	r, err := mapRestErr(client.inner.PostSecretRequestWithResponse(ctx, path, body))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
+}
 
-// func (client *apiClient) PostSecretUndelete(ctx context.Context, path string, versions []int32) error {
-// 	_, err := mapRestErr(client.inner.PostSecretUndeleteWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
-// 	return err
-// }
+func (client *apiClient) PostSecretUndelete(ctx context.Context, path string, versions []uint32) error {
+	_, err := mapRestErr(client.inner.PostSecretUndeleteWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
+	return err
+}
 
 func mapRestErr[T interface{ StatusCode() int }](resp T, err error) (T, error) {
 	if err != nil {
