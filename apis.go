@@ -27,6 +27,7 @@ type API interface {
 	EncryptionApi
 	ServiceKeyApi
 	SecretApi
+	SecretApiV2
 	// Ping(ctx context.Context) error
 	SetCustomHeader(key, value string)
 }
@@ -107,8 +108,35 @@ type SecretApi interface {
 	DeleteSecretRequest(ctx context.Context, path string) error
 	// DeleteSecretVersions deletes the specified secret version. This marks the versions as deleted but the underlying data will not be removed.
 	DeleteSecretVersions(ctx context.Context, path string, versions []uint32) error
-	// PostSecretDestroy permanently removes the data of the specified versions from the secrets store.
-	PostSecretDestroy(ctx context.Context, path string, versions []uint32) error
+	// PutSecretDestroy permanently removes the data of the specified versions from the secrets store.
+	PutSecretDestroy(ctx context.Context, path string, versions []uint32) error
 	// PostSecretUndelete undeletes the data of the specified versions. The versions will no longer be marked as deleted.
 	PostSecretUndelete(ctx context.Context, path string, versions []uint32) error
+}
+
+type SecretApiV2 interface {
+	// ListSecretV2 returns a page of secrets.
+	ListSecretV2(ctx context.Context, pageSize, pageNumber *uint32) (*types.ListSecretV2Response, error)
+	// PostSecretV2 creates a new secret with metadata.
+	PostSecretV2(ctx context.Context, cas *uint32, body types.PostSecretV2Request) (*types.PostSecretV2Response, error)
+	// DeleteSecretV2 deletes a secret and all its versions.
+	DeleteSecretV2(ctx context.Context, path string) error
+	// GetSecretV2 returns a secret and its metadata. If the version is not specified, the current version is returned.
+	GetSecretV2(ctx context.Context, path string, version *uint32, includeData *bool) (*types.GetSecretV2Response, error)
+	// PutSecretV2 updates a secret. If the secret data is updated, a new version will be created.
+	PutSecretV2(ctx context.Context, path string, cas *uint32, body types.PutSecretV2Request) (*types.PutSecretV2Response, error)
+
+	// ListSecretVersionV2 returns the versions of a secret.
+	ListSecretVersionV2(ctx context.Context, path string) (*types.ListSecretVersionV2Response, error)
+	// PostSecretVersionV2 creates a new secret version.
+	PostSecretVersionV2(ctx context.Context, path string, cas *uint32, body types.PostSecretVersionV2Request) (*types.SecretV2Version, error)
+	// GetSecretVersionV2 returns a secret version.
+	GetSecretVersionV2(ctx context.Context, path string, version uint32, includeData *bool) (*types.SecretV2Version, error)
+	// Updates the status of a secret version.
+	PutSecretVersionV2(ctx context.Context, path string, version uint32, body types.PutSecretVersionV2Request) (*types.SecretV2Version, error)
+
+	// GetSecretConfigV2 returns the default secrets configuration.
+	GetSecretConfigV2(ctx context.Context) (*types.GetSecretConfigV2Response, error)
+	// PutSecretConfigV2 updated the default secrets configuration.
+	PutSecretConfigV2(ctx context.Context, body types.PutSecretConfigV2Request) (*types.PutSecretConfigV2Response, error)
 }

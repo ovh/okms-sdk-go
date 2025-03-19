@@ -60,13 +60,13 @@ const (
 
 // Defines values for KeyStates.
 const (
-	Active               KeyStates = "active"
-	All                  KeyStates = "all"
-	Compromised          KeyStates = "compromised"
-	Deactivated          KeyStates = "deactivated"
-	Destroyed            KeyStates = "destroyed"
-	DestroyedCompromised KeyStates = "destroyed_compromised"
-	PreActive            KeyStates = "pre_active"
+	KeyStatesActive               KeyStates = "active"
+	KeyStatesAll                  KeyStates = "all"
+	KeyStatesCompromised          KeyStates = "compromised"
+	KeyStatesDeactivated          KeyStates = "deactivated"
+	KeyStatesDestroyed            KeyStates = "destroyed"
+	KeyStatesDestroyedCompromised KeyStates = "destroyed_compromised"
+	KeyStatesPreActive            KeyStates = "pre_active"
 )
 
 // Defines values for KeyTypes.
@@ -85,6 +85,13 @@ const (
 	PrivilegeWithdrawn   RevocationReasons = "privilege_withdrawn"
 	Superseded           RevocationReasons = "superseded"
 	Unspecified          RevocationReasons = "unspecified"
+)
+
+// Defines values for SecretV2State.
+const (
+	SecretV2StateActive      SecretV2State = "active"
+	SecretV2StateDeactivated SecretV2State = "deactivated"
+	SecretV2StateDeleted     SecretV2State = "deleted"
 )
 
 // Defines values for SignatureFormats.
@@ -203,7 +210,7 @@ type GenerateDataKeyResponse struct {
 
 // GetConfigResponse Get engine configuration
 type GetConfigResponse struct {
-	// Data Default settings for secret API backend service
+	// Data Default settings for Secret-API backend service
 	Data      *PostConfigRequest `json:"data,omitempty"`
 	RequestId *string            `json:"request_id"`
 }
@@ -213,6 +220,18 @@ type GetMetadataResponse struct {
 	// Data Secret metadata or list of keys
 	Data      *SecretMetadata `json:"data,omitempty"`
 	RequestId *string         `json:"request_id"`
+}
+
+// GetSecretConfigV2Response defines model for GetSecretConfigV2Response.
+type GetSecretConfigV2Response struct {
+	// CasRequired cas parameter will be required for each write call if set to true
+	CasRequired *bool `json:"cas_required,omitempty"`
+
+	// DeactivateVersionAfter The length of time before a version is deleted
+	DeactivateVersionAfter *string `json:"deactivate_version_after"`
+
+	// MaxVersions The number of versions to keep (10 default)
+	MaxVersions *uint32 `json:"max_versions"`
 }
 
 // GetSecretResponse Response to get secret operation
@@ -227,6 +246,15 @@ type GetSecretSubkeysResponse struct {
 	// Data Subkey model
 	Data      *SecretDataSubkeys `json:"data,omitempty"`
 	RequestId *string            `json:"request_id"`
+}
+
+// GetSecretV2Response defines model for GetSecretV2Response.
+type GetSecretV2Response struct {
+	Metadata *SecretV2Metadata `json:"metadata,omitempty"`
+
+	// Path Secret identifier
+	Path    *string          `json:"path,omitempty"`
+	Version *SecretV2Version `json:"version,omitempty"`
 }
 
 // GetServiceKeyResponse Get service key response
@@ -369,6 +397,18 @@ type KeyStates string
 // KeyTypes defines model for KeyTypes.
 type KeyTypes string
 
+// ListSecretV2Response List of secrets
+type ListSecretV2Response struct {
+	// Results List of secrets
+	Results *[]GetSecretV2Response `json:"results,omitempty"`
+
+	// TotalCount Total number of secrets.
+	TotalCount *uint32 `json:"total_count,omitempty"`
+}
+
+// ListSecretVersionV2Response defines model for ListSecretVersionV2Response.
+type ListSecretVersionV2Response = []SecretV2Version
+
 // ListServiceKeysResponse List domain keys response
 type ListServiceKeysResponse struct {
 	// ContinuationToken continuation token if list is not complete
@@ -394,7 +434,7 @@ type PatchServiceKeyRequest struct {
 	Name string `json:"name"`
 }
 
-// PostConfigRequest Default settings for secret API backend service
+// PostConfigRequest Default settings for Secret-API backend service
 type PostConfigRequest struct {
 	// CasRequired cas parameter will be required for each write call if set to true
 	CasRequired *bool `json:"cas_required,omitempty"`
@@ -426,6 +466,77 @@ type PostSecretResponse struct {
 	// Data Secret version specific metadata fields
 	Data      *SecretVersionMetadata `json:"data,omitempty"`
 	RequestId *string                `json:"request_id"`
+}
+
+// PostSecretV2Request defines model for PostSecretV2Request.
+type PostSecretV2Request struct {
+	Metadata *SecretV2MetadataShort `json:"metadata,omitempty"`
+
+	// Path Secret identifier
+	Path string `json:"path"`
+
+	// Version Data of the secret version
+	Version SecretV2VersionShort `json:"version"`
+}
+
+// PostSecretV2Response defines model for PostSecretV2Response.
+type PostSecretV2Response struct {
+	Metadata *SecretV2Metadata `json:"metadata,omitempty"`
+
+	// Path Secret identifier
+	Path *string `json:"path,omitempty"`
+}
+
+// PostSecretVersionV2Request defines model for PostSecretVersionV2Request.
+type PostSecretVersionV2Request struct {
+	// Data The secret data map to store
+	Data *map[string]interface{} `json:"data"`
+}
+
+// PutSecretConfigV2Request defines model for PutSecretConfigV2Request.
+type PutSecretConfigV2Request struct {
+	// CasRequired cas parameter will be required for each write call if set to true
+	CasRequired *bool `json:"cas_required"`
+
+	// DeactivateVersionAfter The length of time before a version is deleted
+	DeactivateVersionAfter *string `json:"deactivate_version_after"`
+
+	// MaxVersions The number of versions to keep (10 default)
+	MaxVersions *uint32 `json:"max_versions"`
+}
+
+// PutSecretConfigV2Response defines model for PutSecretConfigV2Response.
+type PutSecretConfigV2Response struct {
+	// CasRequired cas parameter will be required for each write call if set to true
+	CasRequired *bool `json:"cas_required,omitempty"`
+
+	// DeactivateVersionAfter The length of time before a version is deleted
+	DeactivateVersionAfter *string `json:"deactivate_version_after"`
+
+	// MaxVersions The number of versions to keep (10 default)
+	MaxVersions *uint32 `json:"max_versions"`
+}
+
+// PutSecretV2Request defines model for PutSecretV2Request.
+type PutSecretV2Request struct {
+	Metadata *SecretV2MetadataShort `json:"metadata,omitempty"`
+
+	// Version Data of the secret version
+	Version *SecretV2VersionShort `json:"version,omitempty"`
+}
+
+// PutSecretV2Response defines model for PutSecretV2Response.
+type PutSecretV2Response struct {
+	Metadata *SecretV2Metadata `json:"metadata,omitempty"`
+
+	// Path Secret identifier
+	Path *string `json:"path,omitempty"`
+}
+
+// PutSecretVersionV2Request defines model for PutSecretVersionV2Request.
+type PutSecretVersionV2Request struct {
+	// State State of the secret version
+	State SecretV2State `json:"state"`
 }
 
 // RevocationReasons defines model for RevocationReasons.
@@ -497,6 +608,74 @@ type SecretUpdatableMetadata struct {
 	MaxVersions *uint32 `json:"max_versions"`
 }
 
+// SecretV2CustomMetadata defines model for SecretV2CustomMetadata.
+type SecretV2CustomMetadata map[string]string
+
+// SecretV2Metadata defines model for SecretV2Metadata.
+type SecretV2Metadata struct {
+	// CasRequired The cas parameter will be required for all write requests if set to true
+	CasRequired *bool `json:"cas_required"`
+
+	// CreatedAt Time of creation of the secret version
+	CreatedAt *string `json:"created_at"`
+
+	// CurrentVersion The secret version.
+	CurrentVersion *uint32                 `json:"current_version,omitempty"`
+	CustomMetadata *SecretV2CustomMetadata `json:"custom_metadata,omitempty"`
+
+	// DeactivateVersionAfter Time duration before a version is deactivated
+	DeactivateVersionAfter *string `json:"deactivate_version_after"`
+
+	// MaxVersions The number of versions to keep (10 default)
+	MaxVersions *uint32 `json:"max_versions"`
+
+	// OldestVersion The secret oldest version
+	OldestVersion *uint32 `json:"oldest_version,omitempty"`
+
+	// UpdatedAt Time of the last update of the secret
+	UpdatedAt *string `json:"updated_at"`
+}
+
+// SecretV2MetadataShort defines model for SecretV2MetadataShort.
+type SecretV2MetadataShort struct {
+	// CasRequired The cas parameter will be required for all write requests if set to true
+	CasRequired    *bool                   `json:"cas_required"`
+	CustomMetadata *SecretV2CustomMetadata `json:"custom_metadata,omitempty"`
+
+	// DeactivateVersionAfter Time duration before a version is deactivated
+	DeactivateVersionAfter *string `json:"deactivate_version_after"`
+
+	// MaxVersions The number of versions to keep (10 default)
+	MaxVersions *uint32 `json:"max_versions"`
+}
+
+// SecretV2State State of the secret version
+type SecretV2State string
+
+// SecretV2Version defines model for SecretV2Version.
+type SecretV2Version struct {
+	// CreatedAt Time of creation of the secret version
+	CreatedAt string `json:"created_at"`
+
+	// Data The secret data map to store
+	Data *map[string]interface{} `json:"data"`
+
+	// DeactivatedAt Time of deactivation of the secret version
+	DeactivatedAt *string `json:"deactivated_at"`
+
+	// Id Secret version
+	Id uint32 `json:"id"`
+
+	// State State of the secret version
+	State SecretV2State `json:"state"`
+}
+
+// SecretV2VersionShort Data of the secret version
+type SecretV2VersionShort struct {
+	// Data The secret data map to store
+	Data *map[string]interface{} `json:"data"`
+}
+
 // SecretVersionMetadata Secret version specific metadata fields
 type SecretVersionMetadata struct {
 	// CreatedTime Time of creation of the secret version
@@ -552,9 +731,6 @@ type SignResponse struct {
 
 // SignatureFormats Formats for digital signature result.
 type SignatureFormats string
-
-// StatusCodes defines model for StatusCodes.
-type StatusCodes = map[string]interface{}
 
 // VerifyRequest Verify signature request model
 type VerifyRequest struct {
@@ -627,6 +803,48 @@ type SignParams struct {
 	Format *SignatureFormats `form:"format,omitempty" json:"format,omitempty"`
 }
 
+// ListSecretV2Params defines parameters for ListSecretV2.
+type ListSecretV2Params struct {
+	// PageSize Maximum number of secrets returned in one call.
+	PageSize *uint32 `form:"page_size,omitempty" json:"page_size,omitempty"`
+
+	// PageNumber Number of the page to return.
+	PageNumber *uint32 `form:"page_number,omitempty" json:"page_number,omitempty"`
+}
+
+// PostSecretV2Params defines parameters for PostSecretV2.
+type PostSecretV2Params struct {
+	// Cas Secret version number.
+	Cas *uint32 `form:"cas,omitempty" json:"cas,omitempty"`
+}
+
+// GetSecretV2Params defines parameters for GetSecretV2.
+type GetSecretV2Params struct {
+	// Version Secret version. If not set, the latest version will be returned.
+	Version *uint32 `form:"version,omitempty" json:"version,omitempty"`
+
+	// IncludeData Secret data.
+	IncludeData *bool `form:"includeData,omitempty" json:"includeData,omitempty"`
+}
+
+// PutSecretV2Params defines parameters for PutSecretV2.
+type PutSecretV2Params struct {
+	// Cas Secret version number.
+	Cas *uint32 `form:"cas,omitempty" json:"cas,omitempty"`
+}
+
+// PostSecretVersionV2Params defines parameters for PostSecretVersionV2.
+type PostSecretVersionV2Params struct {
+	// Cas Secret version number.
+	Cas *uint32 `form:"cas,omitempty" json:"cas,omitempty"`
+}
+
+// GetSecretVersionV2Params defines parameters for GetSecretVersionV2.
+type GetSecretVersionV2Params struct {
+	// IncludeData Secret data.
+	IncludeData *bool `form:"includeData,omitempty" json:"includeData,omitempty"`
+}
+
 // PostSecretConfigJSONRequestBody defines body for PostSecretConfig for application/json ContentType.
 type PostSecretConfigJSONRequestBody = PostConfigRequest
 
@@ -639,8 +857,8 @@ type PostSecretRequestJSONRequestBody = PostSecretRequest
 // DeleteSecretVersionsJSONRequestBody defines body for DeleteSecretVersions for application/json ContentType.
 type DeleteSecretVersionsJSONRequestBody = SecretVersionsRequest
 
-// PostSecretDestroyJSONRequestBody defines body for PostSecretDestroy for application/json ContentType.
-type PostSecretDestroyJSONRequestBody = SecretVersionsRequest
+// PutSecretDestroyJSONRequestBody defines body for PutSecretDestroy for application/json ContentType.
+type PutSecretDestroyJSONRequestBody = SecretVersionsRequest
 
 // PatchSecretMetadataJSONRequestBody defines body for PatchSecretMetadata for application/json ContentType.
 type PatchSecretMetadataJSONRequestBody = SecretUpdatableMetadata
@@ -680,3 +898,18 @@ type SignJSONRequestBody = SignRequest
 
 // VerifyJSONRequestBody defines body for Verify for application/json ContentType.
 type VerifyJSONRequestBody = VerifyRequest
+
+// PostSecretV2JSONRequestBody defines body for PostSecretV2 for application/json ContentType.
+type PostSecretV2JSONRequestBody = PostSecretV2Request
+
+// PutSecretV2JSONRequestBody defines body for PutSecretV2 for application/json ContentType.
+type PutSecretV2JSONRequestBody = PutSecretV2Request
+
+// PostSecretVersionV2JSONRequestBody defines body for PostSecretVersionV2 for application/json ContentType.
+type PostSecretVersionV2JSONRequestBody = PostSecretVersionV2Request
+
+// PutSecretVersionV2JSONRequestBody defines body for PutSecretVersionV2 for application/json ContentType.
+type PutSecretVersionV2JSONRequestBody = PutSecretVersionV2Request
+
+// PutSecretConfigV2JSONRequestBody defines body for PutSecretConfigV2 for application/json ContentType.
+type PutSecretConfigV2JSONRequestBody = PutSecretConfigV2Request

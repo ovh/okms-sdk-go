@@ -98,16 +98,15 @@ func (client *Client) GenerateECKeyPair(ctx context.Context, curve types.Curves,
 	return client.CreateImportServiceKey(ctx, nil, body)
 }
 
-func (client *Client) importJWK(ctx context.Context, jwk types.JsonWebKeyRequest, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+func (client *Client) importJWK(ctx context.Context, jwk types.JsonWebKeyRequest, name, keyCtx string) (*types.GetServiceKeyResponse, error) {
 	var keyContext *string
 	if keyCtx != "" {
 		keyContext = &keyCtx
 	}
 	req := types.CreateImportServiceKeyRequest{
-		Context:    keyContext,
-		Name:       name,
-		Operations: &ops,
-		Keys:       &[]types.JsonWebKeyRequest{jwk},
+		Context: keyContext,
+		Name:    name,
+		Keys:    &[]types.JsonWebKeyRequest{jwk},
 	}
 	format := types.Jwk
 	return client.CreateImportServiceKey(ctx, &format, req)
@@ -123,9 +122,9 @@ func (client *Client) importJWK(ctx context.Context, jwk types.JsonWebKeyRequest
 func (client *Client) ImportKey(ctx context.Context, key any, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
 	switch k := key.(type) {
 	case types.JsonWebKeyRequest:
-		return client.importJWK(ctx, k, name, keyCtx, ops...)
+		return client.importJWK(ctx, k, name, keyCtx)
 	case *types.JsonWebKeyRequest:
-		return client.importJWK(ctx, *k, name, keyCtx, ops...)
+		return client.importJWK(ctx, *k, name, keyCtx)
 	}
 	jwk, err := types.NewJsonWebKey(key, ops, name)
 	if err != nil {
@@ -148,7 +147,7 @@ func (client *Client) ImportKey(ctx context.Context, key any, name, keyCtx strin
 		Crv:    jwk.Crv,
 		K:      jwk.K,
 	}
-	return client.importJWK(ctx, jwkRequest, name, keyCtx, ops...)
+	return client.importJWK(ctx, jwkRequest, name, keyCtx)
 }
 
 // ImportKeyPairPEM imports a PEM formated key into the KMS. keyCtx can be left empty if not needed.
@@ -511,21 +510,25 @@ func (client *apiClient) Verify(ctx context.Context, keyId uuid.UUID, alg types.
 	return r.JSON200.Result, nil
 }
 
+// DeleteSecretMetadata deletes secret metadata and all versions.
 func (client *apiClient) DeleteSecretMetadata(ctx context.Context, path string) error {
 	_, err := mapRestErr(client.inner.DeleteSecretMetadataWithResponse(ctx, path))
 	return err
 }
 
+// DeleteSecretRequest deletes the latest version of a secret. This marks the version as deleted but the underlying data will not be removed.
 func (client *apiClient) DeleteSecretRequest(ctx context.Context, path string) error {
 	_, err := mapRestErr(client.inner.DeleteSecretRequestWithResponse(ctx, path))
 	return err
 }
 
+// DeleteSecretVersions deletes the specified secret version. This marks the versions as deleted but the underlying data will not be removed.
 func (client *apiClient) DeleteSecretVersions(ctx context.Context, path string, versions []uint32) error {
 	_, err := mapRestErr(client.inner.DeleteSecretVersionsWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
 	return err
 }
 
+// GetSecretConfig returns secret store configuration.
 func (client *apiClient) GetSecretConfig(ctx context.Context) (*types.GetConfigResponse, error) {
 	r, err := mapRestErr(client.inner.GetSecretConfigWithResponse(ctx))
 	if err != nil {
@@ -534,6 +537,7 @@ func (client *apiClient) GetSecretConfig(ctx context.Context) (*types.GetConfigR
 	return r.JSON200, err
 }
 
+// GetSecretRequest returns secret version.
 func (client *apiClient) GetSecretRequest(ctx context.Context, path string, version *uint32) (*types.GetSecretResponse, error) {
 	r, err := mapRestErr(client.inner.GetSecretRequestWithResponse(ctx, path, &types.GetSecretRequestParams{Version: version}))
 	if err != nil {
@@ -542,6 +546,7 @@ func (client *apiClient) GetSecretRequest(ctx context.Context, path string, vers
 	return r.JSON200, err
 }
 
+// GetSecretSubkeys returns secret subkeys.
 func (client *apiClient) GetSecretSubkeys(ctx context.Context, path string, depth, version *uint32) (*types.GetSecretSubkeysResponse, error) {
 	r, err := mapRestErr(client.inner.GetSecretSubkeysWithResponse(ctx, path, &types.GetSecretSubkeysParams{Depth: depth, Version: version}))
 	if err != nil {
@@ -550,6 +555,7 @@ func (client *apiClient) GetSecretSubkeys(ctx context.Context, path string, dept
 	return r.JSON200, err
 }
 
+// GetSecretsMetadata returns a secret metadata or a list of secrets if `list` is set to true.
 func (client *apiClient) GetSecretsMetadata(ctx context.Context, path string, list bool) (*types.GetMetadataResponse, error) {
 	r, err := mapRestErr(client.inner.GetSecretsMetadataWithResponse(ctx, path, &types.GetSecretsMetadataParams{List: &list}))
 	if err != nil {
@@ -558,11 +564,13 @@ func (client *apiClient) GetSecretsMetadata(ctx context.Context, path string, li
 	return r.JSON200, err
 }
 
+// PatchSecretMetadata updates secret metadata.
 func (client *apiClient) PatchSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error {
 	_, err := mapRestErr(client.inner.PatchSecretMetadataWithResponse(ctx, path, body))
 	return err
 }
 
+// PatchSecretRequest patches a secret.
 func (client *apiClient) PatchSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PatchSecretResponse, error) {
 	r, err := mapRestErr(client.inner.PatchSecretRequestWithResponse(ctx, path, body))
 	if err != nil {
@@ -571,21 +579,25 @@ func (client *apiClient) PatchSecretRequest(ctx context.Context, path string, bo
 	return r.JSON200, err
 }
 
+// PostSecretConfig configures secret store settings.
 func (client *apiClient) PostSecretConfig(ctx context.Context, body types.PostConfigRequest) error {
 	_, err := mapRestErr(client.inner.PostSecretConfigWithResponse(ctx, body))
 	return err
 }
 
-func (client *apiClient) PostSecretDestroy(ctx context.Context, path string, versions []uint32) error {
-	_, err := mapRestErr(client.inner.PostSecretDestroyWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
+// PutSecretDestroy permanently removes the data of the specified versions from the secrets store.
+func (client *apiClient) PutSecretDestroy(ctx context.Context, path string, versions []uint32) error {
+	_, err := mapRestErr(client.inner.PutSecretDestroyWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
 	return err
 }
 
+// PostSecretMetadata updates secret metadata.
 func (client *apiClient) PostSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error {
 	_, err := mapRestErr(client.inner.PostSecretMetadataWithResponse(ctx, path, body))
 	return err
 }
 
+// PostSecretRequest creates or updates a secret.
 func (client *apiClient) PostSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PostSecretResponse, error) {
 	r, err := mapRestErr(client.inner.PostSecretRequestWithResponse(ctx, path, body))
 	if err != nil {
@@ -594,9 +606,106 @@ func (client *apiClient) PostSecretRequest(ctx context.Context, path string, bod
 	return r.JSON200, err
 }
 
+// PostSecretUndelete undeletes the data of the specified versions. The versions will no longer be marked as deleted.
 func (client *apiClient) PostSecretUndelete(ctx context.Context, path string, versions []uint32) error {
 	_, err := mapRestErr(client.inner.PostSecretUndeleteWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
 	return err
+}
+
+// ListSecretV2 returns a page of secrets.
+func (client *apiClient) ListSecretV2(ctx context.Context, pageSize, pageNumber *uint32) (*types.ListSecretV2Response, error) {
+	r, err := mapRestErr(client.inner.ListSecretV2WithResponse(ctx, &types.ListSecretV2Params{PageSize: pageSize, PageNumber: pageNumber}))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
+}
+
+// PostSecretV2 creates a new secret with metadata.
+func (client *apiClient) PostSecretV2(ctx context.Context, cas *uint32, body types.PostSecretV2Request) (*types.PostSecretV2Response, error) {
+	r, err := mapRestErr(client.inner.PostSecretV2WithResponse(ctx, &types.PostSecretV2Params{Cas: cas}, body))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
+}
+
+// DeleteSecretV2 deletes a secret and all its versions.
+func (client *apiClient) DeleteSecretV2(ctx context.Context, path string) error {
+	_, err := mapRestErr(client.inner.DeleteSecretV2WithResponse(ctx, path))
+	return err
+}
+
+// GetSecretV2 returns a secret and its metadata. If the version is not specified, the current version is returned.
+func (client *apiClient) GetSecretV2(ctx context.Context, path string, version *uint32, includeData *bool) (*types.GetSecretV2Response, error) {
+	r, err := mapRestErr(client.inner.GetSecretV2WithResponse(ctx, path, &types.GetSecretV2Params{Version: version, IncludeData: includeData}))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
+}
+
+// PutSecretV2 updates a secret. If the secret data is updated, a new version will be created.
+func (client *apiClient) PutSecretV2(ctx context.Context, path string, cas *uint32, body types.PutSecretV2Request) (*types.PutSecretV2Response, error) {
+	r, err := mapRestErr(client.inner.PutSecretV2WithResponse(ctx, path, &types.PutSecretV2Params{Cas: cas}, body))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
+}
+
+// ListSecretVersionV2 returns the versions of a secret.
+func (client *apiClient) ListSecretVersionV2(ctx context.Context, path string) (*types.ListSecretVersionV2Response, error) {
+	r, err := mapRestErr(client.inner.ListSecretVersionV2WithResponse(ctx, path))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
+}
+
+// PostSecretVersionV2 creates a new secret version.
+func (client *apiClient) PostSecretVersionV2(ctx context.Context, path string, cas *uint32, body types.PostSecretVersionV2Request) (*types.SecretV2Version, error) {
+	r, err := mapRestErr(client.inner.PostSecretVersionV2WithResponse(ctx, path, &types.PostSecretVersionV2Params{Cas: cas}, body))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
+}
+
+// GetSecretVersionV2 returns a secret version.
+func (client *apiClient) GetSecretVersionV2(ctx context.Context, path string, version uint32, includeData *bool) (*types.SecretV2Version, error) {
+	r, err := mapRestErr(client.inner.GetSecretVersionV2WithResponse(ctx, path, version, &types.GetSecretVersionV2Params{IncludeData: includeData}))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
+}
+
+// Updates the status of a secret version.
+func (client *apiClient) PutSecretVersionV2(ctx context.Context, path string, version uint32, body types.PutSecretVersionV2Request) (*types.SecretV2Version, error) {
+	r, err := mapRestErr(client.inner.PutSecretVersionV2WithResponse(ctx, path, version, body))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
+}
+
+// GetSecretConfigV2 returns the default secrets configuration.
+func (client *apiClient) GetSecretConfigV2(ctx context.Context) (*types.GetSecretConfigV2Response, error) {
+	r, err := mapRestErr(client.inner.GetSecretConfigV2WithResponse(ctx))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
+}
+
+// PutSecretConfigV2 updated the default secrets configuration.
+func (client *apiClient) PutSecretConfigV2(ctx context.Context, body types.PutSecretConfigV2Request) (*types.PutSecretConfigV2Response, error) {
+	r, err := mapRestErr(client.inner.PutSecretConfigV2WithResponse(ctx, body))
+	if err != nil {
+		return nil, err
+	}
+	return r.JSON200, err
 }
 
 func mapRestErr[T interface{ StatusCode() int }](resp T, err error) (T, error) {

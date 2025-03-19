@@ -120,10 +120,10 @@ type ClientInterface interface {
 
 	DeleteSecretVersions(ctx context.Context, path string, body DeleteSecretVersionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostSecretDestroyWithBody request with any body
-	PostSecretDestroyWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// PutSecretDestroyWithBody request with any body
+	PutSecretDestroyWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	PostSecretDestroy(ctx context.Context, path string, body PostSecretDestroyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PutSecretDestroy(ctx context.Context, path string, body PutSecretDestroyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteSecretMetadata request
 	DeleteSecretMetadata(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -207,6 +207,49 @@ type ClientInterface interface {
 	VerifyWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	Verify(ctx context.Context, id openapi_types.UUID, body VerifyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListSecretV2 request
+	ListSecretV2(ctx context.Context, params *ListSecretV2Params, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostSecretV2WithBody request with any body
+	PostSecretV2WithBody(ctx context.Context, params *PostSecretV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostSecretV2(ctx context.Context, params *PostSecretV2Params, body PostSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteSecretV2 request
+	DeleteSecretV2(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetSecretV2 request
+	GetSecretV2(ctx context.Context, path string, params *GetSecretV2Params, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PutSecretV2WithBody request with any body
+	PutSecretV2WithBody(ctx context.Context, path string, params *PutSecretV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PutSecretV2(ctx context.Context, path string, params *PutSecretV2Params, body PutSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListSecretVersionV2 request
+	ListSecretVersionV2(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostSecretVersionV2WithBody request with any body
+	PostSecretVersionV2WithBody(ctx context.Context, path string, params *PostSecretVersionV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostSecretVersionV2(ctx context.Context, path string, params *PostSecretVersionV2Params, body PostSecretVersionV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetSecretVersionV2 request
+	GetSecretVersionV2(ctx context.Context, path string, version uint32, params *GetSecretVersionV2Params, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PutSecretVersionV2WithBody request with any body
+	PutSecretVersionV2WithBody(ctx context.Context, path string, version uint32, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PutSecretVersionV2(ctx context.Context, path string, version uint32, body PutSecretVersionV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetSecretConfigV2 request
+	GetSecretConfigV2(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PutSecretConfigV2WithBody request with any body
+	PutSecretConfigV2WithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PutSecretConfigV2(ctx context.Context, body PutSecretConfigV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) GetSecretConfig(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -341,8 +384,8 @@ func (c *Client) DeleteSecretVersions(ctx context.Context, path string, body Del
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostSecretDestroyWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostSecretDestroyRequestWithBody(c.Server, path, contentType, body)
+func (c *Client) PutSecretDestroyWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPutSecretDestroyRequestWithBody(c.Server, path, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -353,8 +396,8 @@ func (c *Client) PostSecretDestroyWithBody(ctx context.Context, path string, con
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostSecretDestroy(ctx context.Context, path string, body PostSecretDestroyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostSecretDestroyRequest(c.Server, path, body)
+func (c *Client) PutSecretDestroy(ctx context.Context, path string, body PutSecretDestroyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPutSecretDestroyRequest(c.Server, path, body)
 	if err != nil {
 		return nil, err
 	}
@@ -749,6 +792,198 @@ func (c *Client) Verify(ctx context.Context, id openapi_types.UUID, body VerifyJ
 	return c.Client.Do(req)
 }
 
+func (c *Client) ListSecretV2(ctx context.Context, params *ListSecretV2Params, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListSecretV2Request(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSecretV2WithBody(ctx context.Context, params *PostSecretV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretV2RequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSecretV2(ctx context.Context, params *PostSecretV2Params, body PostSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretV2Request(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteSecretV2(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSecretV2Request(c.Server, path)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetSecretV2(ctx context.Context, path string, params *GetSecretV2Params, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSecretV2Request(c.Server, path, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PutSecretV2WithBody(ctx context.Context, path string, params *PutSecretV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPutSecretV2RequestWithBody(c.Server, path, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PutSecretV2(ctx context.Context, path string, params *PutSecretV2Params, body PutSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPutSecretV2Request(c.Server, path, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListSecretVersionV2(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListSecretVersionV2Request(c.Server, path)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSecretVersionV2WithBody(ctx context.Context, path string, params *PostSecretVersionV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretVersionV2RequestWithBody(c.Server, path, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostSecretVersionV2(ctx context.Context, path string, params *PostSecretVersionV2Params, body PostSecretVersionV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretVersionV2Request(c.Server, path, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetSecretVersionV2(ctx context.Context, path string, version uint32, params *GetSecretVersionV2Params, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSecretVersionV2Request(c.Server, path, version, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PutSecretVersionV2WithBody(ctx context.Context, path string, version uint32, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPutSecretVersionV2RequestWithBody(c.Server, path, version, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PutSecretVersionV2(ctx context.Context, path string, version uint32, body PutSecretVersionV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPutSecretVersionV2Request(c.Server, path, version, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetSecretConfigV2(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSecretConfigV2Request(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PutSecretConfigV2WithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPutSecretConfigV2RequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PutSecretConfigV2(ctx context.Context, body PutSecretConfigV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPutSecretConfigV2Request(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 // NewGetSecretConfigRequest generates requests for GetSecretConfig
 func NewGetSecretConfigRequest(server string) (*http.Request, error) {
 	var err error
@@ -1047,19 +1282,19 @@ func NewDeleteSecretVersionsRequestWithBody(server string, path string, contentT
 	return req, nil
 }
 
-// NewPostSecretDestroyRequest calls the generic PostSecretDestroy builder with application/json body
-func NewPostSecretDestroyRequest(server string, path string, body PostSecretDestroyJSONRequestBody) (*http.Request, error) {
+// NewPutSecretDestroyRequest calls the generic PutSecretDestroy builder with application/json body
+func NewPutSecretDestroyRequest(server string, path string, body PutSecretDestroyJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPostSecretDestroyRequestWithBody(server, path, "application/json", bodyReader)
+	return NewPutSecretDestroyRequestWithBody(server, path, "application/json", bodyReader)
 }
 
-// NewPostSecretDestroyRequestWithBody generates requests for PostSecretDestroy with any type of body
-func NewPostSecretDestroyRequestWithBody(server string, path string, contentType string, body io.Reader) (*http.Request, error) {
+// NewPutSecretDestroyRequestWithBody generates requests for PutSecretDestroy with any type of body
+func NewPutSecretDestroyRequestWithBody(server string, path string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1084,7 +1319,7 @@ func NewPostSecretDestroyRequestWithBody(server string, path string, contentType
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", queryURL.String(), body)
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -2073,6 +2308,595 @@ func NewVerifyRequestWithBody(server string, id openapi_types.UUID, contentType 
 	return req, nil
 }
 
+// NewListSecretV2Request generates requests for ListSecretV2
+func NewListSecretV2Request(server string, params *ListSecretV2Params) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/secret")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page_size", runtime.ParamLocationQuery, *params.PageSize); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.PageNumber != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page_number", runtime.ParamLocationQuery, *params.PageNumber); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostSecretV2Request calls the generic PostSecretV2 builder with application/json body
+func NewPostSecretV2Request(server string, params *PostSecretV2Params, body PostSecretV2JSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostSecretV2RequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewPostSecretV2RequestWithBody generates requests for PostSecretV2 with any type of body
+func NewPostSecretV2RequestWithBody(server string, params *PostSecretV2Params, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/secret")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Cas != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "cas", runtime.ParamLocationQuery, *params.Cas); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteSecretV2Request generates requests for DeleteSecretV2
+func NewDeleteSecretV2Request(server string, path string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/secret/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetSecretV2Request generates requests for GetSecretV2
+func NewGetSecretV2Request(server string, path string, params *GetSecretV2Params) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/secret/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Version != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "version", runtime.ParamLocationQuery, *params.Version); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.IncludeData != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "includeData", runtime.ParamLocationQuery, *params.IncludeData); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPutSecretV2Request calls the generic PutSecretV2 builder with application/json body
+func NewPutSecretV2Request(server string, path string, params *PutSecretV2Params, body PutSecretV2JSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPutSecretV2RequestWithBody(server, path, params, "application/json", bodyReader)
+}
+
+// NewPutSecretV2RequestWithBody generates requests for PutSecretV2 with any type of body
+func NewPutSecretV2RequestWithBody(server string, path string, params *PutSecretV2Params, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/secret/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Cas != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "cas", runtime.ParamLocationQuery, *params.Cas); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListSecretVersionV2Request generates requests for ListSecretVersionV2
+func NewListSecretVersionV2Request(server string, path string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/secret/%s/version", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostSecretVersionV2Request calls the generic PostSecretVersionV2 builder with application/json body
+func NewPostSecretVersionV2Request(server string, path string, params *PostSecretVersionV2Params, body PostSecretVersionV2JSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostSecretVersionV2RequestWithBody(server, path, params, "application/json", bodyReader)
+}
+
+// NewPostSecretVersionV2RequestWithBody generates requests for PostSecretVersionV2 with any type of body
+func NewPostSecretVersionV2RequestWithBody(server string, path string, params *PostSecretVersionV2Params, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/secret/%s/version", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Cas != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "cas", runtime.ParamLocationQuery, *params.Cas); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetSecretVersionV2Request generates requests for GetSecretVersionV2
+func NewGetSecretVersionV2Request(server string, path string, version uint32, params *GetSecretVersionV2Params) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "version", runtime.ParamLocationPath, version)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/secret/%s/version/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.IncludeData != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "includeData", runtime.ParamLocationQuery, *params.IncludeData); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPutSecretVersionV2Request calls the generic PutSecretVersionV2 builder with application/json body
+func NewPutSecretVersionV2Request(server string, path string, version uint32, body PutSecretVersionV2JSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPutSecretVersionV2RequestWithBody(server, path, version, "application/json", bodyReader)
+}
+
+// NewPutSecretVersionV2RequestWithBody generates requests for PutSecretVersionV2 with any type of body
+func NewPutSecretVersionV2RequestWithBody(server string, path string, version uint32, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "path", runtime.ParamLocationPath, path)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "version", runtime.ParamLocationPath, version)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/secret/%s/version/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetSecretConfigV2Request generates requests for GetSecretConfigV2
+func NewGetSecretConfigV2Request(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/secretConfig")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPutSecretConfigV2Request calls the generic PutSecretConfigV2 builder with application/json body
+func NewPutSecretConfigV2Request(server string, body PutSecretConfigV2JSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPutSecretConfigV2RequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPutSecretConfigV2RequestWithBody generates requests for PutSecretConfigV2 with any type of body
+func NewPutSecretConfigV2RequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/secretConfig")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -2145,10 +2969,10 @@ type ClientWithResponsesInterface interface {
 
 	DeleteSecretVersionsWithResponse(ctx context.Context, path string, body DeleteSecretVersionsJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteSecretVersionsHTTPResponse, error)
 
-	// PostSecretDestroyWithBodyWithResponse request with any body
-	PostSecretDestroyWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretDestroyHTTPResponse, error)
+	// PutSecretDestroyWithBodyWithResponse request with any body
+	PutSecretDestroyWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutSecretDestroyHTTPResponse, error)
 
-	PostSecretDestroyWithResponse(ctx context.Context, path string, body PostSecretDestroyJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretDestroyHTTPResponse, error)
+	PutSecretDestroyWithResponse(ctx context.Context, path string, body PutSecretDestroyJSONRequestBody, reqEditors ...RequestEditorFn) (*PutSecretDestroyHTTPResponse, error)
 
 	// DeleteSecretMetadataWithResponse request
 	DeleteSecretMetadataWithResponse(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*DeleteSecretMetadataHTTPResponse, error)
@@ -2232,6 +3056,49 @@ type ClientWithResponsesInterface interface {
 	VerifyWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*VerifyHTTPResponse, error)
 
 	VerifyWithResponse(ctx context.Context, id openapi_types.UUID, body VerifyJSONRequestBody, reqEditors ...RequestEditorFn) (*VerifyHTTPResponse, error)
+
+	// ListSecretV2WithResponse request
+	ListSecretV2WithResponse(ctx context.Context, params *ListSecretV2Params, reqEditors ...RequestEditorFn) (*ListSecretV2HTTPResponse, error)
+
+	// PostSecretV2WithBodyWithResponse request with any body
+	PostSecretV2WithBodyWithResponse(ctx context.Context, params *PostSecretV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretV2HTTPResponse, error)
+
+	PostSecretV2WithResponse(ctx context.Context, params *PostSecretV2Params, body PostSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretV2HTTPResponse, error)
+
+	// DeleteSecretV2WithResponse request
+	DeleteSecretV2WithResponse(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*DeleteSecretV2HTTPResponse, error)
+
+	// GetSecretV2WithResponse request
+	GetSecretV2WithResponse(ctx context.Context, path string, params *GetSecretV2Params, reqEditors ...RequestEditorFn) (*GetSecretV2HTTPResponse, error)
+
+	// PutSecretV2WithBodyWithResponse request with any body
+	PutSecretV2WithBodyWithResponse(ctx context.Context, path string, params *PutSecretV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutSecretV2HTTPResponse, error)
+
+	PutSecretV2WithResponse(ctx context.Context, path string, params *PutSecretV2Params, body PutSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PutSecretV2HTTPResponse, error)
+
+	// ListSecretVersionV2WithResponse request
+	ListSecretVersionV2WithResponse(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*ListSecretVersionV2HTTPResponse, error)
+
+	// PostSecretVersionV2WithBodyWithResponse request with any body
+	PostSecretVersionV2WithBodyWithResponse(ctx context.Context, path string, params *PostSecretVersionV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretVersionV2HTTPResponse, error)
+
+	PostSecretVersionV2WithResponse(ctx context.Context, path string, params *PostSecretVersionV2Params, body PostSecretVersionV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretVersionV2HTTPResponse, error)
+
+	// GetSecretVersionV2WithResponse request
+	GetSecretVersionV2WithResponse(ctx context.Context, path string, version uint32, params *GetSecretVersionV2Params, reqEditors ...RequestEditorFn) (*GetSecretVersionV2HTTPResponse, error)
+
+	// PutSecretVersionV2WithBodyWithResponse request with any body
+	PutSecretVersionV2WithBodyWithResponse(ctx context.Context, path string, version uint32, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutSecretVersionV2HTTPResponse, error)
+
+	PutSecretVersionV2WithResponse(ctx context.Context, path string, version uint32, body PutSecretVersionV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PutSecretVersionV2HTTPResponse, error)
+
+	// GetSecretConfigV2WithResponse request
+	GetSecretConfigV2WithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSecretConfigV2HTTPResponse, error)
+
+	// PutSecretConfigV2WithBodyWithResponse request with any body
+	PutSecretConfigV2WithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutSecretConfigV2HTTPResponse, error)
+
+	PutSecretConfigV2WithResponse(ctx context.Context, body PutSecretConfigV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PutSecretConfigV2HTTPResponse, error)
 }
 
 type GetSecretConfigHTTPResponse struct {
@@ -2420,7 +3287,7 @@ func (r DeleteSecretVersionsHTTPResponse) StatusCode() int {
 	return 0
 }
 
-type PostSecretDestroyHTTPResponse struct {
+type PutSecretDestroyHTTPResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON400      *ErrorResponse
@@ -2431,7 +3298,7 @@ type PostSecretDestroyHTTPResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r PostSecretDestroyHTTPResponse) Status() string {
+func (r PutSecretDestroyHTTPResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2439,7 +3306,7 @@ func (r PostSecretDestroyHTTPResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostSecretDestroyHTTPResponse) StatusCode() int {
+func (r PutSecretDestroyHTTPResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2740,7 +3607,6 @@ func (r PatchServiceKeyHTTPResponse) StatusCode() int {
 type ActivateServiceKeyHTTPResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *StatusCodes
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
@@ -2821,7 +3687,6 @@ func (r DecryptDataKeyHTTPResponse) StatusCode() int {
 type DeactivateServiceKeyHTTPResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *StatusCodes
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
@@ -2953,6 +3818,302 @@ func (r VerifyHTTPResponse) StatusCode() int {
 	return 0
 }
 
+type ListSecretV2HTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ListSecretV2Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r ListSecretV2HTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListSecretV2HTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostSecretV2HTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *PostSecretV2Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PostSecretV2HTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostSecretV2HTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteSecretV2HTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteSecretV2HTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteSecretV2HTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSecretV2HTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GetSecretV2Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSecretV2HTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSecretV2HTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PutSecretV2HTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *PutSecretV2Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PutSecretV2HTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PutSecretV2HTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListSecretVersionV2HTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ListSecretVersionV2Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r ListSecretVersionV2HTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListSecretVersionV2HTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostSecretVersionV2HTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SecretV2Version
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PostSecretVersionV2HTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostSecretVersionV2HTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSecretVersionV2HTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SecretV2Version
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSecretVersionV2HTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSecretVersionV2HTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PutSecretVersionV2HTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SecretV2Version
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PutSecretVersionV2HTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PutSecretVersionV2HTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSecretConfigV2HTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GetSecretConfigV2Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSecretConfigV2HTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSecretConfigV2HTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PutSecretConfigV2HTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *PutSecretConfigV2Response
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PutSecretConfigV2HTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PutSecretConfigV2HTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 // GetSecretConfigWithResponse request returning *GetSecretConfigHTTPResponse
 func (c *ClientWithResponses) GetSecretConfigWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSecretConfigHTTPResponse, error) {
 	rsp, err := c.GetSecretConfig(ctx, reqEditors...)
@@ -3048,21 +4209,21 @@ func (c *ClientWithResponses) DeleteSecretVersionsWithResponse(ctx context.Conte
 	return ParseDeleteSecretVersionsHTTPResponse(rsp)
 }
 
-// PostSecretDestroyWithBodyWithResponse request with arbitrary body returning *PostSecretDestroyHTTPResponse
-func (c *ClientWithResponses) PostSecretDestroyWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretDestroyHTTPResponse, error) {
-	rsp, err := c.PostSecretDestroyWithBody(ctx, path, contentType, body, reqEditors...)
+// PutSecretDestroyWithBodyWithResponse request with arbitrary body returning *PutSecretDestroyHTTPResponse
+func (c *ClientWithResponses) PutSecretDestroyWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutSecretDestroyHTTPResponse, error) {
+	rsp, err := c.PutSecretDestroyWithBody(ctx, path, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostSecretDestroyHTTPResponse(rsp)
+	return ParsePutSecretDestroyHTTPResponse(rsp)
 }
 
-func (c *ClientWithResponses) PostSecretDestroyWithResponse(ctx context.Context, path string, body PostSecretDestroyJSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretDestroyHTTPResponse, error) {
-	rsp, err := c.PostSecretDestroy(ctx, path, body, reqEditors...)
+func (c *ClientWithResponses) PutSecretDestroyWithResponse(ctx context.Context, path string, body PutSecretDestroyJSONRequestBody, reqEditors ...RequestEditorFn) (*PutSecretDestroyHTTPResponse, error) {
+	rsp, err := c.PutSecretDestroy(ctx, path, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostSecretDestroyHTTPResponse(rsp)
+	return ParsePutSecretDestroyHTTPResponse(rsp)
 }
 
 // DeleteSecretMetadataWithResponse request returning *DeleteSecretMetadataHTTPResponse
@@ -3338,6 +4499,145 @@ func (c *ClientWithResponses) VerifyWithResponse(ctx context.Context, id openapi
 		return nil, err
 	}
 	return ParseVerifyHTTPResponse(rsp)
+}
+
+// ListSecretV2WithResponse request returning *ListSecretV2HTTPResponse
+func (c *ClientWithResponses) ListSecretV2WithResponse(ctx context.Context, params *ListSecretV2Params, reqEditors ...RequestEditorFn) (*ListSecretV2HTTPResponse, error) {
+	rsp, err := c.ListSecretV2(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListSecretV2HTTPResponse(rsp)
+}
+
+// PostSecretV2WithBodyWithResponse request with arbitrary body returning *PostSecretV2HTTPResponse
+func (c *ClientWithResponses) PostSecretV2WithBodyWithResponse(ctx context.Context, params *PostSecretV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretV2HTTPResponse, error) {
+	rsp, err := c.PostSecretV2WithBody(ctx, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSecretV2HTTPResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostSecretV2WithResponse(ctx context.Context, params *PostSecretV2Params, body PostSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretV2HTTPResponse, error) {
+	rsp, err := c.PostSecretV2(ctx, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSecretV2HTTPResponse(rsp)
+}
+
+// DeleteSecretV2WithResponse request returning *DeleteSecretV2HTTPResponse
+func (c *ClientWithResponses) DeleteSecretV2WithResponse(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*DeleteSecretV2HTTPResponse, error) {
+	rsp, err := c.DeleteSecretV2(ctx, path, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteSecretV2HTTPResponse(rsp)
+}
+
+// GetSecretV2WithResponse request returning *GetSecretV2HTTPResponse
+func (c *ClientWithResponses) GetSecretV2WithResponse(ctx context.Context, path string, params *GetSecretV2Params, reqEditors ...RequestEditorFn) (*GetSecretV2HTTPResponse, error) {
+	rsp, err := c.GetSecretV2(ctx, path, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSecretV2HTTPResponse(rsp)
+}
+
+// PutSecretV2WithBodyWithResponse request with arbitrary body returning *PutSecretV2HTTPResponse
+func (c *ClientWithResponses) PutSecretV2WithBodyWithResponse(ctx context.Context, path string, params *PutSecretV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutSecretV2HTTPResponse, error) {
+	rsp, err := c.PutSecretV2WithBody(ctx, path, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePutSecretV2HTTPResponse(rsp)
+}
+
+func (c *ClientWithResponses) PutSecretV2WithResponse(ctx context.Context, path string, params *PutSecretV2Params, body PutSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PutSecretV2HTTPResponse, error) {
+	rsp, err := c.PutSecretV2(ctx, path, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePutSecretV2HTTPResponse(rsp)
+}
+
+// ListSecretVersionV2WithResponse request returning *ListSecretVersionV2HTTPResponse
+func (c *ClientWithResponses) ListSecretVersionV2WithResponse(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*ListSecretVersionV2HTTPResponse, error) {
+	rsp, err := c.ListSecretVersionV2(ctx, path, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListSecretVersionV2HTTPResponse(rsp)
+}
+
+// PostSecretVersionV2WithBodyWithResponse request with arbitrary body returning *PostSecretVersionV2HTTPResponse
+func (c *ClientWithResponses) PostSecretVersionV2WithBodyWithResponse(ctx context.Context, path string, params *PostSecretVersionV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretVersionV2HTTPResponse, error) {
+	rsp, err := c.PostSecretVersionV2WithBody(ctx, path, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSecretVersionV2HTTPResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostSecretVersionV2WithResponse(ctx context.Context, path string, params *PostSecretVersionV2Params, body PostSecretVersionV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretVersionV2HTTPResponse, error) {
+	rsp, err := c.PostSecretVersionV2(ctx, path, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostSecretVersionV2HTTPResponse(rsp)
+}
+
+// GetSecretVersionV2WithResponse request returning *GetSecretVersionV2HTTPResponse
+func (c *ClientWithResponses) GetSecretVersionV2WithResponse(ctx context.Context, path string, version uint32, params *GetSecretVersionV2Params, reqEditors ...RequestEditorFn) (*GetSecretVersionV2HTTPResponse, error) {
+	rsp, err := c.GetSecretVersionV2(ctx, path, version, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSecretVersionV2HTTPResponse(rsp)
+}
+
+// PutSecretVersionV2WithBodyWithResponse request with arbitrary body returning *PutSecretVersionV2HTTPResponse
+func (c *ClientWithResponses) PutSecretVersionV2WithBodyWithResponse(ctx context.Context, path string, version uint32, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutSecretVersionV2HTTPResponse, error) {
+	rsp, err := c.PutSecretVersionV2WithBody(ctx, path, version, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePutSecretVersionV2HTTPResponse(rsp)
+}
+
+func (c *ClientWithResponses) PutSecretVersionV2WithResponse(ctx context.Context, path string, version uint32, body PutSecretVersionV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PutSecretVersionV2HTTPResponse, error) {
+	rsp, err := c.PutSecretVersionV2(ctx, path, version, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePutSecretVersionV2HTTPResponse(rsp)
+}
+
+// GetSecretConfigV2WithResponse request returning *GetSecretConfigV2HTTPResponse
+func (c *ClientWithResponses) GetSecretConfigV2WithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSecretConfigV2HTTPResponse, error) {
+	rsp, err := c.GetSecretConfigV2(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSecretConfigV2HTTPResponse(rsp)
+}
+
+// PutSecretConfigV2WithBodyWithResponse request with arbitrary body returning *PutSecretConfigV2HTTPResponse
+func (c *ClientWithResponses) PutSecretConfigV2WithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutSecretConfigV2HTTPResponse, error) {
+	rsp, err := c.PutSecretConfigV2WithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePutSecretConfigV2HTTPResponse(rsp)
+}
+
+func (c *ClientWithResponses) PutSecretConfigV2WithResponse(ctx context.Context, body PutSecretConfigV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PutSecretConfigV2HTTPResponse, error) {
+	rsp, err := c.PutSecretConfigV2(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePutSecretConfigV2HTTPResponse(rsp)
 }
 
 // ParseGetSecretConfigHTTPResponse parses an HTTP response from a GetSecretConfigWithResponse call
@@ -3746,15 +5046,15 @@ func ParseDeleteSecretVersionsHTTPResponse(rsp *http.Response) (*DeleteSecretVer
 	return response, nil
 }
 
-// ParsePostSecretDestroyHTTPResponse parses an HTTP response from a PostSecretDestroyWithResponse call
-func ParsePostSecretDestroyHTTPResponse(rsp *http.Response) (*PostSecretDestroyHTTPResponse, error) {
+// ParsePutSecretDestroyHTTPResponse parses an HTTP response from a PutSecretDestroyWithResponse call
+func ParsePutSecretDestroyHTTPResponse(rsp *http.Response) (*PutSecretDestroyHTTPResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PostSecretDestroyHTTPResponse{
+	response := &PutSecretDestroyHTTPResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -4443,13 +5743,6 @@ func ParseActivateServiceKeyHTTPResponse(rsp *http.Response) (*ActivateServiceKe
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest StatusCodes
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -4626,13 +5919,6 @@ func ParseDeactivateServiceKeyHTTPResponse(rsp *http.Response) (*DeactivateServi
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest StatusCodes
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -4872,6 +6158,670 @@ func ParseVerifyHTTPResponse(rsp *http.Response) (*VerifyHTTPResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest VerifyResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListSecretV2HTTPResponse parses an HTTP response from a ListSecretV2WithResponse call
+func ParseListSecretV2HTTPResponse(rsp *http.Response) (*ListSecretV2HTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListSecretV2HTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListSecretV2Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostSecretV2HTTPResponse parses an HTTP response from a PostSecretV2WithResponse call
+func ParsePostSecretV2HTTPResponse(rsp *http.Response) (*PostSecretV2HTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostSecretV2HTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PostSecretV2Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteSecretV2HTTPResponse parses an HTTP response from a DeleteSecretV2WithResponse call
+func ParseDeleteSecretV2HTTPResponse(rsp *http.Response) (*DeleteSecretV2HTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteSecretV2HTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSecretV2HTTPResponse parses an HTTP response from a GetSecretV2WithResponse call
+func ParseGetSecretV2HTTPResponse(rsp *http.Response) (*GetSecretV2HTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSecretV2HTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetSecretV2Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePutSecretV2HTTPResponse parses an HTTP response from a PutSecretV2WithResponse call
+func ParsePutSecretV2HTTPResponse(rsp *http.Response) (*PutSecretV2HTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PutSecretV2HTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PutSecretV2Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListSecretVersionV2HTTPResponse parses an HTTP response from a ListSecretVersionV2WithResponse call
+func ParseListSecretVersionV2HTTPResponse(rsp *http.Response) (*ListSecretVersionV2HTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListSecretVersionV2HTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListSecretVersionV2Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostSecretVersionV2HTTPResponse parses an HTTP response from a PostSecretVersionV2WithResponse call
+func ParsePostSecretVersionV2HTTPResponse(rsp *http.Response) (*PostSecretVersionV2HTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostSecretVersionV2HTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SecretV2Version
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSecretVersionV2HTTPResponse parses an HTTP response from a GetSecretVersionV2WithResponse call
+func ParseGetSecretVersionV2HTTPResponse(rsp *http.Response) (*GetSecretVersionV2HTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSecretVersionV2HTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SecretV2Version
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePutSecretVersionV2HTTPResponse parses an HTTP response from a PutSecretVersionV2WithResponse call
+func ParsePutSecretVersionV2HTTPResponse(rsp *http.Response) (*PutSecretVersionV2HTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PutSecretVersionV2HTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SecretV2Version
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSecretConfigV2HTTPResponse parses an HTTP response from a GetSecretConfigV2WithResponse call
+func ParseGetSecretConfigV2HTTPResponse(rsp *http.Response) (*GetSecretConfigV2HTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSecretConfigV2HTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetSecretConfigV2Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePutSecretConfigV2HTTPResponse parses an HTTP response from a PutSecretConfigV2WithResponse call
+func ParsePutSecretConfigV2HTTPResponse(rsp *http.Response) (*PutSecretConfigV2HTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PutSecretConfigV2HTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PutSecretConfigV2Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
