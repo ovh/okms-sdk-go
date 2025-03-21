@@ -4,8 +4,6 @@ output: internal/client.gen.go
 generate:
   client: true
 output-options:
-  exclude-tags:
-    - SecretsApi
   exclude-operation-ids:
     - GenerateRandomBytes
   skip-prune: false
