@@ -84,11 +84,13 @@ const (
 )
 
 func (m Minor) StringFor(major Major) string {
-	if m == 0 {
+	switch m {
+	case 0:
 		return "Unspecified"
-	} else if m == 1 {
+	case 1:
 		return "General"
 	}
+
 	if majMap, ok := minorStr[major]; ok {
 		if s, ok := majMap[m]; ok {
 			return s

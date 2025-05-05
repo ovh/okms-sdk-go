@@ -78,10 +78,11 @@ func (sig *jwkSigner) Public() crypto.PublicKey {
 // the caller is responsible for hashing the larger message and passing
 // the hash (as digest) and the hash function (as opts) to Sign.
 func (sign *jwkSigner) Sign(rand io.Reader, digest []byte, opts crypto.SignerOpts) (signature []byte, err error) {
-	if sign.Kty == types.EC {
+	switch sign.Kty {
+	case types.EC:
 		// ECDSA signature
 		return sign.signEcdsa(digest, opts.HashFunc())
-	} else if sign.Kty == types.RSA {
+	case types.RSA:
 		if pssOpts, ok := opts.(*rsa.PSSOptions); ok {
 			// RSA PSS signature
 			return sign.signRsaPss(digest, pssOpts)
