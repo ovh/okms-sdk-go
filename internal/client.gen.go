@@ -110,6 +110,8 @@ type ClientInterface interface {
 
 	PatchSecretRequest(ctx context.Context, path string, body PatchSecretRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	PatchSecretRequestWithApplicationMergePatchPlusJSONBody(ctx context.Context, path string, body PatchSecretRequestApplicationMergePatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// PostSecretRequestWithBody request with any body
 	PostSecretRequestWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -135,6 +137,8 @@ type ClientInterface interface {
 	PatchSecretMetadataWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	PatchSecretMetadata(ctx context.Context, path string, body PatchSecretMetadataJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PatchSecretMetadataWithApplicationMergePatchPlusJSONBody(ctx context.Context, path string, body PatchSecretMetadataApplicationMergePatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostSecretMetadataWithBody request with any body
 	PostSecretMetadataWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -212,9 +216,9 @@ type ClientInterface interface {
 	ListSecretV2(ctx context.Context, params *ListSecretV2Params, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostSecretV2WithBody request with any body
-	PostSecretV2WithBody(ctx context.Context, params *PostSecretV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostSecretV2WithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	PostSecretV2(ctx context.Context, params *PostSecretV2Params, body PostSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostSecretV2(ctx context.Context, body PostSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteSecretV2 request
 	DeleteSecretV2(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -336,6 +340,18 @@ func (c *Client) PatchSecretRequest(ctx context.Context, path string, body Patch
 	return c.Client.Do(req)
 }
 
+func (c *Client) PatchSecretRequestWithApplicationMergePatchPlusJSONBody(ctx context.Context, path string, body PatchSecretRequestApplicationMergePatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchSecretRequestRequestWithApplicationMergePatchPlusJSONBody(c.Server, path, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) PostSecretRequestWithBody(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostSecretRequestRequestWithBody(c.Server, path, contentType, body)
 	if err != nil {
@@ -446,6 +462,18 @@ func (c *Client) PatchSecretMetadataWithBody(ctx context.Context, path string, c
 
 func (c *Client) PatchSecretMetadata(ctx context.Context, path string, body PatchSecretMetadataJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPatchSecretMetadataRequest(c.Server, path, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchSecretMetadataWithApplicationMergePatchPlusJSONBody(ctx context.Context, path string, body PatchSecretMetadataApplicationMergePatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchSecretMetadataRequestWithApplicationMergePatchPlusJSONBody(c.Server, path, body)
 	if err != nil {
 		return nil, err
 	}
@@ -804,8 +832,8 @@ func (c *Client) ListSecretV2(ctx context.Context, params *ListSecretV2Params, r
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostSecretV2WithBody(ctx context.Context, params *PostSecretV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostSecretV2RequestWithBody(c.Server, params, contentType, body)
+func (c *Client) PostSecretV2WithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretV2RequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -816,8 +844,8 @@ func (c *Client) PostSecretV2WithBody(ctx context.Context, params *PostSecretV2P
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostSecretV2(ctx context.Context, params *PostSecretV2Params, body PostSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostSecretV2Request(c.Server, params, body)
+func (c *Client) PostSecretV2(ctx context.Context, body PostSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostSecretV2Request(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1152,6 +1180,17 @@ func NewPatchSecretRequestRequest(server string, path string, body PatchSecretRe
 	return NewPatchSecretRequestRequestWithBody(server, path, "application/json", bodyReader)
 }
 
+// NewPatchSecretRequestRequestWithApplicationMergePatchPlusJSONBody calls the generic PatchSecretRequest builder with application/merge-patch+json body
+func NewPatchSecretRequestRequestWithApplicationMergePatchPlusJSONBody(server string, path string, body PatchSecretRequestApplicationMergePatchPlusJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPatchSecretRequestRequestWithBody(server, path, "application/merge-patch+json", bodyReader)
+}
+
 // NewPatchSecretRequestRequestWithBody generates requests for PatchSecretRequest with any type of body
 func NewPatchSecretRequestRequestWithBody(server string, path string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
@@ -1428,6 +1467,17 @@ func NewPatchSecretMetadataRequest(server string, path string, body PatchSecretM
 	}
 	bodyReader = bytes.NewReader(buf)
 	return NewPatchSecretMetadataRequestWithBody(server, path, "application/json", bodyReader)
+}
+
+// NewPatchSecretMetadataRequestWithApplicationMergePatchPlusJSONBody calls the generic PatchSecretMetadata builder with application/merge-patch+json body
+func NewPatchSecretMetadataRequestWithApplicationMergePatchPlusJSONBody(server string, path string, body PatchSecretMetadataApplicationMergePatchPlusJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPatchSecretMetadataRequestWithBody(server, path, "application/merge-patch+json", bodyReader)
 }
 
 // NewPatchSecretMetadataRequestWithBody generates requests for PatchSecretMetadata with any type of body
@@ -2374,18 +2424,18 @@ func NewListSecretV2Request(server string, params *ListSecretV2Params) (*http.Re
 }
 
 // NewPostSecretV2Request calls the generic PostSecretV2 builder with application/json body
-func NewPostSecretV2Request(server string, params *PostSecretV2Params, body PostSecretV2JSONRequestBody) (*http.Request, error) {
+func NewPostSecretV2Request(server string, body PostSecretV2JSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPostSecretV2RequestWithBody(server, params, "application/json", bodyReader)
+	return NewPostSecretV2RequestWithBody(server, "application/json", bodyReader)
 }
 
 // NewPostSecretV2RequestWithBody generates requests for PostSecretV2 with any type of body
-func NewPostSecretV2RequestWithBody(server string, params *PostSecretV2Params, contentType string, body io.Reader) (*http.Request, error) {
+func NewPostSecretV2RequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -2401,28 +2451,6 @@ func NewPostSecretV2RequestWithBody(server string, params *PostSecretV2Params, c
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Cas != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "cas", runtime.ParamLocationQuery, *params.Cas); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("POST", queryURL.String(), body)
@@ -2959,6 +2987,8 @@ type ClientWithResponsesInterface interface {
 
 	PatchSecretRequestWithResponse(ctx context.Context, path string, body PatchSecretRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchSecretRequestHTTPResponse, error)
 
+	PatchSecretRequestWithApplicationMergePatchPlusJSONBodyWithResponse(ctx context.Context, path string, body PatchSecretRequestApplicationMergePatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchSecretRequestHTTPResponse, error)
+
 	// PostSecretRequestWithBodyWithResponse request with any body
 	PostSecretRequestWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretRequestHTTPResponse, error)
 
@@ -2984,6 +3014,8 @@ type ClientWithResponsesInterface interface {
 	PatchSecretMetadataWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchSecretMetadataHTTPResponse, error)
 
 	PatchSecretMetadataWithResponse(ctx context.Context, path string, body PatchSecretMetadataJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchSecretMetadataHTTPResponse, error)
+
+	PatchSecretMetadataWithApplicationMergePatchPlusJSONBodyWithResponse(ctx context.Context, path string, body PatchSecretMetadataApplicationMergePatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchSecretMetadataHTTPResponse, error)
 
 	// PostSecretMetadataWithBodyWithResponse request with any body
 	PostSecretMetadataWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretMetadataHTTPResponse, error)
@@ -3061,9 +3093,9 @@ type ClientWithResponsesInterface interface {
 	ListSecretV2WithResponse(ctx context.Context, params *ListSecretV2Params, reqEditors ...RequestEditorFn) (*ListSecretV2HTTPResponse, error)
 
 	// PostSecretV2WithBodyWithResponse request with any body
-	PostSecretV2WithBodyWithResponse(ctx context.Context, params *PostSecretV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretV2HTTPResponse, error)
+	PostSecretV2WithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretV2HTTPResponse, error)
 
-	PostSecretV2WithResponse(ctx context.Context, params *PostSecretV2Params, body PostSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretV2HTTPResponse, error)
+	PostSecretV2WithResponse(ctx context.Context, body PostSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretV2HTTPResponse, error)
 
 	// DeleteSecretV2WithResponse request
 	DeleteSecretV2WithResponse(ctx context.Context, path string, reqEditors ...RequestEditorFn) (*DeleteSecretV2HTTPResponse, error)
@@ -3186,7 +3218,7 @@ type GetSecretRequestHTTPResponse struct {
 	JSON200      *GetSecretResponse
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
-	JSON404      *ErrorResponse
+	JSON404      *GetErrorResponseWithMetadata
 	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
 }
@@ -3213,7 +3245,7 @@ type PatchSecretRequestHTTPResponse struct {
 	JSON200      *PatchSecretResponse
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
-	JSON404      *ErrorResponse
+	JSON404      *PatchErrorResponseWithMetadata
 	JSON429      *ErrorResponse
 	JSON500      *ErrorResponse
 }
@@ -4175,6 +4207,14 @@ func (c *ClientWithResponses) PatchSecretRequestWithResponse(ctx context.Context
 	return ParsePatchSecretRequestHTTPResponse(rsp)
 }
 
+func (c *ClientWithResponses) PatchSecretRequestWithApplicationMergePatchPlusJSONBodyWithResponse(ctx context.Context, path string, body PatchSecretRequestApplicationMergePatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchSecretRequestHTTPResponse, error) {
+	rsp, err := c.PatchSecretRequestWithApplicationMergePatchPlusJSONBody(ctx, path, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchSecretRequestHTTPResponse(rsp)
+}
+
 // PostSecretRequestWithBodyWithResponse request with arbitrary body returning *PostSecretRequestHTTPResponse
 func (c *ClientWithResponses) PostSecretRequestWithBodyWithResponse(ctx context.Context, path string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretRequestHTTPResponse, error) {
 	rsp, err := c.PostSecretRequestWithBody(ctx, path, contentType, body, reqEditors...)
@@ -4255,6 +4295,14 @@ func (c *ClientWithResponses) PatchSecretMetadataWithBodyWithResponse(ctx contex
 
 func (c *ClientWithResponses) PatchSecretMetadataWithResponse(ctx context.Context, path string, body PatchSecretMetadataJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchSecretMetadataHTTPResponse, error) {
 	rsp, err := c.PatchSecretMetadata(ctx, path, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchSecretMetadataHTTPResponse(rsp)
+}
+
+func (c *ClientWithResponses) PatchSecretMetadataWithApplicationMergePatchPlusJSONBodyWithResponse(ctx context.Context, path string, body PatchSecretMetadataApplicationMergePatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchSecretMetadataHTTPResponse, error) {
+	rsp, err := c.PatchSecretMetadataWithApplicationMergePatchPlusJSONBody(ctx, path, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -4511,16 +4559,16 @@ func (c *ClientWithResponses) ListSecretV2WithResponse(ctx context.Context, para
 }
 
 // PostSecretV2WithBodyWithResponse request with arbitrary body returning *PostSecretV2HTTPResponse
-func (c *ClientWithResponses) PostSecretV2WithBodyWithResponse(ctx context.Context, params *PostSecretV2Params, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretV2HTTPResponse, error) {
-	rsp, err := c.PostSecretV2WithBody(ctx, params, contentType, body, reqEditors...)
+func (c *ClientWithResponses) PostSecretV2WithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostSecretV2HTTPResponse, error) {
+	rsp, err := c.PostSecretV2WithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParsePostSecretV2HTTPResponse(rsp)
 }
 
-func (c *ClientWithResponses) PostSecretV2WithResponse(ctx context.Context, params *PostSecretV2Params, body PostSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretV2HTTPResponse, error) {
-	rsp, err := c.PostSecretV2(ctx, params, body, reqEditors...)
+func (c *ClientWithResponses) PostSecretV2WithResponse(ctx context.Context, body PostSecretV2JSONRequestBody, reqEditors ...RequestEditorFn) (*PostSecretV2HTTPResponse, error) {
+	rsp, err := c.PostSecretV2(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -4845,7 +4893,7 @@ func ParseGetSecretRequestHTTPResponse(rsp *http.Response) (*GetSecretRequestHTT
 		response.JSON401 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest ErrorResponse
+		var dest GetErrorResponseWithMetadata
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -4906,7 +4954,7 @@ func ParsePatchSecretRequestHTTPResponse(rsp *http.Response) (*PatchSecretReques
 		response.JSON401 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest ErrorResponse
+		var dest PatchErrorResponseWithMetadata
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

@@ -215,6 +215,24 @@ type GetConfigResponse struct {
 	RequestId *string            `json:"request_id"`
 }
 
+// GetErrorResponseWithMetadata defines model for GetErrorResponseWithMetadata.
+type GetErrorResponseWithMetadata struct {
+	// Data Secret content model
+	Data *SecretData `json:"data,omitempty"`
+
+	// ErrorCode Error code
+	ErrorCode *int32 `json:"error_code,omitempty"`
+
+	// ErrorId Error id
+	ErrorId *string `json:"error_id,omitempty"`
+
+	// Errors List with text error messages associated with ErrorId
+	Errors *[]string `json:"errors,omitempty"`
+
+	// RequestId Request id
+	RequestId *string `json:"request_id,omitempty"`
+}
+
 // GetMetadataResponse Get secret metadata values or list of keys
 type GetMetadataResponse struct {
 	// Data Secret metadata or list of keys
@@ -421,6 +439,24 @@ type ListServiceKeysResponse struct {
 	ObjectsList []GetServiceKeyResponse `json:"objects_list"`
 }
 
+// PatchErrorResponseWithMetadata defines model for PatchErrorResponseWithMetadata.
+type PatchErrorResponseWithMetadata struct {
+	// Data Secret version specific metadata fields
+	Data *SecretVersionMetadata `json:"data,omitempty"`
+
+	// ErrorCode Error code
+	ErrorCode *int32 `json:"error_code,omitempty"`
+
+	// ErrorId Error id
+	ErrorId *string `json:"error_id,omitempty"`
+
+	// Errors List with text error messages associated with ErrorId
+	Errors *[]string `json:"errors,omitempty"`
+
+	// RequestId Request id
+	RequestId *string `json:"request_id,omitempty"`
+}
+
 // PatchSecretResponse Patch secret operation response
 type PatchSecretResponse struct {
 	// Data Secret version specific metadata fields
@@ -437,13 +473,13 @@ type PatchServiceKeyRequest struct {
 // PostConfigRequest Default settings for Secret-API backend service
 type PostConfigRequest struct {
 	// CasRequired cas parameter will be required for each write call if set to true
-	CasRequired *bool `json:"cas_required,omitempty"`
+	CasRequired *bool `json:"cas_required"`
 
 	// DeleteVersionAfter The length of time before a version is deleted
 	DeleteVersionAfter *string `json:"delete_version_after"`
 
 	// MaxVersions The number of versions to keep (10 default)
-	MaxVersions *uint32 `json:"max_versions,omitempty"`
+	MaxVersions *uint32 `json:"max_versions"`
 }
 
 // PostSecretOptions Secret request options
@@ -812,12 +848,6 @@ type ListSecretV2Params struct {
 	PageNumber *uint32 `form:"page_number,omitempty" json:"page_number,omitempty"`
 }
 
-// PostSecretV2Params defines parameters for PostSecretV2.
-type PostSecretV2Params struct {
-	// Cas Secret version number.
-	Cas *uint32 `form:"cas,omitempty" json:"cas,omitempty"`
-}
-
 // GetSecretV2Params defines parameters for GetSecretV2.
 type GetSecretV2Params struct {
 	// Version Secret version. If not set, the latest version will be returned.
@@ -851,6 +881,9 @@ type PostSecretConfigJSONRequestBody = PostConfigRequest
 // PatchSecretRequestJSONRequestBody defines body for PatchSecretRequest for application/json ContentType.
 type PatchSecretRequestJSONRequestBody = PostSecretRequest
 
+// PatchSecretRequestApplicationMergePatchPlusJSONRequestBody defines body for PatchSecretRequest for application/merge-patch+json ContentType.
+type PatchSecretRequestApplicationMergePatchPlusJSONRequestBody = PostSecretRequest
+
 // PostSecretRequestJSONRequestBody defines body for PostSecretRequest for application/json ContentType.
 type PostSecretRequestJSONRequestBody = PostSecretRequest
 
@@ -862,6 +895,9 @@ type PutSecretDestroyJSONRequestBody = SecretVersionsRequest
 
 // PatchSecretMetadataJSONRequestBody defines body for PatchSecretMetadata for application/json ContentType.
 type PatchSecretMetadataJSONRequestBody = SecretUpdatableMetadata
+
+// PatchSecretMetadataApplicationMergePatchPlusJSONRequestBody defines body for PatchSecretMetadata for application/merge-patch+json ContentType.
+type PatchSecretMetadataApplicationMergePatchPlusJSONRequestBody = SecretUpdatableMetadata
 
 // PostSecretMetadataJSONRequestBody defines body for PostSecretMetadata for application/json ContentType.
 type PostSecretMetadataJSONRequestBody = SecretUpdatableMetadata
