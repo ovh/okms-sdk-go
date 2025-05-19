@@ -1,0 +1,3437 @@
+openapi: 3.0.1
+info:
+  title: OVHcloud KMS REST API
+  version: 2.0.0
+paths:
+  /v1/servicekey:
+    post:
+      tags:
+        - Service-Key-API
+      summary: Create or imports customer service key
+      description: >
+        |  Action IAM      | Description |
+
+        | ---------------- | ------------|
+
+        | okms:apikms:serviceKey/import | Required when importing a service key
+        |
+
+        | okms:apikms:serviceKey/create | Required when creating a service key |
+      operationId: CreateImportServiceKey
+      parameters:
+        - name: format
+          in: query
+          description: Formatting options for key representation.
+          schema:
+            $ref: '#/components/schemas/KeyFormats'
+      requestBody:
+        description: Request payload.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateImportServiceKeyRequest'
+        required: true
+      responses:
+        '201':
+          description: Returns id of a key created or imported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetServiceKeyResponse'
+        '400':
+          description: Bad request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - Service-Key-API
+      summary: >-
+        List service keys, returns continuation token if result is not complete,
+        returns max 100 values by default
+      description: /v1/servicekey.
+      operationId: ListServiceKeys
+      parameters:
+        - name: state
+          in: query
+          description: Returns objects with specified state.
+          schema:
+            $ref: '#/components/schemas/KeyStates'
+        - name: continuation-token
+          in: query
+          description: Continuation token from previous incomplete call.
+          schema:
+            maxLength: 500
+            type: string
+        - name: max
+          in: query
+          description: Maximum number of keys returned in one call.
+          schema:
+            maximum: 100
+            minimum: 10
+            type: integer
+            format: uint32
+            default: 100
+      responses:
+        '200':
+          description: List of service keys.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListServiceKeysResponse'
+        '400':
+          description: Bad request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/servicekey/{id}/encrypt:
+    post:
+      tags:
+        - Service-Key-API
+      summary: Encrypts data, up to 4Kb in size, using service key provided
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:serviceKey/encrypt | Required to use this operation|
+      operationId: Encrypt
+      parameters:
+        - name: id
+          in: path
+          description: Id of a key used for operation.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Body of a request.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EncryptRequest'
+        required: true
+      responses:
+        '200':
+          description: Ciphertext produced by encryption.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EncryptResponse'
+        '400':
+          description: Bad request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/servicekey/{id}/decrypt:
+    post:
+      tags:
+        - Service-Key-API
+      summary: Decrypt data previously encrypted by Encrypt operation
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:serviceKey/decrypt | Required to use this operation |
+      operationId: Decrypt
+      parameters:
+        - name: id
+          in: path
+          description: Id of a key used for operation.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Body payload.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecryptRequest'
+        required: true
+      responses:
+        '200':
+          description: Plaintext produced by decryption.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecryptResponse'
+        '400':
+          description: Bad request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/servicekey/{id}/datakey:
+    post:
+      tags:
+        - Service-Key-API
+      summary: Generate data key enveloped by servicekey
+      description: >
+        |  Action IAM      | Description |
+
+        | ---------------- | ------------|
+
+        | okms:apikms:serviceKey/dataKey/create | Required to use this
+        operation|
+      operationId: GenerateDataKey
+      parameters:
+        - name: id
+          in: path
+          description: Service key id used for operation.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Data key generation request.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateDataKeyRequest'
+        required: true
+      responses:
+        '201':
+          description: New data key encrypted blob and plaintext copy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateDataKeyResponse'
+        '400':
+          description: Bad request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/servicekey/{id}/datakey/decrypt:
+    post:
+      tags:
+        - Service-Key-API
+      summary: Decrypt data key encrypted by service key
+      description: >
+        |  Action IAM      | Description |
+
+        | ---------------- | ------------|
+
+        | okms:apikms:serviceKey/dataKey/decrypt | Required to use this
+        operation|
+      operationId: DecryptDataKey
+      parameters:
+        - name: id
+          in: path
+          description: Service key id used for operation.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Body payload containing data key blob.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecryptDataKeyRequest'
+        required: true
+      responses:
+        '200':
+          description: Plaintext data key, base64 encoded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecryptDataKeyResponse'
+        '400':
+          description: Bad request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/servicekey/{id}/sign:
+    post:
+      tags:
+        - Service-Key-API
+      summary: Sign digest with service key
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:serviceKey/sign | Required to use this operation|
+      operationId: Sign
+      parameters:
+        - name: format
+          in: query
+          description: Signature format.
+          schema:
+            $ref: '#/components/schemas/SignatureFormats'
+        - name: id
+          in: path
+          description: Service key id used for operation.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Body payload containing digest and algorithm spec.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignRequest'
+        required: true
+      responses:
+        '200':
+          description: Signature of the content with the requested key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignResponse'
+        '400':
+          description: Bad request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/servicekey/{id}/verify:
+    post:
+      tags:
+        - Service-Key-API
+      summary: Verify signature
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:serviceKey/verify | Required to use this operation|
+      operationId: Verify
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyRequest'
+        required: true
+      responses:
+        '200':
+          description: Result of the verification of the signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyResponse'
+        '400':
+          description: Bad request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/servicekey/{id}:
+    delete:
+      tags:
+        - Service-Key-API
+      summary: Delete service key
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:serviceKey/delete | Required to use this operation|
+      operationId: DeleteServiceKey
+      parameters:
+        - name: id
+          in: path
+          description: Id of a service key.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Service key is deleted
+        '400':
+          description: Bad request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - Service-Key-API
+      summary: Get service key metadata
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:serviceKey/get | Required to use this operation|
+      operationId: GetServiceKey
+      parameters:
+        - name: format
+          in: query
+          description: Formatting options for key representation.
+          schema:
+            $ref: '#/components/schemas/KeyFormats'
+        - name: id
+          in: path
+          description: Id of a service key.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Service key metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetServiceKeyResponse'
+        '400':
+          description: Bad request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      tags:
+        - Service-Key-API
+      summary: Patch service key metadata
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:serviceKey/update | Required to use this operation|
+      operationId: PatchServiceKey
+      parameters:
+        - name: id
+          in: path
+          description: Id of a service key.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Request payload.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchServiceKeyRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/PatchServiceKeyRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/PatchServiceKeyRequest'
+        required: true
+      responses:
+        '200':
+          description: Service key metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetServiceKeyResponse'
+        '400':
+          description: Bad request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/servicekey/{id}/activate:
+    post:
+      tags:
+        - Service-Key-API
+      summary: Activate service key
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:serviceKey/activate | Required to use this operation|
+      operationId: ActivateServiceKey
+      parameters:
+        - name: id
+          in: path
+          description: Id of a service key.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Service key is activated
+        '400':
+          description: Bad request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/servicekey/{id}/deactivate:
+    post:
+      tags:
+        - Service-Key-API
+      summary: Deactivate service key
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:serviceKey/deactivate | Required to use this operation|
+      operationId: DeactivateServiceKey
+      parameters:
+        - name: id
+          in: path
+          description: Id of a service key.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Request body.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeactivateServicekeyRequest'
+        required: true
+      responses:
+        '204':
+          description: Service key is deactivated
+        '400':
+          description: Bad request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/random:
+    get:
+      tags:
+        - Service-Key-API
+      summary: Generate random bytes sequence
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:random/get | Required to use this operation|
+      operationId: GenerateRandomBytes
+      parameters:
+        - name: length
+          in: query
+          description: Number of bytes to generate.
+          schema:
+            maximum: 4096
+            minimum: 1
+            type: integer
+            format: uint32
+            default: 1
+      responses:
+        '200':
+          description: Random bytes sequence.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRandomResponse'
+        '400':
+          description: Bad request error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/secret:
+    get:
+      tags:
+        - Secret-API
+      summary: List all secrets
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:secret/get | Required to use this operation |
+      operationId: ListSecretV2
+      parameters:
+        - name: page_size
+          in: query
+          description: Maximum number of secrets returned in one call.
+          schema:
+            maximum: 100
+            minimum: 10
+            type: integer
+            format: uint32
+            default: 100
+        - name: page_number
+          in: query
+          description: Number of the page to return.
+          schema:
+            minimum: 1
+            type: integer
+            format: uint32
+      responses:
+        '200':
+          description: List of all secrets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListSecretV2Response'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Secret-API
+      summary: Create a secret
+      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n| okms:apikms:secret/create |\tRequired to use this operation|\n| okms:apikms:secret/updateMetadata |\tRequired to create secret metadata|\n"
+      operationId: PostSecretV2
+      requestBody:
+        description: Request body.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostSecretV2Request'
+        required: true
+      responses:
+        '200':
+          description: Created secret metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostSecretV2Response'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/secret/{path}:
+    get:
+      tags:
+        - Secret-API
+      summary: Retrieve a secret
+      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secret/get | \tRequired to use this operation\n|okms:apikms:secret/version/get \t| Required to get version data |\n"
+      operationId: GetSecretV2
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret.
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+            pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+        - name: version
+          in: query
+          description: Secret version. If not set, the latest version will be returned.
+          required: false
+          schema:
+            type: integer
+            format: uint32
+            minimum: 0
+            maximum: 24000
+        - name: includeData
+          in: query
+          description: Secret data.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Version of the Secret
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSecretV2Response'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - Secret-API
+      summary: Update a secret
+      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secret/edit |\tRequired to use this operation|\n|okms:apikms:secret/version/create \t|Required to update secret data|\n|okms:apikms:secret/updateMetadata |\tRequired to update secret metadata|\n"
+      operationId: PutSecretV2
+      parameters:
+        - name: cas
+          in: query
+          description: Secret version number.
+          required: false
+          schema:
+            type: integer
+            format: uint32
+            minimum: 0
+            maximum: 24000
+        - name: path
+          in: path
+          description: Location of the secret.
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+            pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutSecretV2Request'
+        required: true
+      responses:
+        '200':
+          description: Secret metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PutSecretV2Response'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Secret-API
+      summary: Delete a secret and all its versions
+      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secret/delete |\tRequired to use this operation|\n"
+      operationId: DeleteSecretV2
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret.
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+            pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+      responses:
+        '204':
+          description: Secret is deleted
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/secret/{path}/version:
+    get:
+      tags:
+        - Secret-API
+      summary: Retrieve all secret versions
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:secret/get | Required to use this operation |
+      operationId: ListSecretVersionV2
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret.
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+            pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+      responses:
+        '200':
+          description: Secret versions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListSecretVersionV2Response'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Secret-API
+      summary: Create a secret version
+      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secret/version/create |\tRequired to use this operation|\n"
+      operationId: PostSecretVersionV2
+      parameters:
+        - name: cas
+          in: query
+          description: Secret version number.
+          required: false
+          schema:
+            type: integer
+            format: uint32
+            minimum: 1
+            maximum: 24000
+        - name: path
+          in: path
+          description: Location of the secret.
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+            pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostSecretVersionV2Request'
+        required: true
+      responses:
+        '200':
+          description: Version of the Secret
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecretV2Version'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/secret/{path}/version/{version}:
+    get:
+      tags:
+        - Secret-API
+      summary: Retrieve a secret version
+      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secret/version/get \t|Required to use this operation|\n"
+      operationId: GetSecretVersionV2
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret.
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+            pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+        - name: version
+          in: path
+          description: Secret version.
+          required: true
+          schema:
+            type: integer
+            format: uint32
+            minimum: 1
+            maximum: 24000
+        - name: includeData
+          in: query
+          description: Secret data.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Version of the Secret
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecretV2Version'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - Secret-API
+      summary: Update a secret version
+      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secret/version/edit| \tRequired to delete/deactivate/activate a secret version|\n|okms:apikms:secret/version/delete |\tRequired to delete a secret version|\n|okms:apikms:secret/version/activate \t|Required to activate a secret version|\n|okms:apikms:secret/version/deactivate \t|Required to deactivate a secret version|\n"
+      operationId: PutSecretVersionV2
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret.
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+            pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+        - name: version
+          in: path
+          description: Secret version.
+          required: true
+          schema:
+            type: integer
+            format: uint32
+            minimum: 1
+            maximum: 24000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutSecretVersionV2Request'
+        required: true
+      responses:
+        '200':
+          description: Version of the Secret
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecretV2Version'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v2/secretConfig:
+    get:
+      tags:
+        - Secret-API
+      summary: Retrieve secrets configuration
+      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secretConfig/get | \tRequired to use this operation\n"
+      operationId: GetSecretConfigV2
+      responses:
+        '200':
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSecretConfigV2Response'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - Secret-API
+      summary: Update secrets configuration
+      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secretConfig/update|  \tRequired to use this operation|\n"
+      operationId: PutSecretConfigV2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutSecretConfigV2Request'
+        required: true
+      responses:
+        '200':
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PutSecretConfigV2Response'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/secret/config:
+    get:
+      tags:
+        - Secret-API-Vault-Compliant
+      summary: Read KV engine configuration
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:secretConfig/get | Required to use this operation |
+      operationId: GetSecretConfig
+      responses:
+        '200':
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetConfigResponse'
+        '400':
+          description: Operation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Secret-API-Vault-Compliant
+      summary: Configure the KV engine
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:secretConfig/update | Required to use this operation|
+      operationId: PostSecretConfig
+      requestBody:
+        description: Parameters to change
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostConfigRequest'
+        required: true
+      responses:
+        '204':
+          description: Engine is configured
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/secret/data/{path}:
+    post:
+      tags:
+        - Secret-API-Vault-Compliant
+      summary: Create/update secret
+      description: >
+        |  Action IAM      | Description |
+
+        | ---------------- | ------------|
+
+        | okms:apikms:secret/create | Required when creating a new secret |
+
+        | okms:apikms:secret/version/create | Required when creating a new
+        secret version |
+      operationId: PostSecretRequest
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Secret json data to be created
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostSecretRequest'
+        required: true
+      responses:
+        '200':
+          description: Created secret metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostSecretResponse'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - Secret-API-Vault-Compliant
+      summary: Read secret version
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:secret/version/get |Required to use this operation|
+      operationId: GetSecretRequest
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Version of the secret requested
+          schema:
+            type: integer
+            format: uint32
+            default: 0
+      responses:
+        '200':
+          description: Secret data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSecretResponse'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetErrorResponseWithMetadata'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      tags:
+        - Secret-API-Vault-Compliant
+      summary: Patch secret
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:secret/version/create | Required to use this operation |
+      operationId: PatchSecretRequest
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Patch data for the secret
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/PostSecretRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostSecretRequest'
+        required: true
+      responses:
+        '200':
+          description: Secret metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatchSecretResponse'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatchErrorResponseWithMetadata'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Secret-API-Vault-Compliant
+      summary: Delete secret versions
+      description: >
+        |  Action IAM      | Description |
+
+        | ---------------- | ------------|
+
+        | okms:apikms:secret/version/deactivate | Required to use this operation
+        |
+      operationId: DeleteSecretRequest
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Secret versions are deleted
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/secret/subkeys/{path}:
+    get:
+      tags:
+        - Secret-API-Vault-Compliant
+      summary: Read secret subkeys
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:secret/subKeys/get | Required to use this operation |
+      operationId: GetSecretSubkeys
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret
+          required: true
+          schema:
+            type: string
+        - name: depth
+          in: query
+          description: Location of the secret
+          schema:
+            type: integer
+            format: uint32
+        - name: version
+          in: query
+          description: Version of the secret requested
+          schema:
+            type: integer
+            format: uint32
+      responses:
+        '200':
+          description: Secret data keys
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSecretSubkeysResponse'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/secret/delete/{path}:
+    post:
+      tags:
+        - Secret-API-Vault-Compliant
+      summary: Delete secret versions
+      description: >
+        |  Action IAM      | Description |
+
+        | ---------------- | ------------|
+
+        | okms:apikms:secret/version/deactivate | Required to use this operation
+        |
+      operationId: DeleteSecretVersions
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret to be deleted
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Request payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecretVersionsRequest'
+      responses:
+        '204':
+          description: Secret versions are deleted
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/secret/undelete/{path}:
+    post:
+      tags:
+        - Secret-API-Vault-Compliant
+      summary: Undelete secret versions
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:secret/version/activate | Required to use this operation |
+      operationId: PostSecretUndelete
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Request payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecretVersionsRequest'
+      responses:
+        '204':
+          description: Secret is undeleted
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/secret/destroy/{path}:
+    put:
+      tags:
+        - Secret-API-Vault-Compliant
+      summary: Destroy secret versions
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:secret/version/delete | Required to use this operation|
+      operationId: PutSecretDestroy
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Request payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecretVersionsRequest'
+      responses:
+        '204':
+          description: Secret is destroyed
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/secret/metadata/{path}:
+    get:
+      tags:
+        - Secret-API-Vault-Compliant
+      summary: Read secret metadata or list secrets
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:secret/get | Required when reading metadata |
+      operationId: GetSecretsMetadata
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret
+          required: true
+          schema:
+            type: string
+        - name: list
+          in: query
+          description: Return a list of secrets instead of metadata if set to true
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: List of secret at requested level
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMetadataResponse'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Secret-API-Vault-Compliant
+      summary: Update secret metadata
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:secret/updateMetadata| Required to use this operation|
+      operationId: PostSecretMetadata
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Request payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecretUpdatableMetadata'
+        required: true
+      responses:
+        '204':
+          description: Metadata is created/updated
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      tags:
+        - Secret-API-Vault-Compliant
+      summary: Update secret metadata
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:secret/updateMetadata| Required to use this operation|
+      operationId: PatchSecretMetadata
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Request payload
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/SecretUpdatableMetadata'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecretUpdatableMetadata'
+      responses:
+        '204':
+          description: Metadata is updated
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Secret-API-Vault-Compliant
+      summary: Delete metadata and all versions
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:secret/delete | Required to use this operation|
+      operationId: DeleteSecretMetadata
+      parameters:
+        - name: path
+          in: path
+          description: Location of the secret.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Secret and all versions are deleted
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    CreateImportServiceKeyRequest:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 32
+          minLength: 1
+          type: string
+          description: Key friendly name
+        context:
+          maxLength: 64
+          type: string
+          description: Optional key context, utf8 text string
+        type:
+          $ref: '#/components/schemas/KeyTypes'
+        size:
+          $ref: '#/components/schemas/KeySizes'
+        curve:
+          $ref: '#/components/schemas/Curves'
+        operations:
+          maxItems: 32
+          type: array
+          items:
+            $ref: '#/components/schemas/CryptographicUsages'
+          description: Operations array specifies key usage
+          nullable: true
+        keys:
+          type: array
+          items:
+            $ref: '#/components/schemas/JsonWebKeyRequest'
+          description: Json Web Key Set representing keys in request
+          nullable: true
+      additionalProperties: false
+      description: Create domain key model
+    CryptographicUsages:
+      enum:
+        - sign
+        - verify
+        - encrypt
+        - decrypt
+        - wrapKey
+        - unwrapKey
+      type: string
+    Curves:
+      enum:
+        - P-256
+        - P-384
+        - P-521
+      type: string
+    DeactivateServicekeyRequest:
+      required:
+        - reason
+      type: object
+      properties:
+        reason:
+          $ref: '#/components/schemas/RevocationReasons'
+      additionalProperties: false
+      description: Request to deactivate a service key
+    DecryptDataKeyRequest:
+      required:
+        - key
+      type: object
+      properties:
+        key:
+          maxLength: 5000
+          minLength: 1
+          type: string
+          description: Encrypted data key blob, output of generate data key operations
+          format: jwe-token
+      additionalProperties: false
+      description: >-
+        Request to extract and decrypt data key from protobuffer key metadata
+        message
+    DecryptDataKeyResponse:
+      required:
+        - plaintext
+      type: object
+      properties:
+        plaintext:
+          minLength: 1
+          type: string
+          description: Plaintext data key (base64 encoded bytes)
+          format: byte
+      additionalProperties: false
+      description: Response for data key decrypt operation
+    DecryptRequest:
+      required:
+        - ciphertext
+      type: object
+      properties:
+        ciphertext:
+          maxLength: 5120
+          minLength: 1
+          type: string
+          description: Ciphertext for Decrypt operation
+          format: jwe-token
+        context:
+          maxLength: 64
+          type: string
+          description: >-
+            Optional additional context to be used for decryption if provided on
+            encryption
+          nullable: true
+      additionalProperties: false
+      description: Decrypt request model
+    DecryptResponse:
+      required:
+        - plaintext
+      type: object
+      properties:
+        plaintext:
+          minLength: 1
+          type: string
+          description: Decrypted ciphertext
+          format: byte
+      additionalProperties: false
+      description: Decrypt operation response model
+    DigitalSignatureAlgorithms:
+      enum:
+        - ES256
+        - ES384
+        - ES512
+        - RS256
+        - RS384
+        - RS512
+        - PS256
+        - PS384
+        - PS512
+      type: string
+    EncryptRequest:
+      required:
+        - plaintext
+      type: object
+      properties:
+        plaintext:
+          maxLength: 4096
+          minLength: 1
+          type: string
+          description: Plaintext for encryption
+          format: byte
+        context:
+          maxLength: 64
+          type: string
+          description: Optional additional authenticated data
+          nullable: true
+      additionalProperties: false
+      description: Encrypt request model
+    EncryptResponse:
+      required:
+        - ciphertext
+      type: object
+      properties:
+        ciphertext:
+          minLength: 1
+          type: string
+          description: Result of encrypt operation, ciphertext
+          format: jwe-token
+      additionalProperties: false
+      description: Encrypt operation response model
+    ErrorResponse:
+      type: object
+      properties:
+        error_id:
+          type: string
+          description: Error id
+          readOnly: true
+        error_code:
+          type: integer
+          description: Error code
+          format: int32
+          readOnly: true
+        errors:
+          type: array
+          items:
+            type: string
+          description: List with text error messages associated with ErrorId
+          readOnly: true
+        request_id:
+          type: string
+          description: Request id
+          readOnly: true
+      additionalProperties: false
+      description: API error response
+    PatchErrorResponseWithMetadata:
+      type: object
+      properties:
+        error_id:
+          type: string
+          description: Error id
+          readOnly: true
+        error_code:
+          type: integer
+          description: Error code
+          format: int32
+          readOnly: true
+        errors:
+          type: array
+          items:
+            type: string
+          description: List with text error messages associated with ErrorId
+          readOnly: true
+        request_id:
+          type: string
+          description: Request id
+          readOnly: true
+        data:
+          $ref: '#/components/schemas/SecretVersionMetadata'
+    GetErrorResponseWithMetadata:
+      type: object
+      properties:
+        error_id:
+          type: string
+          description: Error id
+          readOnly: true
+        error_code:
+          type: integer
+          description: Error code
+          format: int32
+          readOnly: true
+        errors:
+          type: array
+          items:
+            type: string
+          description: List with text error messages associated with ErrorId
+          readOnly: true
+        request_id:
+          type: string
+          description: Request id
+          readOnly: true
+        data:
+          $ref: '#/components/schemas/SecretData'
+    GenerateDataKeyRequest:
+      required:
+        - size
+      type: object
+      properties:
+        name:
+          maxLength: 32
+          type: string
+          description: Key name
+          nullable: true
+        size:
+          maximum: 4096
+          minimum: 64
+          type: integer
+          description: Size of the key to be generated in bits
+          format: int32
+      additionalProperties: false
+      description: Generate data key shortcut helper
+    GenerateDataKeyResponse:
+      required:
+        - key
+      type: object
+      properties:
+        key:
+          minLength: 1
+          type: string
+          description: Data key blob (JWE token)
+          format: jwe-token
+        plaintext:
+          type: string
+          description: Plaintext key material (based64 encoded bytes)
+          format: byte
+      additionalProperties: false
+      description: Data key creation model
+    GetConfigResponse:
+      type: object
+      properties:
+        request_id:
+          type: string
+          nullable: true
+        data:
+          $ref: '#/components/schemas/PostConfigRequest'
+      additionalProperties: false
+      description: Get engine configuration
+    GetMetadataResponse:
+      type: object
+      properties:
+        request_id:
+          type: string
+          nullable: true
+        data:
+          $ref: '#/components/schemas/SecretMetadata'
+      additionalProperties: false
+      description: Get secret metadata values or list of keys
+    GetRandomResponse:
+      required:
+        - bytes
+      type: object
+      properties:
+        bytes:
+          minLength: 1
+          type: string
+          description: Random bytes string (base64 encoded)
+          format: byte
+      additionalProperties: false
+      description: Random bytes response model
+    GetSecretResponse:
+      type: object
+      properties:
+        request_id:
+          type: string
+          nullable: true
+        data:
+          $ref: '#/components/schemas/SecretData'
+      additionalProperties: false
+      description: Response to get secret operation
+    GetSecretSubkeysResponse:
+      type: object
+      properties:
+        request_id:
+          type: string
+          nullable: true
+        data:
+          $ref: '#/components/schemas/SecretDataSubkeys'
+      additionalProperties: false
+      description: Get subkeys of the secret
+    GetServiceKeyResponse:
+      required:
+        - id
+        - name
+        - type
+      type: object
+      properties:
+        id:
+          minLength: 1
+          type: string
+          description: Id of the key, UUID
+          format: uuid
+        name:
+          minLength: 1
+          type: string
+          description: Key friendly name
+        type:
+          $ref: '#/components/schemas/KeyTypes'
+        curve:
+          $ref: '#/components/schemas/Curves'
+        operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CryptographicUsages'
+          description: Key usage array specifies key usage
+        size:
+          $ref: '#/components/schemas/KeySizes'
+        attributes:
+          type: object
+          additionalProperties: {}
+          description: Additional key metadata
+          nullable: true
+        keys:
+          type: array
+          items:
+            $ref: '#/components/schemas/JsonWebKeyResponse'
+          description: Json Web Key Set representing keys in request
+          nullable: true
+      additionalProperties: false
+      description: Get service key response
+    JsonWebKeyRequest:
+      required:
+        - kty
+      type: object
+      properties:
+        use:
+          $ref: '#/components/schemas/JwkUses'
+        key_ops:
+          type: array
+          items:
+            $ref: '#/components/schemas/CryptographicUsages'
+          description: >-
+            The "key_ops" (key operations) parameter identifies the operation(s)
+            for which the key is intended to be used.
+          nullable: true
+        alg:
+          $ref: '#/components/schemas/DigitalSignatureAlgorithms'
+        kty:
+          $ref: '#/components/schemas/KeyTypes'
+        'n':
+          type: string
+          description: "The \"n\" (modulus) parameter contains the modulus value for the RSA public key. It is represented as a Base64urlUInt-encoded value.\r\nRequired for RSA public key"
+          format: base64url
+          nullable: true
+        e:
+          type: string
+          description: "The \"e\" (exponent) parameter contains the exponent value for the RSA public key. It is represented as a Base64urlUInt-encoded value.\r\nRequired for RSA public key"
+          format: base64url
+          nullable: true
+        k:
+          type: string
+          description: "The \"k\" (key value) parameter contains the value of the symmetric (or other single-valued) key.\r\nIt is represented as the base64url encoding of the octet sequence containing the key value."
+          format: base64url
+          nullable: true
+        crv:
+          $ref: '#/components/schemas/Curves'
+        x:
+          type: string
+          description: "The \"x\" (x coordinate) parameter contains the x coordinate for the Elliptic Curve point.\r\nIt is represented as the base64url encoding of the octet string representation of the coordinate"
+          format: base64url
+          nullable: true
+        'y':
+          type: string
+          description: "The \"y\" (y coordinate) parameter contains the y coordinate for the Elliptic Curve point.\r\nIt is represented as the base64url encoding of the octet string representation of the coordinate"
+          format: base64url
+          nullable: true
+        d:
+          type: string
+          description: The "d" parameter of EC key or RSA private exponent
+          format: base64url
+          nullable: true
+        dp:
+          type: string
+          description: '"dp" RSA private key parameter (first factor CRT exponent)'
+          format: base64url
+          nullable: true
+        dq:
+          type: string
+          description: '"dq" RSA private key parameter (second factor CRT exponent)'
+          format: base64url
+          nullable: true
+        p:
+          type: string
+          description: '"p" RSA private key parameter (first prime factor)'
+          format: base64url
+          nullable: true
+        q:
+          type: string
+          description: '"q" RSA private key parameter (second prime factor)'
+          format: base64url
+          nullable: true
+        qi:
+          type: string
+          description: '"qi" RSA private key parameter (first CRT coefficient)'
+          format: base64url
+          nullable: true
+        kid:
+          type: string
+          description: The "kid" (key ID) parameter is used to match a specific key.
+          nullable: true
+      additionalProperties: false
+    JsonWebKeyResponse:
+      required:
+        - kid
+        - kty
+      type: object
+      properties:
+        use:
+          $ref: '#/components/schemas/JwkUses'
+        key_ops:
+          type: array
+          items:
+            $ref: '#/components/schemas/CryptographicUsages'
+          description: >-
+            The "key_ops" (key operations) parameter identifies the operation(s)
+            for which the key is intended to be used.
+          nullable: true
+        alg:
+          $ref: '#/components/schemas/DigitalSignatureAlgorithms'
+        kty:
+          $ref: '#/components/schemas/KeyTypes'
+        'n':
+          type: string
+          description: "The \"n\" (modulus) parameter contains the modulus value for the RSA public key. It is represented as a Base64urlUInt-encoded value.\r\nRequired for RSA public key"
+          format: base64url
+          nullable: true
+        e:
+          type: string
+          description: "The \"e\" (exponent) parameter contains the exponent value for the RSA public key. It is represented as a Base64urlUInt-encoded value.\r\nRequired for RSA public key"
+          format: base64url
+          nullable: true
+        k:
+          type: string
+          description: "The \"k\" (key value) parameter contains the value of the symmetric (or other single-valued) key.\r\nIt is represented as the base64url encoding of the octet sequence containing the key value."
+          format: base64url
+          nullable: true
+        crv:
+          $ref: '#/components/schemas/Curves'
+        x:
+          type: string
+          description: "The \"x\" (x coordinate) parameter contains the x coordinate for the Elliptic Curve point.\r\nIt is represented as the base64url encoding of the octet string representation of the coordinate"
+          format: base64url
+          nullable: true
+        'y':
+          type: string
+          description: "The \"y\" (y coordinate) parameter contains the y coordinate for the Elliptic Curve point.\r\nIt is represented as the base64url encoding of the octet string representation of the coordinate"
+          format: base64url
+          nullable: true
+        d:
+          type: string
+          description: The "d" parameter of EC key or RSA private exponent
+          format: base64url
+          nullable: true
+        dp:
+          type: string
+          description: '"dp" RSA private key parameter (first factor CRT exponent)'
+          format: base64url
+          nullable: true
+        dq:
+          type: string
+          description: '"dq" RSA private key parameter (second factor CRT exponent)'
+          format: base64url
+          nullable: true
+        p:
+          type: string
+          description: '"p" RSA private key parameter (first prime factor)'
+          format: base64url
+          nullable: true
+        q:
+          type: string
+          description: '"q" RSA private key parameter (second prime factor)'
+          format: base64url
+          nullable: true
+        qi:
+          type: string
+          description: '"qi" RSA private key parameter (first CRT coefficient)'
+          format: base64url
+          nullable: true
+        kid:
+          minLength: 1
+          type: string
+          description: The "kid" (key ID) parameter is used to match a specific key.
+      additionalProperties: false
+    JwkUses:
+      enum:
+        - sig
+        - enc
+      type: string
+    KeyFormats:
+      enum:
+        - jwk
+      type: string
+    KeySizes:
+      enum:
+        - 128
+        - 192
+        - 256
+        - 2048
+        - 3072
+        - 4096
+      type: integer
+    KeyStates:
+      enum:
+        - pre_active
+        - active
+        - deactivated
+        - compromised
+        - destroyed
+        - destroyed_compromised
+        - all
+      type: string
+    KeyTypes:
+      enum:
+        - oct
+        - RSA
+        - EC
+      type: string
+    ListServiceKeysResponse:
+      required:
+        - continuation_token
+        - is_truncated
+        - objects_list
+      type: object
+      properties:
+        objects_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetServiceKeyResponse'
+          description: List of keys returnede
+        continuation_token:
+          minLength: 1
+          type: string
+          description: continuation token if list is not complete
+        is_truncated:
+          type: boolean
+          description: Is the list complete
+      additionalProperties: false
+      description: List domain keys response
+    PatchSecretResponse:
+      type: object
+      properties:
+        request_id:
+          type: string
+          nullable: true
+        data:
+          $ref: '#/components/schemas/SecretVersionMetadata'
+      additionalProperties: false
+      description: Patch secret operation response
+    PatchServiceKeyRequest:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 32
+          minLength: 1
+          type: string
+          description: Key friendly name
+      additionalProperties: false
+      description: Patch domain key model
+    PostConfigRequest:
+      type: object
+      properties:
+        cas_required:
+          type: boolean
+          description: cas parameter will be required for each write call if set to true
+          nullable: true
+        delete_version_after:
+          type: string
+          description: The length of time before a version is deleted
+          nullable: true
+        max_versions:
+          type: integer
+          description: The number of versions to keep (10 default)
+          format: uint32
+          nullable: true
+      additionalProperties: false
+      description: Default settings for Secret-API backend service
+    PostSecretOptions:
+      type: object
+      properties:
+        cas:
+          type: integer
+          description: Version of the current secret
+          format: uint32
+          nullable: true
+      additionalProperties: false
+      description: Secret request options
+    PostSecretRequest:
+      type: object
+      properties:
+        data:
+          description: The secret data map to store
+          nullable: true
+        options:
+          $ref: '#/components/schemas/PostSecretOptions'
+      additionalProperties: false
+      description: Secret request model
+    PostSecretResponse:
+      type: object
+      properties:
+        request_id:
+          type: string
+          nullable: true
+        data:
+          $ref: '#/components/schemas/SecretVersionMetadata'
+      additionalProperties: false
+      description: Post secret operation response
+    RevocationReasons:
+      enum:
+        - unspecified
+        - key_compromise
+        - ca_compromise
+        - affiliation_changed
+        - superseded
+        - cessation_of_operation
+        - privilege_withdrawn
+      type: string
+    SecretData:
+      type: object
+      properties:
+        data:
+          description: Data field
+          nullable: true
+        metadata:
+          $ref: '#/components/schemas/SecretVersionMetadata'
+      additionalProperties: false
+      description: Secret content model
+    SecretDataSubkeys:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/SecretVersionMetadata'
+        subkeys:
+          description: Subkey element
+          nullable: true
+      additionalProperties: false
+      description: Subkey model
+    SecretMetadata:
+      type: object
+      properties:
+        keys:
+          type: array
+          items:
+            type: string
+          description: Keys of the element stored in the secret
+          nullable: true
+        cas_required:
+          type: boolean
+          description: is the cas parameter required for each write call
+          nullable: true
+        created_time:
+          type: string
+          description: Time of creation of the secret version
+          nullable: true
+        current_version:
+          type: integer
+          description: Current version number of the secret
+          format: uint32
+          nullable: true
+        custom_metadata:
+          description: Custom metadata attached to the secret
+          nullable: true
+          type: object
+          additionalProperties:
+            type: string
+        delete_version_after:
+          type: string
+          description: The length of time before a version is deleted
+          nullable: true
+        max_versions:
+          type: integer
+          description: The number of versions to keep
+          format: uint32
+          nullable: true
+        oldest_version:
+          type: integer
+          description: Oldest version kept of the secret
+          format: uint32
+          nullable: true
+        updated_time:
+          type: string
+          description: Time fof the last update of the secret
+          nullable: true
+        versions:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/SecretVersionMetadataShort'
+          description: List of versions of the secret
+          nullable: true
+      additionalProperties: false
+      description: Secret metadata or list of keys
+    SecretUpdatableMetadata:
+      type: object
+      properties:
+        cas_required:
+          type: boolean
+          description: is the cas parameter required for each write call
+          nullable: true
+        custom_metadata:
+          description: Custom metadata attached to the secret
+          nullable: true
+          type: object
+          additionalProperties:
+            type: string
+        delete_version_after:
+          type: string
+          description: The length of time before a version is deleted
+          nullable: true
+        max_versions:
+          type: integer
+          description: 'description: The number of versions to keep'
+          format: uint32
+          nullable: true
+      additionalProperties: false
+      description: 'Model of payload to update metadata '
+    SecretVersionMetadata:
+      type: object
+      properties:
+        created_time:
+          type: string
+          description: Time of creation of the secret version
+          nullable: true
+        custom_metadata:
+          description: Custom metadata attached to the secret
+          nullable: true
+          type: object
+          additionalProperties:
+            type: string
+        deletion_time:
+          type: string
+          description: Time of deletion of the secret version
+          nullable: true
+        destroyed:
+          type: boolean
+          description: Is the secret destroyed
+          nullable: true
+        version:
+          type: integer
+          description: Version number of the secret
+          format: uint32
+          nullable: true
+          minimum: 0
+          maximum: 24000
+      additionalProperties: false
+      description: Secret version specific metadata fields
+    SecretVersionMetadataShort:
+      type: object
+      properties:
+        created_time:
+          type: string
+          description: Time of creation of the secret version
+          nullable: true
+        deletion_time:
+          type: string
+          description: Time of deletion of the secret version
+          nullable: true
+        destroyed:
+          type: boolean
+          description: Is the secret version destroyed
+      additionalProperties: false
+      description: Secret version specific metadata fields short model
+    SecretVersionsRequest:
+      required:
+        - versions
+      type: object
+      properties:
+        versions:
+          type: array
+          items:
+            type: integer
+            format: uint32
+          description: The versions to be soft deleted
+      additionalProperties: false
+      description: List of secrets in scope of operation
+    SignRequest:
+      required:
+        - alg
+        - message
+      type: object
+      properties:
+        message:
+          maxLength: 4096
+          minLength: 1
+          type: string
+          description: Message to be signed
+          format: byte
+        alg:
+          $ref: '#/components/schemas/DigitalSignatureAlgorithms'
+        isdigest:
+          type: boolean
+          description: Is the message already hashed
+      additionalProperties: false
+      description: Sign request model
+    SignResponse:
+      required:
+        - signature
+      type: object
+      properties:
+        signature:
+          minLength: 1
+          type: string
+          description: Signature data
+          format: string
+      additionalProperties: false
+      description: Sign response model
+    SignatureFormats:
+      enum:
+        - raw
+        - jws
+        - jwt
+      type: string
+      description: Formats for digital signature result.
+    StatusCodes:
+      type: object
+      additionalProperties: false
+    VerifyRequest:
+      required:
+        - signature
+      type: object
+      properties:
+        message:
+          maxLength: 4094
+          type: string
+          description: Signed message to be verified
+          format: byte
+          nullable: true
+        signature:
+          minLength: 1
+          type: string
+          description: String token containing signature for verification
+          format: string
+        alg:
+          $ref: '#/components/schemas/DigitalSignatureAlgorithms'
+        isdigest:
+          type: boolean
+          description: Is the message already hashed
+      additionalProperties: false
+      description: Verify signature request model
+    VerifyResponse:
+      required:
+        - result
+      type: object
+      properties:
+        result:
+          type: boolean
+          description: Result of verify operation
+      additionalProperties: false
+      description: Verify response model
+    SecretV2CustomMetadata:
+      type: object
+      maxProperties: 64
+      additionalProperties:
+        type: string
+        minLength: 1
+        maxLength: 512
+        pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+    SecretV2State:
+      enum:
+        - active
+        - deactivated
+        - deleted
+      type: string
+      description: State of the secret version
+    SecretV2Metadata:
+      properties:
+        cas_required:
+          type: boolean
+          nullable: true
+          description: >-
+            The cas parameter will be required for all write requests if set to
+            true
+        created_at:
+          type: string
+          description: Time of creation of the secret version
+          nullable: true
+        current_version:
+          type: integer
+          nullable: false
+          description: The secret version.
+          format: uint32
+        custom_metadata:
+          $ref: '#/components/schemas/SecretV2CustomMetadata'
+        deactivate_version_after:
+          type: string
+          description: Time duration before a version is deactivated
+          nullable: true
+        max_versions:
+          type: integer
+          nullable: true
+          description: The number of versions to keep (10 default)
+          format: uint32
+          minimum: 0
+          maximum: 24000
+        oldest_version:
+          type: integer
+          nullable: false
+          description: The secret oldest version
+          format: uint32
+        updated_at:
+          type: string
+          nullable: true
+          description: Time of the last update of the secret
+    SecretV2MetadataShort:
+      properties:
+        cas_required:
+          type: boolean
+          nullable: true
+          description: >-
+            The cas parameter will be required for all write requests if set to
+            true
+        custom_metadata:
+          $ref: '#/components/schemas/SecretV2CustomMetadata'
+        deactivate_version_after:
+          type: string
+          description: Time duration before a version is deactivated
+          nullable: true
+        max_versions:
+          type: integer
+          nullable: true
+          description: The number of versions to keep (10 default)
+          format: uint32
+          minimum: 0
+          maximum: 24000
+    SecretV2Version:
+      required:
+        - id
+        - state
+        - created_at
+      properties:
+        created_at:
+          type: string
+          description: Time of creation of the secret version
+        data:
+          type: object
+          description: The secret data map to store
+          nullable: true
+        deactivated_at:
+          type: string
+          description: Time of deactivation of the secret version
+          nullable: true
+        id:
+          type: integer
+          description: Secret version
+          format: uint32
+          minimum: 0
+          maximum: 24000
+        state:
+          $ref: '#/components/schemas/SecretV2State'
+    SecretV2VersionShort:
+      type: object
+      description: Data of the secret version
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          description: The secret data map to store
+          nullable: true
+    ListSecretV2Response:
+      type: object
+      description: List of secrets
+      properties:
+        results:
+          description: List of secrets
+          type: array
+          items:
+            $ref: '#/components/schemas/GetSecretV2Response'
+        total_count:
+          type: integer
+          format: uint32
+          description: Total number of secrets.
+    PostSecretV2Request:
+      type: object
+      required:
+        - path
+        - version
+      properties:
+        metadata:
+          $ref: '#/components/schemas/SecretV2MetadataShort'
+        path:
+          type: string
+          nullable: false
+          description: Secret identifier
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+        version:
+          $ref: '#/components/schemas/SecretV2VersionShort'
+    PostSecretV2Response:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/SecretV2Metadata'
+        path:
+          type: string
+          nullable: false
+          description: Secret identifier
+    GetSecretV2Response:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/SecretV2Metadata'
+        path:
+          type: string
+          nullable: false
+          description: Secret identifier
+        version:
+          $ref: '#/components/schemas/SecretV2Version'
+    PutSecretV2Request:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/SecretV2MetadataShort'
+        version:
+          $ref: '#/components/schemas/SecretV2VersionShort'
+    PutSecretV2Response:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/SecretV2Metadata'
+        path:
+          type: string
+          nullable: false
+          description: Secret identifier
+    ListSecretVersionV2Response:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecretV2Version'
+    PostSecretVersionV2Request:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          description: The secret data map to store
+          nullable: true
+    PutSecretVersionV2Request:
+      type: object
+      required:
+        - state
+      properties:
+        state:
+          $ref: '#/components/schemas/SecretV2State'
+    GetSecretConfigV2Response:
+      type: object
+      properties:
+        cas_required:
+          type: boolean
+          description: cas parameter will be required for each write call if set to true
+          nullable: false
+        deactivate_version_after:
+          type: string
+          description: The length of time before a version is deleted
+          nullable: true
+        max_versions:
+          type: integer
+          description: The number of versions to keep (10 default)
+          nullable: true
+          format: uint32
+          minimum: 0
+          maximum: 24000
+    PutSecretConfigV2Response:
+      type: object
+      properties:
+        cas_required:
+          type: boolean
+          description: cas parameter will be required for each write call if set to true
+          nullable: false
+        deactivate_version_after:
+          type: string
+          description: The length of time before a version is deleted
+          nullable: true
+        max_versions:
+          type: integer
+          description: The number of versions to keep (10 default)
+          nullable: true
+          format: uint32
+          minimum: 0
+          maximum: 24000
+    PutSecretConfigV2Request:
+      type: object
+      properties:
+        cas_required:
+          type: boolean
+          description: cas parameter will be required for each write call if set to true
+          nullable: true
+        deactivate_version_after:
+          type: string
+          description: The length of time before a version is deleted
+          nullable: true
+        max_versions:
+          type: integer
+          minimum: 0
+          maximum: 24000
+          description: The number of versions to keep (10 default)
+          nullable: true
+          format: uint32
