@@ -1634,9 +1634,9 @@ func (_c *APIMock_PostSecretUndelete_Call) RunAndReturn(run func(context.Context
 	return _c
 }
 
-// PostSecretV2 provides a mock function with given fields: ctx, cas, body
-func (_m *APIMock) PostSecretV2(ctx context.Context, cas *uint32, body types.PostSecretV2Request) (*types.PostSecretV2Response, error) {
-	ret := _m.Called(ctx, cas, body)
+// PostSecretV2 provides a mock function with given fields: ctx, body
+func (_m *APIMock) PostSecretV2(ctx context.Context, body types.PostSecretV2Request) (*types.PostSecretV2Response, error) {
+	ret := _m.Called(ctx, body)
 
 	if len(ret) == 0 {
 		panic("no return value specified for PostSecretV2")
@@ -1644,19 +1644,19 @@ func (_m *APIMock) PostSecretV2(ctx context.Context, cas *uint32, body types.Pos
 
 	var r0 *types.PostSecretV2Response
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *uint32, types.PostSecretV2Request) (*types.PostSecretV2Response, error)); ok {
-		return rf(ctx, cas, body)
+	if rf, ok := ret.Get(0).(func(context.Context, types.PostSecretV2Request) (*types.PostSecretV2Response, error)); ok {
+		return rf(ctx, body)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *uint32, types.PostSecretV2Request) *types.PostSecretV2Response); ok {
-		r0 = rf(ctx, cas, body)
+	if rf, ok := ret.Get(0).(func(context.Context, types.PostSecretV2Request) *types.PostSecretV2Response); ok {
+		r0 = rf(ctx, body)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*types.PostSecretV2Response)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *uint32, types.PostSecretV2Request) error); ok {
-		r1 = rf(ctx, cas, body)
+	if rf, ok := ret.Get(1).(func(context.Context, types.PostSecretV2Request) error); ok {
+		r1 = rf(ctx, body)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -1671,15 +1671,14 @@ type APIMock_PostSecretV2_Call struct {
 
 // PostSecretV2 is a helper method to define mock.On call
 //   - ctx context.Context
-//   - cas *uint32
 //   - body types.PostSecretV2Request
-func (_e *APIMock_Expecter) PostSecretV2(ctx interface{}, cas interface{}, body interface{}) *APIMock_PostSecretV2_Call {
-	return &APIMock_PostSecretV2_Call{Call: _e.mock.On("PostSecretV2", ctx, cas, body)}
+func (_e *APIMock_Expecter) PostSecretV2(ctx interface{}, body interface{}) *APIMock_PostSecretV2_Call {
+	return &APIMock_PostSecretV2_Call{Call: _e.mock.On("PostSecretV2", ctx, body)}
 }
 
-func (_c *APIMock_PostSecretV2_Call) Run(run func(ctx context.Context, cas *uint32, body types.PostSecretV2Request)) *APIMock_PostSecretV2_Call {
+func (_c *APIMock_PostSecretV2_Call) Run(run func(ctx context.Context, body types.PostSecretV2Request)) *APIMock_PostSecretV2_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*uint32), args[2].(types.PostSecretV2Request))
+		run(args[0].(context.Context), args[1].(types.PostSecretV2Request))
 	})
 	return _c
 }
@@ -1689,7 +1688,7 @@ func (_c *APIMock_PostSecretV2_Call) Return(_a0 *types.PostSecretV2Response, _a1
 	return _c
 }
 
-func (_c *APIMock_PostSecretV2_Call) RunAndReturn(run func(context.Context, *uint32, types.PostSecretV2Request) (*types.PostSecretV2Response, error)) *APIMock_PostSecretV2_Call {
+func (_c *APIMock_PostSecretV2_Call) RunAndReturn(run func(context.Context, types.PostSecretV2Request) (*types.PostSecretV2Response, error)) *APIMock_PostSecretV2_Call {
 	_c.Call.Return(run)
 	return _c
 }

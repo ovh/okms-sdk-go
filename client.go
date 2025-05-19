@@ -622,7 +622,7 @@ func (client *apiClient) ListSecretV2(ctx context.Context, pageSize, pageNumber 
 }
 
 // PostSecretV2 creates a new secret with metadata.
-func (client *apiClient) PostSecretV2(ctx context.Context, cas *uint32, body types.PostSecretV2Request) (*types.PostSecretV2Response, error) {
+func (client *apiClient) PostSecretV2(ctx context.Context, body types.PostSecretV2Request) (*types.PostSecretV2Response, error) {
 	r, err := mapRestErr(client.inner.PostSecretV2WithResponse(ctx, body))
 	if err != nil {
 		return nil, err

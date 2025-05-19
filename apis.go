@@ -118,7 +118,7 @@ type SecretApiV2 interface {
 	// ListSecretV2 returns a page of secrets.
 	ListSecretV2(ctx context.Context, pageSize, pageNumber *uint32) (*types.ListSecretV2Response, error)
 	// PostSecretV2 creates a new secret with metadata.
-	PostSecretV2(ctx context.Context, cas *uint32, body types.PostSecretV2Request) (*types.PostSecretV2Response, error)
+	PostSecretV2(ctx context.Context, body types.PostSecretV2Request) (*types.PostSecretV2Response, error)
 	// DeleteSecretV2 deletes a secret and all its versions.
 	DeleteSecretV2(ctx context.Context, path string) error
 	// GetSecretV2 returns a secret and its metadata. If the version is not specified, the current version is returned.
