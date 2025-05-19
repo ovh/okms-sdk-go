@@ -14,4 +14,4 @@ package okms
 //go:generate go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2 -config .github/codegen/oapi-codegen-types.yaml .github/codegen/schemas/swagger.yaml
 //go:generate go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2 -config .github/codegen/oapi-codegen-client.yaml .github/codegen/schemas/swagger.yaml
 
-//#go:generate go run github.com/vektra/mockery/v2@v2.42 --config .github/codegen/mockery.yaml
+//go:generate go run github.com/vektra/mockery/v2@v2.42 --config .github/codegen/mockery.yaml
