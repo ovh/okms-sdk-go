@@ -4,8 +4,6 @@ output: types/types.gen.go
 generate:
   models: true
 output-options:
-  exclude-tags:
-    - SecretsApi
   exclude-operation-ids:
     - GenerateRandomBytes
   skip-prune: false
