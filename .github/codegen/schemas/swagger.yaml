@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: OVHcloud KMS REST API
-  version: 2.0.0
+  version: 2.2.0
 paths:
   /v1/servicekey:
     post:
@@ -863,25 +863,35 @@ paths:
         | okms:apikms:secret/get | Required to use this operation |
       operationId: ListSecretV2
       parameters:
-        - name: page_size
-          in: query
+        - name: X-Pagination-Size
+          in: header
           description: Maximum number of secrets returned in one call.
+          required: false
           schema:
-            maximum: 100
-            minimum: 10
             type: integer
             format: uint32
-            default: 100
-        - name: page_number
-          in: query
-          description: Number of the page to return.
+        - name: X-Pagination-Cursor
+          in: header
+          description: Page cursor to use as offset.
+          required: false
           schema:
-            minimum: 1
-            type: integer
-            format: uint32
+            type: string
+        - name: X-Kms-ListIds
+          in: header
+          description: Comma-separated list of path used as filter.
+          required: false
+          schema:
+            type: string
+            maxLength: 255
+            pattern: ^[a-zA-Z0-9_.:/=@%-]+$
       responses:
         '200':
           description: List of all secrets
+          headers:
+            X-Pagination-Cursor-Next:
+              description: continuation token if list is not complete.
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -971,7 +981,7 @@ paths:
       tags:
         - Secret-API
       summary: Retrieve a secret
-      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secret/get | \tRequired to use this operation\n|okms:apikms:secret/version/get \t| Required to get version data |\n"
+      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secret/get | \tRequired to use this operation\n|okms:apikms:secret/version/getData \t| Required to get version data |\n"
       operationId: GetSecretV2
       parameters:
         - name: path
@@ -981,7 +991,7 @@ paths:
           schema:
             type: string
             maxLength: 255
-            pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+            pattern: ^[a-zA-Z0-9_.:/=@%-]+$
         - name: version
           in: query
           description: Secret version. If not set, the latest version will be returned.
@@ -989,7 +999,7 @@ paths:
           schema:
             type: integer
             format: uint32
-            minimum: 0
+            minimum: 1
             maximum: 24000
         - name: includeData
           in: query
@@ -1038,7 +1048,7 @@ paths:
       tags:
         - Secret-API
       summary: Update a secret
-      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secret/edit |\tRequired to use this operation|\n|okms:apikms:secret/version/create \t|Required to update secret data|\n|okms:apikms:secret/updateMetadata |\tRequired to update secret metadata|\n"
+      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secret/version/create \t|Required to update secret data|\n|okms:apikms:secret/updateMetadata |\tRequired to update secret metadata|\n"
       operationId: PutSecretV2
       parameters:
         - name: cas
@@ -1057,7 +1067,7 @@ paths:
           schema:
             type: string
             maxLength: 255
-            pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+            pattern: ^[a-zA-Z0-9_.:/=@%-]+$
       requestBody:
         content:
           application/json:
@@ -1115,7 +1125,7 @@ paths:
           schema:
             type: string
             maxLength: 255
-            pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+            pattern: ^[a-zA-Z0-9_.:/=@%-]+$
       responses:
         '204':
           description: Secret is deleted
@@ -1154,12 +1164,28 @@ paths:
       tags:
         - Secret-API
       summary: Retrieve all secret versions
-      description: |
+      description: >
         |  Action IAM      | Description |
+
         | ---------------- | ------------|
-        | okms:apikms:secret/get | Required to use this operation |
+
+        | okms:apikms:secret/get | Only the secret you have the right on will be
+        displayed |
       operationId: ListSecretVersionV2
       parameters:
+        - name: X-Pagination-Size
+          in: header
+          description: Maximum number of secrets returned in one call.
+          required: false
+          schema:
+            type: integer
+            format: uint32
+        - name: X-Pagination-Cursor
+          in: header
+          description: Page cursor to use as offset.
+          required: false
+          schema:
+            type: string
         - name: path
           in: path
           description: Location of the secret.
@@ -1167,10 +1193,15 @@ paths:
           schema:
             type: string
             maxLength: 255
-            pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+            pattern: ^[a-zA-Z0-9_.:/=@%-]+$
       responses:
         '200':
           description: Secret versions
+          headers:
+            X-Pagination-Cursor-Next:
+              description: continuation token if list is not complete.
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -1228,7 +1259,7 @@ paths:
           schema:
             type: string
             maxLength: 255
-            pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+            pattern: ^[a-zA-Z0-9_.:/=@%-]+$
       requestBody:
         content:
           application/json:
@@ -1277,7 +1308,7 @@ paths:
       tags:
         - Secret-API
       summary: Retrieve a secret version
-      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secret/version/get \t|Required to use this operation|\n"
+      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secret/version/getData \t|Required to use this operation|\n"
       operationId: GetSecretVersionV2
       parameters:
         - name: path
@@ -1287,7 +1318,7 @@ paths:
           schema:
             type: string
             maxLength: 255
-            pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+            pattern: ^[a-zA-Z0-9_.:/=@%-]+$
         - name: version
           in: path
           description: Secret version.
@@ -1344,7 +1375,7 @@ paths:
       tags:
         - Secret-API
       summary: Update a secret version
-      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secret/version/edit| \tRequired to delete/deactivate/activate a secret version|\n|okms:apikms:secret/version/delete |\tRequired to delete a secret version|\n|okms:apikms:secret/version/activate \t|Required to activate a secret version|\n|okms:apikms:secret/version/deactivate \t|Required to deactivate a secret version|\n"
+      description: "|  Action IAM      | Description |\n| ---------------- | ------------|\n|okms:apikms:secret/version/delete |\tRequired to delete a secret version|\n|okms:apikms:secret/version/activate \t|Required to activate a secret version|\n|okms:apikms:secret/version/deactivate \t|Required to deactivate a secret version|\n"
       operationId: PutSecretVersionV2
       parameters:
         - name: path
@@ -1354,7 +1385,7 @@ paths:
           schema:
             type: string
             maxLength: 255
-            pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+            pattern: ^[a-zA-Z0-9_.:/=@%-]+$
         - name: version
           in: path
           description: Secret version.
@@ -1618,6 +1649,7 @@ paths:
           required: true
           schema:
             type: string
+            pattern: ^[a-zA-Z0-9_.:/=@%-]+$
       requestBody:
         description: Secret json data to be created
         content:
@@ -1669,7 +1701,7 @@ paths:
       description: |
         |  Action IAM      | Description |
         | ---------------- | ------------|
-        | okms:apikms:secret/version/get |Required to use this operation|
+        | okms:apikms:secret/version/getData |Required to use this operation|
       operationId: GetSecretRequest
       parameters:
         - name: path
@@ -1684,7 +1716,7 @@ paths:
           schema:
             type: integer
             format: uint32
-            default: 0
+            minimum: 1
       responses:
         '200':
           description: Secret data
@@ -1866,6 +1898,7 @@ paths:
           schema:
             type: integer
             format: uint32
+            minimum: 1
       responses:
         '200':
           description: Secret data keys
@@ -2079,10 +2112,13 @@ paths:
       tags:
         - Secret-API-Vault-Compliant
       summary: Read secret metadata or list secrets
-      description: |
+      description: >
         |  Action IAM      | Description |
+
         | ---------------- | ------------|
-        | okms:apikms:secret/get | Required when reading metadata |
+
+        | okms:apikms:secret/get | Only the secret you have the right on will be
+        displayed |
       operationId: GetSecretsMetadata
       parameters:
         - name: path
@@ -2097,9 +2133,30 @@ paths:
           schema:
             type: boolean
             default: false
+        - name: X-Pagination-Size
+          in: header
+          description: Maximum number of secrets returned in one call.
+          required: false
+          schema:
+            maximum: 100
+            minimum: 10
+            type: integer
+            format: uint32
+            default: 100
+        - name: X-Pagination-Cursor
+          in: header
+          description: Page cursor to use as offset.
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: List of secret at requested level
+          headers:
+            X-Pagination-Cursor-Next:
+              description: continuation token if list is not complete.
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -2865,7 +2922,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GetServiceKeyResponse'
-          description: List of keys returnede
+          description: List of keys returned
         continuation_token:
           minLength: 1
           type: string
@@ -3079,7 +3136,7 @@ components:
           description: Version number of the secret
           format: uint32
           nullable: true
-          minimum: 0
+          minimum: 1
           maximum: 24000
       additionalProperties: false
       description: Secret version specific metadata fields
@@ -3193,7 +3250,7 @@ components:
         type: string
         minLength: 1
         maxLength: 512
-        pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+        pattern: ^[a-zA-Z0-9_.:/=@%-]+$
     SecretV2State:
       enum:
         - active
@@ -3282,7 +3339,7 @@ components:
           type: integer
           description: Secret version
           format: uint32
-          minimum: 0
+          minimum: 1
           maximum: 24000
         state:
           $ref: '#/components/schemas/SecretV2State'
@@ -3297,18 +3354,10 @@ components:
           description: The secret data map to store
           nullable: true
     ListSecretV2Response:
-      type: object
+      type: array
       description: List of secrets
-      properties:
-        results:
-          description: List of secrets
-          type: array
-          items:
-            $ref: '#/components/schemas/GetSecretV2Response'
-        total_count:
-          type: integer
-          format: uint32
-          description: Total number of secrets.
+      items:
+        $ref: '#/components/schemas/GetSecretV2Response'
     PostSecretV2Request:
       type: object
       required:
@@ -3322,7 +3371,7 @@ components:
           nullable: false
           description: Secret identifier
           maxLength: 255
-          pattern: ^[a-zA-Z0-9_.:/=+@%-]+$
+          pattern: ^[a-zA-Z0-9_.:/=@-]+$
         version:
           $ref: '#/components/schemas/SecretV2VersionShort'
     PostSecretV2Response:
