@@ -1143,29 +1143,29 @@ func (_c *APIMock_GetServiceKey_Call) RunAndReturn(run func(context.Context, uui
 	return _c
 }
 
-// ListSecretV2 provides a mock function with given fields: ctx, pageSize, pageNumber
-func (_m *APIMock) ListSecretV2(ctx context.Context, pageSize *uint32, pageNumber *uint32) (*types.ListSecretV2Response, error) {
-	ret := _m.Called(ctx, pageSize, pageNumber)
+// ListSecretV2 provides a mock function with given fields: ctx, pageSize, pageCursor
+func (_m *APIMock) ListSecretV2(ctx context.Context, pageSize *uint32, pageCursor *string) (*[]types.GetSecretV2Response, error) {
+	ret := _m.Called(ctx, pageSize, pageCursor)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListSecretV2")
 	}
 
-	var r0 *types.ListSecretV2Response
+	var r0 *[]types.GetSecretV2Response
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *uint32, *uint32) (*types.ListSecretV2Response, error)); ok {
-		return rf(ctx, pageSize, pageNumber)
+	if rf, ok := ret.Get(0).(func(context.Context, *uint32, *string) (*[]types.GetSecretV2Response, error)); ok {
+		return rf(ctx, pageSize, pageCursor)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *uint32, *uint32) *types.ListSecretV2Response); ok {
-		r0 = rf(ctx, pageSize, pageNumber)
+	if rf, ok := ret.Get(0).(func(context.Context, *uint32, *string) *[]types.GetSecretV2Response); ok {
+		r0 = rf(ctx, pageSize, pageCursor)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*types.ListSecretV2Response)
+			r0 = ret.Get(0).(*[]types.GetSecretV2Response)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *uint32, *uint32) error); ok {
-		r1 = rf(ctx, pageSize, pageNumber)
+	if rf, ok := ret.Get(1).(func(context.Context, *uint32, *string) error); ok {
+		r1 = rf(ctx, pageSize, pageCursor)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -1181,31 +1181,31 @@ type APIMock_ListSecretV2_Call struct {
 // ListSecretV2 is a helper method to define mock.On call
 //   - ctx context.Context
 //   - pageSize *uint32
-//   - pageNumber *uint32
-func (_e *APIMock_Expecter) ListSecretV2(ctx interface{}, pageSize interface{}, pageNumber interface{}) *APIMock_ListSecretV2_Call {
-	return &APIMock_ListSecretV2_Call{Call: _e.mock.On("ListSecretV2", ctx, pageSize, pageNumber)}
+//   - pageCursor *string
+func (_e *APIMock_Expecter) ListSecretV2(ctx interface{}, pageSize interface{}, pageCursor interface{}) *APIMock_ListSecretV2_Call {
+	return &APIMock_ListSecretV2_Call{Call: _e.mock.On("ListSecretV2", ctx, pageSize, pageCursor)}
 }
 
-func (_c *APIMock_ListSecretV2_Call) Run(run func(ctx context.Context, pageSize *uint32, pageNumber *uint32)) *APIMock_ListSecretV2_Call {
+func (_c *APIMock_ListSecretV2_Call) Run(run func(ctx context.Context, pageSize *uint32, pageCursor *string)) *APIMock_ListSecretV2_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*uint32), args[2].(*uint32))
+		run(args[0].(context.Context), args[1].(*uint32), args[2].(*string))
 	})
 	return _c
 }
 
-func (_c *APIMock_ListSecretV2_Call) Return(_a0 *types.ListSecretV2Response, _a1 error) *APIMock_ListSecretV2_Call {
+func (_c *APIMock_ListSecretV2_Call) Return(_a0 *[]types.GetSecretV2Response, _a1 error) *APIMock_ListSecretV2_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *APIMock_ListSecretV2_Call) RunAndReturn(run func(context.Context, *uint32, *uint32) (*types.ListSecretV2Response, error)) *APIMock_ListSecretV2_Call {
+func (_c *APIMock_ListSecretV2_Call) RunAndReturn(run func(context.Context, *uint32, *string) (*[]types.GetSecretV2Response, error)) *APIMock_ListSecretV2_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// ListSecretVersionV2 provides a mock function with given fields: ctx, path
-func (_m *APIMock) ListSecretVersionV2(ctx context.Context, path string) (*[]types.SecretV2Version, error) {
-	ret := _m.Called(ctx, path)
+// ListSecretVersionV2 provides a mock function with given fields: ctx, path, pageSize, pageCursor
+func (_m *APIMock) ListSecretVersionV2(ctx context.Context, path string, pageSize *uint32, pageCursor *string) (*[]types.SecretV2Version, error) {
+	ret := _m.Called(ctx, path, pageSize, pageCursor)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListSecretVersionV2")
@@ -1213,19 +1213,19 @@ func (_m *APIMock) ListSecretVersionV2(ctx context.Context, path string) (*[]typ
 
 	var r0 *[]types.SecretV2Version
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (*[]types.SecretV2Version, error)); ok {
-		return rf(ctx, path)
+	if rf, ok := ret.Get(0).(func(context.Context, string, *uint32, *string) (*[]types.SecretV2Version, error)); ok {
+		return rf(ctx, path, pageSize, pageCursor)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) *[]types.SecretV2Version); ok {
-		r0 = rf(ctx, path)
+	if rf, ok := ret.Get(0).(func(context.Context, string, *uint32, *string) *[]types.SecretV2Version); ok {
+		r0 = rf(ctx, path, pageSize, pageCursor)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*[]types.SecretV2Version)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, path)
+	if rf, ok := ret.Get(1).(func(context.Context, string, *uint32, *string) error); ok {
+		r1 = rf(ctx, path, pageSize, pageCursor)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -1241,13 +1241,15 @@ type APIMock_ListSecretVersionV2_Call struct {
 // ListSecretVersionV2 is a helper method to define mock.On call
 //   - ctx context.Context
 //   - path string
-func (_e *APIMock_Expecter) ListSecretVersionV2(ctx interface{}, path interface{}) *APIMock_ListSecretVersionV2_Call {
-	return &APIMock_ListSecretVersionV2_Call{Call: _e.mock.On("ListSecretVersionV2", ctx, path)}
+//   - pageSize *uint32
+//   - pageCursor *string
+func (_e *APIMock_Expecter) ListSecretVersionV2(ctx interface{}, path interface{}, pageSize interface{}, pageCursor interface{}) *APIMock_ListSecretVersionV2_Call {
+	return &APIMock_ListSecretVersionV2_Call{Call: _e.mock.On("ListSecretVersionV2", ctx, path, pageSize, pageCursor)}
 }
 
-func (_c *APIMock_ListSecretVersionV2_Call) Run(run func(ctx context.Context, path string)) *APIMock_ListSecretVersionV2_Call {
+func (_c *APIMock_ListSecretVersionV2_Call) Run(run func(ctx context.Context, path string, pageSize *uint32, pageCursor *string)) *APIMock_ListSecretVersionV2_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
+		run(args[0].(context.Context), args[1].(string), args[2].(*uint32), args[3].(*string))
 	})
 	return _c
 }
@@ -1257,7 +1259,7 @@ func (_c *APIMock_ListSecretVersionV2_Call) Return(_a0 *[]types.SecretV2Version,
 	return _c
 }
 
-func (_c *APIMock_ListSecretVersionV2_Call) RunAndReturn(run func(context.Context, string) (*[]types.SecretV2Version, error)) *APIMock_ListSecretVersionV2_Call {
+func (_c *APIMock_ListSecretVersionV2_Call) RunAndReturn(run func(context.Context, string, *uint32, *string) (*[]types.SecretV2Version, error)) *APIMock_ListSecretVersionV2_Call {
 	_c.Call.Return(run)
 	return _c
 }
