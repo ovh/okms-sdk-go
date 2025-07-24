@@ -887,11 +887,6 @@ paths:
       responses:
         '200':
           description: List of all secrets
-          headers:
-            X-Pagination-Cursor-Next:
-              description: continuation token if list is not complete.
-              schema:
-                type: string
           content:
             application/json:
               schema:
@@ -1197,11 +1192,6 @@ paths:
       responses:
         '200':
           description: Secret versions
-          headers:
-            X-Pagination-Cursor-Next:
-              description: continuation token if list is not complete.
-              schema:
-                type: string
           content:
             application/json:
               schema:
@@ -3354,10 +3344,21 @@ components:
           description: The secret data map to store
           nullable: true
     ListSecretV2Response:
-      type: array
-      description: List of secrets
-      items:
-        $ref: '#/components/schemas/GetSecretV2Response'
+      required:
+        - continuation_token
+        - objects_list
+      type: object
+      properties:
+        objects_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetSecretV2Response'
+          description: List of secrets returned
+        continuation_token:
+          type: string
+          description: continuation token if list is not complete
+      additionalProperties: false
+      description: List secrets response
     PostSecretV2Request:
       type: object
       required:
@@ -3411,9 +3412,21 @@ components:
           nullable: false
           description: Secret identifier
     ListSecretVersionV2Response:
-      type: array
-      items:
-        $ref: '#/components/schemas/SecretV2Version'
+      required:
+        - continuation_token
+        - objects_list
+      type: object
+      properties:
+        objects_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/SecretV2Version'
+          description: List of secrets returned
+        continuation_token:
+          type: string
+          description: continuation token if list is not complete
+      additionalProperties: false
+      description: List secret versions response
     PostSecretVersionV2Request:
       type: object
       required:

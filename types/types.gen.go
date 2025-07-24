@@ -415,11 +415,23 @@ type KeyStates string
 // KeyTypes defines model for KeyTypes.
 type KeyTypes string
 
-// ListSecretV2Response List of secrets
-type ListSecretV2Response = []GetSecretV2Response
+// ListSecretV2Response List secrets response
+type ListSecretV2Response struct {
+	// ContinuationToken continuation token if list is not complete
+	ContinuationToken string `json:"continuation_token"`
 
-// ListSecretVersionV2Response defines model for ListSecretVersionV2Response.
-type ListSecretVersionV2Response = []SecretV2Version
+	// ObjectsList List of secrets returned
+	ObjectsList []GetSecretV2Response `json:"objects_list"`
+}
+
+// ListSecretVersionV2Response List secret versions response
+type ListSecretVersionV2Response struct {
+	// ContinuationToken continuation token if list is not complete
+	ContinuationToken string `json:"continuation_token"`
+
+	// ObjectsList List of secrets returned
+	ObjectsList []SecretV2Version `json:"objects_list"`
+}
 
 // ListServiceKeysResponse List domain keys response
 type ListServiceKeysResponse struct {
