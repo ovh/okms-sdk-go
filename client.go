@@ -613,12 +613,19 @@ func (client *apiClient) PostSecretUndelete(ctx context.Context, path string, ve
 }
 
 // ListSecretV2 returns a page of secrets.
-func (client *apiClient) ListSecretV2(ctx context.Context, pageSize *uint32, pageCursor *string) (*types.ListSecretV2Response, error) {
+func (client *apiClient) ListSecretV2(ctx context.Context, pageSize *uint32, pageCursor *string) (*types.ListSecretV2ResponseWithHeaders, error) {
 	r, err := mapRestErr(client.inner.ListSecretV2WithResponse(ctx, &types.ListSecretV2Params{XPaginationSize: pageSize, XPaginationCursor: pageCursor}))
 	if err != nil {
 		return nil, err
 	}
-	return r.JSON200, err
+
+	cursorNextHdr := r.HTTPResponse.Header.Get("X-Pagination-Cursor-Next")
+
+	resp := &types.ListSecretV2ResponseWithHeaders{
+		Body:    *r.JSON200,
+		Headers: types.ListSecretV2ResponseHeaders{XPaginationCursorNext: cursorNextHdr},
+	}
+	return resp, err
 }
 
 // PostSecretV2 creates a new secret with metadata.
@@ -655,12 +662,18 @@ func (client *apiClient) PutSecretV2(ctx context.Context, path string, cas *uint
 }
 
 // ListSecretVersionV2 returns the versions of a secret.
-func (client *apiClient) ListSecretVersionV2(ctx context.Context, path string, pageSize *uint32, pageCursor *string) (*types.ListSecretVersionV2Response, error) {
+func (client *apiClient) ListSecretVersionV2(ctx context.Context, path string, pageSize *uint32, pageCursor *string) (*types.ListSecretVersionV2ResponseWithHeaders, error) {
 	r, err := mapRestErr(client.inner.ListSecretVersionV2WithResponse(ctx, path, &types.ListSecretVersionV2Params{XPaginationSize: pageSize, XPaginationCursor: pageCursor}))
 	if err != nil {
 		return nil, err
 	}
-	return r.JSON200, err
+	cursorNextHdr := r.HTTPResponse.Header.Get("X-Pagination-Cursor-Next")
+
+	resp := &types.ListSecretVersionV2ResponseWithHeaders{
+		Body:    *r.JSON200,
+		Headers: types.ListSecretVersionV2ResponseHeaders{XPaginationCursorNext: cursorNextHdr},
+	}
+	return resp, err
 }
 
 // PostSecretVersionV2 creates a new secret version.
