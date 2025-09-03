@@ -25,8 +25,8 @@ import (
 )
 
 // DataKeys creates a new datakey provider for the given service key.
-func (client *Client) DataKeys(serviceKeyID uuid.UUID) *DataKeyProvider {
-	return newDataKeyProvider(client, serviceKeyID)
+func (client *Client) DataKeys(oksmId, serviceKeyID uuid.UUID) *DataKeyProvider {
+	return newDataKeyProvider(client, oksmId, serviceKeyID)
 }
 
 // DataKeyProvider is a helper provider that wraps an API client
@@ -35,16 +35,18 @@ func (client *Client) DataKeys(serviceKeyID uuid.UUID) *DataKeyProvider {
 //
 // It also provide helper functions to directly encrypt or decrypt data with a datakey.
 type DataKeyProvider struct {
-	api   DataKeyApi
-	keyId uuid.UUID
+	api    DataKeyApi
+	okmsId uuid.UUID
+	keyId  uuid.UUID
 }
 
 // newDataKeyProvider creates a new datakey provider for the given service key,
 // using the given [DataKeyApi] api client.
-func newDataKeyProvider(api DataKeyApi, keyId uuid.UUID) *DataKeyProvider {
+func newDataKeyProvider(api DataKeyApi, okmsId, keyId uuid.UUID) *DataKeyProvider {
 	return &DataKeyProvider{
-		api:   api,
-		keyId: keyId,
+		api:    api,
+		okmsId: okmsId,
+		keyId:  keyId,
 	}
 }
 
@@ -58,7 +60,7 @@ func (sk *DataKeyProvider) GenerateDataKey(ctx context.Context, name string, siz
 		return nil, nil, errors.New("key size is out of bound")
 	}
 	// Let's first ask the KMS to generate a new DK
-	plain, encryptedKey, err := sk.api.GenerateDataKey(ctx, sk.keyId, name, utils.ToInt32(size))
+	plain, encryptedKey, err := sk.api.GenerateDataKey(ctx, sk.okmsId, sk.keyId, name, utils.ToInt32(size))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -69,7 +71,7 @@ func (sk *DataKeyProvider) GenerateDataKey(ctx context.Context, name string, siz
 // DecryptDataKey decrypts an encrypted datakey like ones returned by [DataKeyProvider.GenerateDataKey].
 func (sk *DataKeyProvider) DecryptDataKey(ctx context.Context, key []byte) ([]byte, error) {
 	// Call KMS to decrypt the key
-	keyPlain, err := sk.api.DecryptDataKey(ctx, sk.keyId, string(key))
+	keyPlain, err := sk.api.DecryptDataKey(ctx, sk.okmsId, sk.keyId, string(key))
 	if err != nil {
 		return nil, err
 	}

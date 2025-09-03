@@ -45,7 +45,7 @@ func (client *Client) WithCustomHeader(key, value string) *Client {
 }
 
 // GenerateSymmetricKey asks the KMS to generate a symmetric key with the given bits length, name and usage. The keyCtx parameter can be left empty if not needed.
-func (client *Client) GenerateSymmetricKey(ctx context.Context, bitSize types.KeySizes, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+func (client *Client) GenerateSymmetricKey(ctx context.Context, okmsId uuid.UUID, bitSize types.KeySizes, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
 	var keyContext *string
 	if keyCtx != "" {
 		keyContext = &keyCtx
@@ -59,11 +59,11 @@ func (client *Client) GenerateSymmetricKey(ctx context.Context, bitSize types.Ke
 		Size:       &bitSize,
 		Keys:       nil,
 	}
-	return client.CreateImportServiceKey(ctx, nil, body)
+	return client.CreateImportServiceKey(ctx, okmsId, nil, body)
 }
 
 // GenerateRSAKeyPair asks the KMS to generate an RSA asymmetric key-pair with the given bits length, name and usage. The keyCtx parameter can be left empty if not needed.
-func (client *Client) GenerateRSAKeyPair(ctx context.Context, bitSize types.KeySizes, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+func (client *Client) GenerateRSAKeyPair(ctx context.Context, okmsId uuid.UUID, bitSize types.KeySizes, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
 	var keyContext *string
 	if keyCtx != "" {
 		keyContext = &keyCtx
@@ -77,11 +77,11 @@ func (client *Client) GenerateRSAKeyPair(ctx context.Context, bitSize types.KeyS
 		Size:       &bitSize,
 		Keys:       nil,
 	}
-	return client.CreateImportServiceKey(ctx, nil, body)
+	return client.CreateImportServiceKey(ctx, okmsId, nil, body)
 }
 
 // GenerateECKeyPair asks the KMS to generate an EC asymmetric key-pair with the given elliptic curve, name and usage. The keyCtx parameter can be left empty if not needed.
-func (client *Client) GenerateECKeyPair(ctx context.Context, curve types.Curves, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+func (client *Client) GenerateECKeyPair(ctx context.Context, okmsId uuid.UUID, curve types.Curves, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
 	var keyContext *string
 	if keyCtx != "" {
 		keyContext = &keyCtx
@@ -95,10 +95,10 @@ func (client *Client) GenerateECKeyPair(ctx context.Context, curve types.Curves,
 		Curve:      &curve,
 		Keys:       nil,
 	}
-	return client.CreateImportServiceKey(ctx, nil, body)
+	return client.CreateImportServiceKey(ctx, okmsId, nil, body)
 }
 
-func (client *Client) importJWK(ctx context.Context, jwk types.JsonWebKeyRequest, name, keyCtx string) (*types.GetServiceKeyResponse, error) {
+func (client *Client) importJWK(ctx context.Context, okmsId uuid.UUID, jwk types.JsonWebKeyRequest, name, keyCtx string) (*types.GetServiceKeyResponse, error) {
 	var keyContext *string
 	if keyCtx != "" {
 		keyContext = &keyCtx
@@ -109,7 +109,7 @@ func (client *Client) importJWK(ctx context.Context, jwk types.JsonWebKeyRequest
 		Keys:    &[]types.JsonWebKeyRequest{jwk},
 	}
 	format := types.Jwk
-	return client.CreateImportServiceKey(ctx, &format, req)
+	return client.CreateImportServiceKey(ctx, okmsId, &format, req)
 }
 
 // ImportKey imports a key into the KMS. keyCtx can be left empty if not needed.
@@ -119,12 +119,12 @@ func (client *Client) importJWK(ctx context.Context, jwk types.JsonWebKeyRequest
 //   - *ecdsa.PrivateKey
 //   - types.JsonWebKey and *types.JsonWebKey
 //   - []byte for importing symmetric keys.
-func (client *Client) ImportKey(ctx context.Context, key any, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+func (client *Client) ImportKey(ctx context.Context, okmsId uuid.UUID, key any, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
 	switch k := key.(type) {
 	case types.JsonWebKeyRequest:
-		return client.importJWK(ctx, k, name, keyCtx)
+		return client.importJWK(ctx, okmsId, k, name, keyCtx)
 	case *types.JsonWebKeyRequest:
-		return client.importJWK(ctx, *k, name, keyCtx)
+		return client.importJWK(ctx, okmsId, *k, name, keyCtx)
 	}
 	jwk, err := types.NewJsonWebKey(key, ops, name)
 	if err != nil {
@@ -147,7 +147,7 @@ func (client *Client) ImportKey(ctx context.Context, key any, name, keyCtx strin
 		Crv:    jwk.Crv,
 		K:      jwk.K,
 	}
-	return client.importJWK(ctx, jwkRequest, name, keyCtx)
+	return client.importJWK(ctx, okmsId, jwkRequest, name, keyCtx)
 }
 
 // ImportKeyPairPEM imports a PEM formated key into the KMS. keyCtx can be left empty if not needed.
@@ -157,7 +157,7 @@ func (client *Client) ImportKey(ctx context.Context, key any, name, keyCtx strin
 //   - PKCS1 private keys
 //   - SEC1
 //   - OpenSSH private keys
-func (client *Client) ImportKeyPairPEM(ctx context.Context, privateKeyPem []byte, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+func (client *Client) ImportKeyPairPEM(ctx context.Context, okmsId uuid.UUID, privateKeyPem []byte, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
 	block, _ := pem.Decode(privateKeyPem)
 	if block == nil {
 		return nil, errors.New("No key to import")
@@ -179,13 +179,13 @@ func (client *Client) ImportKeyPairPEM(ctx context.Context, privateKeyPem []byte
 	if err != nil {
 		return nil, err
 	}
-	return client.ImportKey(ctx, k, name, keyCtx, ops...)
+	return client.ImportKey(ctx, okmsId, k, name, keyCtx, ops...)
 }
 
 // ExportJwkPublicKey returns the public part of a key pair as a Json Web Key.
-func (client *Client) ExportJwkPublicKey(ctx context.Context, keyID uuid.UUID) (*types.JsonWebKeyResponse, error) {
+func (client *Client) ExportJwkPublicKey(ctx context.Context, okmsId, keyID uuid.UUID) (*types.JsonWebKeyResponse, error) {
 	format := types.Jwk
-	k, err := client.GetServiceKey(ctx, keyID, &format)
+	k, err := client.GetServiceKey(ctx, okmsId, keyID, &format)
 	if err != nil {
 		return nil, err
 	}
@@ -201,8 +201,8 @@ func (client *Client) ExportJwkPublicKey(ctx context.Context, keyID uuid.UUID) (
 // ExportPublicKey returns the public part of a key pair as a [crypto.PublicKey].
 //
 // The returned key can then be cast into *rsa.PublicKey or *ecdsa.PublicKey.
-func (client *Client) ExportPublicKey(ctx context.Context, keyID uuid.UUID) (crypto.PublicKey, error) {
-	k, err := client.ExportJwkPublicKey(ctx, keyID)
+func (client *Client) ExportPublicKey(ctx context.Context, okmsId, keyID uuid.UUID) (crypto.PublicKey, error) {
+	k, err := client.ExportJwkPublicKey(ctx, okmsId, keyID)
 	if err != nil {
 		return nil, err
 	}
@@ -363,9 +363,9 @@ func (client *apiClient) addRequestHeaders(ctx context.Context, req *http.Reques
 // }
 
 // GetServiceKey returns a key metadata. If format is not nil, then the public key material is also returned.
-func (client *apiClient) GetServiceKey(ctx context.Context, keyId uuid.UUID, format *types.KeyFormats) (*types.GetServiceKeyResponse, error) {
+func (client *apiClient) GetServiceKey(ctx context.Context, okmsId, keyId uuid.UUID, format *types.KeyFormats) (*types.GetServiceKeyResponse, error) {
 	params := &types.GetServiceKeyParams{Format: format}
-	r, err := mapRestErr(client.inner.GetServiceKeyWithResponse(ctx, keyId, params))
+	r, err := mapRestErr(client.inner.GetServiceKeyWithResponse(ctx, okmsId, keyId, params))
 	if err != nil {
 		return nil, err
 	}
@@ -374,9 +374,9 @@ func (client *apiClient) GetServiceKey(ctx context.Context, keyId uuid.UUID, for
 
 // ListServiceKeys returns a page of service keys. The response contains a continuationToken that must be passed to the
 // subsequent calls in order to get the next page. The state parameter when no nil is used to query keys having a specific state.
-func (client *apiClient) ListServiceKeys(ctx context.Context, continuationToken *string, maxKeys *uint32, state *types.KeyStates) (*types.ListServiceKeysResponse, error) {
+func (client *apiClient) ListServiceKeys(ctx context.Context, okmsId uuid.UUID, continuationToken *string, maxKeys *uint32, state *types.KeyStates) (*types.ListServiceKeysResponse, error) {
 	params := &types.ListServiceKeysParams{ContinuationToken: continuationToken, Max: maxKeys, State: state}
-	r, err := mapRestErr(client.inner.ListServiceKeysWithResponse(ctx, params))
+	r, err := mapRestErr(client.inner.ListServiceKeysWithResponse(ctx, okmsId, params))
 	if err != nil {
 		return nil, err
 	}
@@ -384,14 +384,14 @@ func (client *apiClient) ListServiceKeys(ctx context.Context, continuationToken 
 }
 
 // ActivateServiceKey activates or re-activates a service key.
-func (client *apiClient) ActivateServiceKey(ctx context.Context, keyId uuid.UUID) error {
-	_, err := mapRestErr(client.inner.ActivateServiceKeyWithResponse(ctx, keyId))
+func (client *apiClient) ActivateServiceKey(ctx context.Context, okmsId, keyId uuid.UUID) error {
+	_, err := mapRestErr(client.inner.ActivateServiceKeyWithResponse(ctx, okmsId, keyId))
 	return err
 }
 
 // UpdateServiceKey updates some service key metadata.
-func (client *apiClient) UpdateServiceKey(ctx context.Context, keyId uuid.UUID, body types.PatchServiceKeyRequest) (*types.GetServiceKeyResponse, error) {
-	r, err := mapRestErr(client.inner.PatchServiceKeyWithResponse(ctx, keyId, body))
+func (client *apiClient) UpdateServiceKey(ctx context.Context, okmsId, keyId uuid.UUID, body types.PatchServiceKeyRequest) (*types.GetServiceKeyResponse, error) {
+	r, err := mapRestErr(client.inner.PatchServiceKeyWithResponse(ctx, okmsId, keyId, body))
 	if err != nil {
 		return nil, err
 	}
@@ -399,8 +399,8 @@ func (client *apiClient) UpdateServiceKey(ctx context.Context, keyId uuid.UUID, 
 }
 
 // CreateImportServiceKey is the low level API used to either generate a new key securely in the KMS, or to import a plain key into the KMS domain.
-func (client *apiClient) CreateImportServiceKey(ctx context.Context, format *types.KeyFormats, body types.CreateImportServiceKeyRequest) (*types.GetServiceKeyResponse, error) {
-	r, err := mapRestErr(client.inner.CreateImportServiceKeyWithResponse(ctx, &types.CreateImportServiceKeyParams{Format: format}, body))
+func (client *apiClient) CreateImportServiceKey(ctx context.Context, okmsId uuid.UUID, format *types.KeyFormats, body types.CreateImportServiceKeyRequest) (*types.GetServiceKeyResponse, error) {
+	r, err := mapRestErr(client.inner.CreateImportServiceKeyWithResponse(ctx, okmsId, &types.CreateImportServiceKeyParams{Format: format}, body))
 	if err != nil {
 		return nil, err
 	}
@@ -408,21 +408,21 @@ func (client *apiClient) CreateImportServiceKey(ctx context.Context, format *typ
 }
 
 // DeactivateServiceKey deactivates a service key with the given deactivation reason.
-func (client *apiClient) DeactivateServiceKey(ctx context.Context, keyId uuid.UUID, reason types.RevocationReasons) error {
-	_, err := mapRestErr(client.inner.DeactivateServiceKeyWithResponse(ctx, keyId, types.DeactivateServicekeyRequest{Reason: reason}))
+func (client *apiClient) DeactivateServiceKey(ctx context.Context, okmsId, keyId uuid.UUID, reason types.RevocationReasons) error {
+	_, err := mapRestErr(client.inner.DeactivateServiceKeyWithResponse(ctx, okmsId, keyId, types.DeactivateServicekeyRequest{Reason: reason}))
 	return err
 }
 
 // DeleteServiceKey deletes a deactivated service key. The key cannot be recovered after deletion.
 // It will fail if the key is not deactivated.
-func (client *apiClient) DeleteServiceKey(ctx context.Context, keyId uuid.UUID) error {
-	_, err := mapRestErr(client.inner.DeleteServiceKeyWithResponse(ctx, keyId))
+func (client *apiClient) DeleteServiceKey(ctx context.Context, okmsId, keyId uuid.UUID) error {
+	_, err := mapRestErr(client.inner.DeleteServiceKeyWithResponse(ctx, okmsId, keyId))
 	return err
 }
 
 // DecryptDataKey decrypts a JWE encrypted data key protected by the service key with the ID `keyId`.
-func (client *apiClient) DecryptDataKey(ctx context.Context, keyId uuid.UUID, encryptedKey string) ([]byte, error) {
-	r, err := mapRestErr(client.inner.DecryptDataKeyWithResponse(ctx, keyId, types.DecryptDataKeyRequest{Key: encryptedKey}))
+func (client *apiClient) DecryptDataKey(ctx context.Context, okmsId, keyId uuid.UUID, encryptedKey string) ([]byte, error) {
+	r, err := mapRestErr(client.inner.DecryptDataKeyWithResponse(ctx, okmsId, keyId, types.DecryptDataKeyRequest{Key: encryptedKey}))
 	if err != nil {
 		return nil, err
 	}
@@ -434,12 +434,12 @@ func (client *apiClient) DecryptDataKey(ctx context.Context, keyId uuid.UUID, en
 
 // GenerateDataKey creates a new data key of the given size, protected by the service key with the ID `keyId`.
 // It returns the plain datakey, and the JWE encrypted version of it, which can be decrypted by calling the DecryptDataKey method.
-func (client *apiClient) GenerateDataKey(ctx context.Context, keyId uuid.UUID, name string, size int32) (plain []byte, encrypted string, err error) {
+func (client *apiClient) GenerateDataKey(ctx context.Context, okmsId, keyId uuid.UUID, name string, size int32) (plain []byte, encrypted string, err error) {
 	req := types.GenerateDataKeyRequest{Size: size}
 	if name != "" {
 		req.Name = &name
 	}
-	r, err := mapRestErr(client.inner.GenerateDataKeyWithResponse(ctx, keyId, req))
+	r, err := mapRestErr(client.inner.GenerateDataKeyWithResponse(ctx, okmsId, keyId, req))
 	if err != nil {
 		return nil, "", err
 	}
@@ -450,12 +450,12 @@ func (client *apiClient) GenerateDataKey(ctx context.Context, keyId uuid.UUID, n
 }
 
 // Decrypt decrypts JWE `data` previously encrypted with the remote symmetric key having the ID `keyId`.
-func (client *apiClient) Decrypt(ctx context.Context, keyId uuid.UUID, keyCtx, data string) ([]byte, error) {
+func (client *apiClient) Decrypt(ctx context.Context, okmsId, keyId uuid.UUID, keyCtx, data string) ([]byte, error) {
 	req := types.DecryptRequest{Ciphertext: data}
 	if keyCtx != "" {
 		req.Context = &keyCtx
 	}
-	r, err := mapRestErr(client.inner.DecryptWithResponse(ctx, keyId, req))
+	r, err := mapRestErr(client.inner.DecryptWithResponse(ctx, okmsId, keyId, req))
 	if err != nil {
 		return nil, err
 	}
@@ -463,12 +463,12 @@ func (client *apiClient) Decrypt(ctx context.Context, keyId uuid.UUID, keyCtx, d
 }
 
 // Encrypt encrypts `data` with the remote symmetric key having the ID `keyId`. Returns a JWE (Json Web Encryption) string.
-func (client *apiClient) Encrypt(ctx context.Context, keyId uuid.UUID, keyCtx string, data []byte) (string, error) {
+func (client *apiClient) Encrypt(ctx context.Context, okmsId, keyId uuid.UUID, keyCtx string, data []byte) (string, error) {
 	req := types.EncryptRequest{Plaintext: data}
 	if keyCtx != "" {
 		req.Context = &keyCtx
 	}
-	r, err := mapRestErr(client.inner.EncryptWithResponse(ctx, keyId, req))
+	r, err := mapRestErr(client.inner.EncryptWithResponse(ctx, okmsId, keyId, req))
 	if err != nil {
 		return "", err
 	}
@@ -476,7 +476,7 @@ func (client *apiClient) Encrypt(ctx context.Context, keyId uuid.UUID, keyCtx st
 }
 
 // Sign signs the given message with the remote private key having the ID `keyId`. The message can be pre-hashed or not.
-func (client *apiClient) Sign(ctx context.Context, keyId uuid.UUID, format *types.SignatureFormats, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte) (string, error) {
+func (client *apiClient) Sign(ctx context.Context, okmsId, keyId uuid.UUID, format *types.SignatureFormats, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte) (string, error) {
 	req := types.SignRequest{
 		Alg:      alg,
 		Isdigest: &preHashed,
@@ -485,7 +485,7 @@ func (client *apiClient) Sign(ctx context.Context, keyId uuid.UUID, format *type
 	param := &types.SignParams{
 		Format: format,
 	}
-	r, err := mapRestErr(client.inner.SignWithResponse(ctx, keyId, param, req))
+	r, err := mapRestErr(client.inner.SignWithResponse(ctx, okmsId, keyId, param, req))
 	if err != nil {
 		return "", err
 	}
@@ -496,14 +496,14 @@ func (client *apiClient) Sign(ctx context.Context, keyId uuid.UUID, format *type
 }
 
 // Verify checks the signature of given message against the remote public key having the ID `keyId`. The message can be pre-hashed or not.
-func (client *apiClient) Verify(ctx context.Context, keyId uuid.UUID, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte, sig string) (bool, error) {
+func (client *apiClient) Verify(ctx context.Context, okmsId, keyId uuid.UUID, alg types.DigitalSignatureAlgorithms, preHashed bool, msg []byte, sig string) (bool, error) {
 	req := types.VerifyRequest{
 		Alg:       &alg,
 		Isdigest:  &preHashed,
 		Message:   &msg,
 		Signature: sig,
 	}
-	r, err := mapRestErr(client.inner.VerifyWithResponse(ctx, keyId, req))
+	r, err := mapRestErr(client.inner.VerifyWithResponse(ctx, okmsId, keyId, req))
 	if err != nil {
 		return false, err
 	}
@@ -511,26 +511,26 @@ func (client *apiClient) Verify(ctx context.Context, keyId uuid.UUID, alg types.
 }
 
 // DeleteSecretMetadata deletes secret metadata and all versions.
-func (client *apiClient) DeleteSecretMetadata(ctx context.Context, path string) error {
-	_, err := mapRestErr(client.inner.DeleteSecretMetadataWithResponse(ctx, path))
+func (client *apiClient) DeleteSecretMetadata(ctx context.Context, okmsId uuid.UUID, path string) error {
+	_, err := mapRestErr(client.inner.DeleteSecretMetadataWithResponse(ctx, okmsId, path))
 	return err
 }
 
 // DeleteSecretRequest deletes the latest version of a secret. This marks the version as deleted but the underlying data will not be removed.
-func (client *apiClient) DeleteSecretRequest(ctx context.Context, path string) error {
-	_, err := mapRestErr(client.inner.DeleteSecretRequestWithResponse(ctx, path))
+func (client *apiClient) DeleteSecretRequest(ctx context.Context, okmsId uuid.UUID, path string) error {
+	_, err := mapRestErr(client.inner.DeleteSecretRequestWithResponse(ctx, okmsId, path))
 	return err
 }
 
 // DeleteSecretVersions deletes the specified secret version. This marks the versions as deleted but the underlying data will not be removed.
-func (client *apiClient) DeleteSecretVersions(ctx context.Context, path string, versions []uint32) error {
-	_, err := mapRestErr(client.inner.DeleteSecretVersionsWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
+func (client *apiClient) DeleteSecretVersions(ctx context.Context, okmsId uuid.UUID, path string, versions []uint32) error {
+	_, err := mapRestErr(client.inner.DeleteSecretVersionsWithResponse(ctx, okmsId, path, types.SecretVersionsRequest{Versions: versions}))
 	return err
 }
 
 // GetSecretConfig returns secret store configuration.
-func (client *apiClient) GetSecretConfig(ctx context.Context) (*types.GetConfigResponse, error) {
-	r, err := mapRestErr(client.inner.GetSecretConfigWithResponse(ctx))
+func (client *apiClient) GetSecretConfig(ctx context.Context, okmsId uuid.UUID) (*types.GetConfigResponse, error) {
+	r, err := mapRestErr(client.inner.GetSecretConfigWithResponse(ctx, okmsId))
 	if err != nil {
 		return nil, err
 	}
@@ -538,8 +538,8 @@ func (client *apiClient) GetSecretConfig(ctx context.Context) (*types.GetConfigR
 }
 
 // GetSecretRequest returns secret version.
-func (client *apiClient) GetSecretRequest(ctx context.Context, path string, version *uint32) (*types.GetSecretResponse, error) {
-	r, err := mapRestErr(client.inner.GetSecretRequestWithResponse(ctx, path, &types.GetSecretRequestParams{Version: version}))
+func (client *apiClient) GetSecretRequest(ctx context.Context, okmsId uuid.UUID, path string, version *uint32) (*types.GetSecretResponse, error) {
+	r, err := mapRestErr(client.inner.GetSecretRequestWithResponse(ctx, okmsId, path, &types.GetSecretRequestParams{Version: version}))
 	if err != nil {
 		return nil, err
 	}
@@ -547,8 +547,8 @@ func (client *apiClient) GetSecretRequest(ctx context.Context, path string, vers
 }
 
 // GetSecretSubkeys returns secret subkeys.
-func (client *apiClient) GetSecretSubkeys(ctx context.Context, path string, depth, version *uint32) (*types.GetSecretSubkeysResponse, error) {
-	r, err := mapRestErr(client.inner.GetSecretSubkeysWithResponse(ctx, path, &types.GetSecretSubkeysParams{Depth: depth, Version: version}))
+func (client *apiClient) GetSecretSubkeys(ctx context.Context, okmsId uuid.UUID, path string, depth, version *uint32) (*types.GetSecretSubkeysResponse, error) {
+	r, err := mapRestErr(client.inner.GetSecretSubkeysWithResponse(ctx, okmsId, path, &types.GetSecretSubkeysParams{Depth: depth, Version: version}))
 	if err != nil {
 		return nil, err
 	}
@@ -556,8 +556,8 @@ func (client *apiClient) GetSecretSubkeys(ctx context.Context, path string, dept
 }
 
 // GetSecretsMetadata returns a secret metadata or a list of secrets if `list` is set to true.
-func (client *apiClient) GetSecretsMetadata(ctx context.Context, path string, list bool) (*types.GetMetadataResponse, error) {
-	r, err := mapRestErr(client.inner.GetSecretsMetadataWithResponse(ctx, path, &types.GetSecretsMetadataParams{List: &list}))
+func (client *apiClient) GetSecretsMetadata(ctx context.Context, okmsId uuid.UUID, path string, list bool) (*types.GetMetadataResponse, error) {
+	r, err := mapRestErr(client.inner.GetSecretsMetadataWithResponse(ctx, okmsId, path, &types.GetSecretsMetadataParams{List: &list}))
 	if err != nil {
 		return nil, err
 	}
@@ -565,14 +565,14 @@ func (client *apiClient) GetSecretsMetadata(ctx context.Context, path string, li
 }
 
 // PatchSecretMetadata updates secret metadata.
-func (client *apiClient) PatchSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error {
-	_, err := mapRestErr(client.inner.PatchSecretMetadataWithResponse(ctx, path, body))
+func (client *apiClient) PatchSecretMetadata(ctx context.Context, okmsId uuid.UUID, path string, body types.SecretUpdatableMetadata) error {
+	_, err := mapRestErr(client.inner.PatchSecretMetadataWithResponse(ctx, okmsId, path, body))
 	return err
 }
 
 // PatchSecretRequest patches a secret.
-func (client *apiClient) PatchSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PatchSecretResponse, error) {
-	r, err := mapRestErr(client.inner.PatchSecretRequestWithResponse(ctx, path, body))
+func (client *apiClient) PatchSecretRequest(ctx context.Context, okmsId uuid.UUID, path string, body types.PostSecretRequest) (*types.PatchSecretResponse, error) {
+	r, err := mapRestErr(client.inner.PatchSecretRequestWithResponse(ctx, okmsId, path, body))
 	if err != nil {
 		return nil, err
 	}
@@ -580,26 +580,26 @@ func (client *apiClient) PatchSecretRequest(ctx context.Context, path string, bo
 }
 
 // PostSecretConfig configures secret store settings.
-func (client *apiClient) PostSecretConfig(ctx context.Context, body types.PostConfigRequest) error {
-	_, err := mapRestErr(client.inner.PostSecretConfigWithResponse(ctx, body))
+func (client *apiClient) PostSecretConfig(ctx context.Context, okmsId uuid.UUID, body types.PostConfigRequest) error {
+	_, err := mapRestErr(client.inner.PostSecretConfigWithResponse(ctx, okmsId, body))
 	return err
 }
 
 // PutSecretDestroy permanently removes the data of the specified versions from the secrets store.
-func (client *apiClient) PutSecretDestroy(ctx context.Context, path string, versions []uint32) error {
-	_, err := mapRestErr(client.inner.PutSecretDestroyWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
+func (client *apiClient) PutSecretDestroy(ctx context.Context, okmsId uuid.UUID, path string, versions []uint32) error {
+	_, err := mapRestErr(client.inner.PutSecretDestroyWithResponse(ctx, okmsId, path, types.SecretVersionsRequest{Versions: versions}))
 	return err
 }
 
 // PostSecretMetadata updates secret metadata.
-func (client *apiClient) PostSecretMetadata(ctx context.Context, path string, body types.SecretUpdatableMetadata) error {
-	_, err := mapRestErr(client.inner.PostSecretMetadataWithResponse(ctx, path, body))
+func (client *apiClient) PostSecretMetadata(ctx context.Context, okmsId uuid.UUID, path string, body types.SecretUpdatableMetadata) error {
+	_, err := mapRestErr(client.inner.PostSecretMetadataWithResponse(ctx, okmsId, path, body))
 	return err
 }
 
 // PostSecretRequest creates or updates a secret.
-func (client *apiClient) PostSecretRequest(ctx context.Context, path string, body types.PostSecretRequest) (*types.PostSecretResponse, error) {
-	r, err := mapRestErr(client.inner.PostSecretRequestWithResponse(ctx, path, body))
+func (client *apiClient) PostSecretRequest(ctx context.Context, okmsId uuid.UUID, path string, body types.PostSecretRequest) (*types.PostSecretResponse, error) {
+	r, err := mapRestErr(client.inner.PostSecretRequestWithResponse(ctx, okmsId, path, body))
 	if err != nil {
 		return nil, err
 	}
@@ -607,30 +607,29 @@ func (client *apiClient) PostSecretRequest(ctx context.Context, path string, bod
 }
 
 // PostSecretUndelete undeletes the data of the specified versions. The versions will no longer be marked as deleted.
-func (client *apiClient) PostSecretUndelete(ctx context.Context, path string, versions []uint32) error {
-	_, err := mapRestErr(client.inner.PostSecretUndeleteWithResponse(ctx, path, types.SecretVersionsRequest{Versions: versions}))
+func (client *apiClient) PostSecretUndelete(ctx context.Context, okmsId uuid.UUID, path string, versions []uint32) error {
+	_, err := mapRestErr(client.inner.PostSecretUndeleteWithResponse(ctx, okmsId, path, types.SecretVersionsRequest{Versions: versions}))
 	return err
 }
 
 // ListSecretV2 returns a page of secrets.
-func (client *apiClient) ListSecretV2(ctx context.Context, pageSize *uint32, pageCursor *string) (*types.ListSecretV2ResponseWithHeaders, error) {
-	r, err := mapRestErr(client.inner.ListSecretV2WithResponse(ctx, &types.ListSecretV2Params{XPaginationSize: pageSize, XPaginationCursor: pageCursor}))
+func (client *apiClient) ListSecretV2(ctx context.Context, okmsId uuid.UUID, pageSize *uint32, pageCursor *string) (*types.ListSecretV2ResponseWithPagination, error) {
+	r, err := mapRestErr(client.inner.ListSecretV2WithResponse(ctx, okmsId, &types.ListSecretV2Params{XPaginationSize: pageSize, XPaginationCursor: pageCursor}))
 	if err != nil {
 		return nil, err
 	}
 
-	cursorNextHdr := r.HTTPResponse.Header.Get("X-Pagination-Cursor-Next")
-
-	resp := &types.ListSecretV2ResponseWithHeaders{
-		Body:    *r.JSON200,
-		Headers: types.ListSecretV2ResponseHeaders{XPaginationCursorNext: cursorNextHdr},
+	resp := &types.ListSecretV2ResponseWithPagination{
+		ListSecretV2Response: *r.JSON200,
+		PageCursorNext:       r.HTTPResponse.Header.Get("X-Pagination-Cursor"),
 	}
+
 	return resp, err
 }
 
 // PostSecretV2 creates a new secret with metadata.
-func (client *apiClient) PostSecretV2(ctx context.Context, body types.PostSecretV2Request) (*types.PostSecretV2Response, error) {
-	r, err := mapRestErr(client.inner.PostSecretV2WithResponse(ctx, body))
+func (client *apiClient) PostSecretV2(ctx context.Context, okmsId uuid.UUID, body types.PostSecretV2Request) (*types.PostSecretV2Response, error) {
+	r, err := mapRestErr(client.inner.PostSecretV2WithResponse(ctx, okmsId, body))
 	if err != nil {
 		return nil, err
 	}
@@ -638,14 +637,14 @@ func (client *apiClient) PostSecretV2(ctx context.Context, body types.PostSecret
 }
 
 // DeleteSecretV2 deletes a secret and all its versions.
-func (client *apiClient) DeleteSecretV2(ctx context.Context, path string) error {
-	_, err := mapRestErr(client.inner.DeleteSecretV2WithResponse(ctx, path))
+func (client *apiClient) DeleteSecretV2(ctx context.Context, okmsId uuid.UUID, path string) error {
+	_, err := mapRestErr(client.inner.DeleteSecretV2WithResponse(ctx, okmsId, path))
 	return err
 }
 
 // GetSecretV2 returns a secret and its metadata. If the version is not specified, the current version is returned.
-func (client *apiClient) GetSecretV2(ctx context.Context, path string, version *uint32, includeData *bool) (*types.GetSecretV2Response, error) {
-	r, err := mapRestErr(client.inner.GetSecretV2WithResponse(ctx, path, &types.GetSecretV2Params{Version: version, IncludeData: includeData}))
+func (client *apiClient) GetSecretV2(ctx context.Context, okmsId uuid.UUID, path string, version *uint32, includeData *bool) (*types.GetSecretV2Response, error) {
+	r, err := mapRestErr(client.inner.GetSecretV2WithResponse(ctx, okmsId, path, &types.GetSecretV2Params{Version: version, IncludeData: includeData}))
 	if err != nil {
 		return nil, err
 	}
@@ -653,8 +652,8 @@ func (client *apiClient) GetSecretV2(ctx context.Context, path string, version *
 }
 
 // PutSecretV2 updates a secret. If the secret data is updated, a new version will be created.
-func (client *apiClient) PutSecretV2(ctx context.Context, path string, cas *uint32, body types.PutSecretV2Request) (*types.PutSecretV2Response, error) {
-	r, err := mapRestErr(client.inner.PutSecretV2WithResponse(ctx, path, &types.PutSecretV2Params{Cas: cas}, body))
+func (client *apiClient) PutSecretV2(ctx context.Context, okmsId uuid.UUID, path string, cas *uint32, body types.PutSecretV2Request) (*types.PutSecretV2Response, error) {
+	r, err := mapRestErr(client.inner.PutSecretV2WithResponse(ctx, okmsId, path, &types.PutSecretV2Params{Cas: cas}, body))
 	if err != nil {
 		return nil, err
 	}
@@ -662,23 +661,22 @@ func (client *apiClient) PutSecretV2(ctx context.Context, path string, cas *uint
 }
 
 // ListSecretVersionV2 returns the versions of a secret.
-func (client *apiClient) ListSecretVersionV2(ctx context.Context, path string, pageSize *uint32, pageCursor *string) (*types.ListSecretVersionV2ResponseWithHeaders, error) {
-	r, err := mapRestErr(client.inner.ListSecretVersionV2WithResponse(ctx, path, &types.ListSecretVersionV2Params{XPaginationSize: pageSize, XPaginationCursor: pageCursor}))
+func (client *apiClient) ListSecretVersionV2(ctx context.Context, okmsId uuid.UUID, path string, pageSize *uint32, pageCursor *string) (*types.ListSecretVersionV2ResponseWithPagination, error) {
+	r, err := mapRestErr(client.inner.ListSecretVersionV2WithResponse(ctx, okmsId, path, &types.ListSecretVersionV2Params{XPaginationSize: pageSize, XPaginationCursor: pageCursor}))
 	if err != nil {
 		return nil, err
 	}
-	cursorNextHdr := r.HTTPResponse.Header.Get("X-Pagination-Cursor-Next")
-
-	resp := &types.ListSecretVersionV2ResponseWithHeaders{
-		Body:    *r.JSON200,
-		Headers: types.ListSecretVersionV2ResponseHeaders{XPaginationCursorNext: cursorNextHdr},
+	resp := &types.ListSecretVersionV2ResponseWithPagination{
+		ListSecretVersionV2Response: *r.JSON200,
+		PageCursorNext:              r.HTTPResponse.Header.Get("X-Pagination-Cursor"),
 	}
+
 	return resp, err
 }
 
 // PostSecretVersionV2 creates a new secret version.
-func (client *apiClient) PostSecretVersionV2(ctx context.Context, path string, cas *uint32, body types.PostSecretVersionV2Request) (*types.SecretV2Version, error) {
-	r, err := mapRestErr(client.inner.PostSecretVersionV2WithResponse(ctx, path, &types.PostSecretVersionV2Params{Cas: cas}, body))
+func (client *apiClient) PostSecretVersionV2(ctx context.Context, okmsId uuid.UUID, path string, cas *uint32, body types.PostSecretVersionV2Request) (*types.SecretV2Version, error) {
+	r, err := mapRestErr(client.inner.PostSecretVersionV2WithResponse(ctx, okmsId, path, &types.PostSecretVersionV2Params{Cas: cas}, body))
 	if err != nil {
 		return nil, err
 	}
@@ -686,8 +684,8 @@ func (client *apiClient) PostSecretVersionV2(ctx context.Context, path string, c
 }
 
 // GetSecretVersionV2 returns a secret version.
-func (client *apiClient) GetSecretVersionV2(ctx context.Context, path string, version uint32, includeData *bool) (*types.SecretV2Version, error) {
-	r, err := mapRestErr(client.inner.GetSecretVersionV2WithResponse(ctx, path, version, &types.GetSecretVersionV2Params{IncludeData: includeData}))
+func (client *apiClient) GetSecretVersionV2(ctx context.Context, okmsId uuid.UUID, path string, version uint32, includeData *bool) (*types.SecretV2Version, error) {
+	r, err := mapRestErr(client.inner.GetSecretVersionV2WithResponse(ctx, okmsId, path, version, &types.GetSecretVersionV2Params{IncludeData: includeData}))
 	if err != nil {
 		return nil, err
 	}
@@ -695,8 +693,8 @@ func (client *apiClient) GetSecretVersionV2(ctx context.Context, path string, ve
 }
 
 // Updates the status of a secret version.
-func (client *apiClient) PutSecretVersionV2(ctx context.Context, path string, version uint32, body types.PutSecretVersionV2Request) (*types.SecretV2Version, error) {
-	r, err := mapRestErr(client.inner.PutSecretVersionV2WithResponse(ctx, path, version, body))
+func (client *apiClient) PutSecretVersionV2(ctx context.Context, okmsId uuid.UUID, path string, version uint32, body types.PutSecretVersionV2Request) (*types.SecretV2Version, error) {
+	r, err := mapRestErr(client.inner.PutSecretVersionV2WithResponse(ctx, okmsId, path, version, body))
 	if err != nil {
 		return nil, err
 	}
@@ -704,8 +702,8 @@ func (client *apiClient) PutSecretVersionV2(ctx context.Context, path string, ve
 }
 
 // GetSecretConfigV2 returns the default secrets configuration.
-func (client *apiClient) GetSecretConfigV2(ctx context.Context) (*types.GetSecretConfigV2Response, error) {
-	r, err := mapRestErr(client.inner.GetSecretConfigV2WithResponse(ctx))
+func (client *apiClient) GetSecretConfigV2(ctx context.Context, okmsId uuid.UUID) (*types.GetSecretConfigV2Response, error) {
+	r, err := mapRestErr(client.inner.GetSecretConfigV2WithResponse(ctx, okmsId))
 	if err != nil {
 		return nil, err
 	}
@@ -713,8 +711,8 @@ func (client *apiClient) GetSecretConfigV2(ctx context.Context) (*types.GetSecre
 }
 
 // PutSecretConfigV2 updated the default secrets configuration.
-func (client *apiClient) PutSecretConfigV2(ctx context.Context, body types.PutSecretConfigV2Request) (*types.PutSecretConfigV2Response, error) {
-	r, err := mapRestErr(client.inner.PutSecretConfigV2WithResponse(ctx, body))
+func (client *apiClient) PutSecretConfigV2(ctx context.Context, okmsId uuid.UUID, body types.PutSecretConfigV2Request) (*types.PutSecretConfigV2Response, error) {
+	r, err := mapRestErr(client.inner.PutSecretConfigV2WithResponse(ctx, okmsId, body))
 	if err != nil {
 		return nil, err
 	}
