@@ -13,26 +13,27 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/ovh/okms-sdk-go"
 	"github.com/ovh/okms-sdk-go/types"
 )
 
-func encryptDecrypt(ctx context.Context, kmsClient *okms.Client) {
+func encryptDecrypt(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
 	// Create a new AES 256 key
-	respAes, err := kmsClient.GenerateSymmetricKey(ctx, types.N256, "AES key example", "", types.Encrypt, types.Decrypt)
+	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", "", types.Encrypt, types.Decrypt)
 	if err != nil {
 		panic(err)
 	}
 
 	// Encrypt some data
-	encryptResp, err := kmsClient.Encrypt(ctx, respAes.Id, "", []byte("My super secret message."))
+	encryptResp, err := okmsClient.Encrypt(ctx, okmsId, respAes.Id, "", []byte("My super secret message."))
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("Encrypted message:", encryptResp)
 
 	// And later decrypt those data
-	decryptResp, err := kmsClient.Decrypt(ctx, respAes.Id, "", encryptResp)
+	decryptResp, err := okmsClient.Decrypt(ctx, okmsId, respAes.Id, "", encryptResp)
 	if err != nil {
 		panic(err)
 	}

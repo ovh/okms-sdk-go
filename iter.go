@@ -13,13 +13,15 @@ import (
 	"context"
 	"iter"
 
+	"github.com/google/uuid"
 	"github.com/ovh/okms-sdk-go/types"
 )
 
 // ListAllServiceKeys returns an iterator to go through all the keys without having to deal with pagination.
-func (client *Client) ListAllServiceKeys(pageSize *uint32, state *types.KeyStates) KeyIter {
+func (client *Client) ListAllServiceKeys(okmsId uuid.UUID, pageSize *uint32, state *types.KeyStates) KeyIter {
 	return KeyIter{
 		client:   client.API,
+		OkmsId:   okmsId,
 		pageSize: pageSize,
 		buf:      nil,
 		state:    state,
@@ -29,6 +31,7 @@ func (client *Client) ListAllServiceKeys(pageSize *uint32, state *types.KeyState
 // KeyIter is an iterator for service keys. It helps in iterating efficiently over multiple pages
 // without having to deal with the pagination.
 type KeyIter struct {
+	OkmsId   uuid.UUID
 	client   ServiceKeyApi
 	pageSize *uint32
 	state    *types.KeyStates
@@ -44,7 +47,7 @@ func (it *KeyIter) Next(ctx context.Context) bool {
 		return false
 	}
 	if it.buf == nil {
-		it.buf, it.err = it.client.ListServiceKeys(ctx, nil, it.pageSize, it.state)
+		it.buf, it.err = it.client.ListServiceKeys(ctx, it.OkmsId, nil, it.pageSize, it.state)
 		if it.err != nil {
 			return true
 		}
@@ -55,7 +58,7 @@ func (it *KeyIter) Next(ctx context.Context) bool {
 		return true
 	}
 	if it.buf.IsTruncated {
-		it.buf, it.err = it.client.ListServiceKeys(ctx, &it.buf.ContinuationToken, it.pageSize, it.state)
+		it.buf, it.err = it.client.ListServiceKeys(ctx, it.OkmsId, &it.buf.ContinuationToken, it.pageSize, it.state)
 		return it.err != nil || len(it.buf.ObjectsList) > 0
 	}
 	return false

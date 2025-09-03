@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/ovh/okms-sdk-go/mocks"
 	"github.com/ovh/okms-sdk-go/types"
 	"github.com/stretchr/testify/mock"
@@ -15,7 +16,9 @@ func TestKeyIter(t *testing.T) {
 	mc := mocks.NewAPIMock(t)
 	client := Client{mc}
 
-	it := client.ListAllServiceKeys(nil, nil)
+	okmsId := uuid.New()
+
+	it := client.ListAllServiceKeys(okmsId, nil, nil)
 
 	contToken := "abcdef"
 	keys := []types.GetServiceKeyResponse{
@@ -25,11 +28,11 @@ func TestKeyIter(t *testing.T) {
 		{Name: "d"},
 	}
 
-	mc.EXPECT().ListServiceKeys(mock.Anything, (*string)(nil), (*uint32)(nil), (*types.KeyStates)(nil)).
+	mc.EXPECT().ListServiceKeys(mock.Anything, okmsId, (*string)(nil), (*uint32)(nil), (*types.KeyStates)(nil)).
 		Return(&types.ListServiceKeysResponse{IsTruncated: true, ContinuationToken: contToken, ObjectsList: keys[:2]}, nil).
 		Once()
 
-	mc.EXPECT().ListServiceKeys(mock.Anything, &contToken, (*uint32)(nil), (*types.KeyStates)(nil)).
+	mc.EXPECT().ListServiceKeys(mock.Anything, okmsId, &contToken, (*uint32)(nil), (*types.KeyStates)(nil)).
 		Return(&types.ListServiceKeysResponse{IsTruncated: false, ContinuationToken: "", ObjectsList: keys[2:]}, nil).
 		Once()
 
@@ -45,7 +48,9 @@ func TestKeyIter_error(t *testing.T) {
 	mc := mocks.NewAPIMock(t)
 	client := Client{mc}
 
-	it := client.ListAllServiceKeys(nil, nil)
+	okmsId := uuid.New()
+
+	it := client.ListAllServiceKeys(okmsId, nil, nil)
 
 	contToken := "abcdef"
 	keys := []types.GetServiceKeyResponse{
@@ -55,11 +60,11 @@ func TestKeyIter_error(t *testing.T) {
 		{Name: "d"},
 	}
 
-	mc.EXPECT().ListServiceKeys(mock.Anything, (*string)(nil), (*uint32)(nil), (*types.KeyStates)(nil)).
+	mc.EXPECT().ListServiceKeys(mock.Anything, okmsId, (*string)(nil), (*uint32)(nil), (*types.KeyStates)(nil)).
 		Return(&types.ListServiceKeysResponse{IsTruncated: true, ContinuationToken: contToken, ObjectsList: keys[:2]}, nil).
 		Once()
 
-	mc.EXPECT().ListServiceKeys(mock.Anything, &contToken, (*uint32)(nil), (*types.KeyStates)(nil)).
+	mc.EXPECT().ListServiceKeys(mock.Anything, okmsId, &contToken, (*uint32)(nil), (*types.KeyStates)(nil)).
 		Return(nil, errors.New("Failure")).
 		Once()
 
