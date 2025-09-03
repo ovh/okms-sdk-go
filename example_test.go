@@ -26,7 +26,7 @@ import (
 )
 
 func ExampleNewRestAPIClientWithHttp() {
-	cert, err := tls.LoadX509KeyPair(os.Getenv("KMS_CLIENT_CERT_FILE"), os.Getenv("KMS_CLIENT_KEY_FILE"))
+	cert, err := tls.LoadX509KeyPair(os.Getenv("OKMS_CLIENT_CERT_FILE"), os.Getenv("OKMS_CLIENT_KEY_FILE"))
 	if err != nil {
 		panic(err)
 	}
@@ -36,13 +36,20 @@ func ExampleNewRestAPIClientWithHttp() {
 			MinVersion:   tls.VersionTLS12,
 		}},
 	}
+
+	okmsIdString := os.Getenv("OKMS_ID")
+	okmsId, err := uuid.Parse(okmsIdString)
+	if err != nil {
+		panic(err)
+	}
+
 	kmsClient, err := okms.NewRestAPIClientWithHttp("https://eu-west-rbx.okms.ovh.net", &httpClient)
 	if err != nil {
 		panic(err)
 	}
 
 	// Use KMS client, for example to activate a service key
-	if err := kmsClient.ActivateServiceKey(context.Background(), uuid.MustParse("2dab95dc-d7d3-482b-a07b-6b4dfae89d58")); err != nil {
+	if err := kmsClient.ActivateServiceKey(context.Background(), okmsId, uuid.MustParse("2dab95dc-d7d3-482b-a07b-6b4dfae89d58")); err != nil {
 		panic(err)
 	}
 }
@@ -54,7 +61,7 @@ func ExampleClient_CreateImportServiceKey_generateAES() {
 	kSize := types.N256
 	ops := []types.CryptographicUsages{types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey}
 	// Create a new AES 256 key
-	respAes, err := kmsClient.CreateImportServiceKey(context.Background(), nil, types.CreateImportServiceKeyRequest{
+	respAes, err := kmsClient.CreateImportServiceKey(context.Background(), uuid.MustParse("7745c93b-8ed3-4eef-921c-87bd8bbdd01b"), nil, types.CreateImportServiceKeyRequest{
 		Name:       "AES key example",
 		Type:       &kType,
 		Size:       &kSize,
@@ -73,7 +80,7 @@ func ExampleClient_CreateImportServiceKey_generateRSA() {
 	kSize := types.N2048
 	ops := []types.CryptographicUsages{types.Sign, types.Verify}
 	// Create a new RSA 2048 key-pair
-	respRSA, err := kmsClient.CreateImportServiceKey(context.Background(), nil, types.CreateImportServiceKeyRequest{
+	respRSA, err := kmsClient.CreateImportServiceKey(context.Background(), uuid.MustParse("7745c93b-8ed3-4eef-921c-87bd8bbdd01b"), nil, types.CreateImportServiceKeyRequest{
 		Name:       "RSA key-pair example",
 		Type:       &kType,
 		Size:       &kSize,
@@ -92,7 +99,7 @@ func ExampleClient_CreateImportServiceKey_generateECDSA() {
 	curve := types.P256
 	ops := []types.CryptographicUsages{types.Sign, types.Verify}
 	// Create a new ECDSA P-256 key-pair
-	respEC, err := kmsClient.CreateImportServiceKey(context.Background(), nil, types.CreateImportServiceKeyRequest{
+	respEC, err := kmsClient.CreateImportServiceKey(context.Background(), uuid.MustParse("7745c93b-8ed3-4eef-921c-87bd8bbdd01b"), nil, types.CreateImportServiceKeyRequest{
 		Name:       "ECDSA key-pair example",
 		Type:       &kType,
 		Curve:      &curve,
@@ -108,7 +115,15 @@ func ExampleClient_Sign() {
 	var kmsClient *okms.Client // Initialize client
 	data := "Hello World !!!"  // Data to sign
 	format := types.Raw
-	signResponse, err := kmsClient.Sign(context.Background(), uuid.MustParse("2dab95dc-d7d3-482b-a07b-6b4dfae89d58"), &format, types.ES256, false, []byte(data))
+	signResponse, err := kmsClient.Sign(
+		context.Background(),
+		uuid.MustParse("7745c93b-8ed3-4eef-921c-87bd8bbdd01b"),
+		uuid.MustParse("2dab95dc-d7d3-482b-a07b-6b4dfae89d58"),
+		&format,
+		types.ES256,
+		false,
+		[]byte(data),
+	)
 	if err != nil {
 		panic(err)
 	}
@@ -119,7 +134,15 @@ func ExampleClient_Verify() {
 	var kmsClient *okms.Client // Initialize client
 	var signature string       // Base64 encoded signature
 	data := "Hello World !!!"  // Data to sign
-	result, err := kmsClient.Verify(context.Background(), uuid.MustParse("2dab95dc-d7d3-482b-a07b-6b4dfae89d58"), types.ES256, false, []byte(data), signature)
+	result, err := kmsClient.Verify(
+		context.Background(),
+		uuid.MustParse("7745c93b-8ed3-4eef-921c-87bd8bbdd01b"),
+		uuid.MustParse("2dab95dc-d7d3-482b-a07b-6b4dfae89d58"),
+		types.ES256,
+		false,
+		[]byte(data),
+		signature,
+	)
 	if err != nil {
 		panic(err)
 	}
@@ -130,7 +153,7 @@ func ExampleDataKeyProvider_helpers() {
 	var kmsClient *okms.Client // Initialize client
 
 	data := "Hello World !!!" // Data to encrypt
-	dkProvider := kmsClient.DataKeys(uuid.MustParse("2dab95dc-d7d3-482b-a07b-6b4dfae89d58"))
+	dkProvider := kmsClient.DataKeys(uuid.MustParse("7745c93b-8ed3-4eef-921c-87bd8bbdd01b"), uuid.MustParse("2dab95dc-d7d3-482b-a07b-6b4dfae89d58"))
 
 	// Unless you want to use another algorithm than AES-GCM 256 bits, you can use the 2 following helper methods:
 	encryptedData, encryptedKey, nonce, err := dkProvider.EncryptGCM(context.Background(), "Example DK", []byte(data), []byte("Some additional data"))
@@ -148,7 +171,7 @@ func ExampleDataKeyProvider_helpers() {
 func ExampleDataKeyProvider_GenerateDataKey() {
 	var kmsClient *okms.Client // Initialize client
 	data := "Hello World !!!"  // Data to encrypt
-	dkProvider := kmsClient.DataKeys(uuid.MustParse("2dab95dc-d7d3-482b-a07b-6b4dfae89d58"))
+	dkProvider := kmsClient.DataKeys(uuid.MustParse("7745c93b-8ed3-4eef-921c-87bd8bbdd01b"), uuid.MustParse("2dab95dc-d7d3-482b-a07b-6b4dfae89d58"))
 
 	// Generate a new datakey
 	plain, encrypted, err := dkProvider.GenerateDataKey(context.Background(), "Example DK", 256)
@@ -183,7 +206,7 @@ func ExampleDataKeyProvider_DecryptDataKey() {
 	var encryptedData []byte   // Some encrypted data
 	var encryptedKey []byte    // Encrypted datakey
 	var nonce []byte           // Nonce used for data encryption
-	dkProvider := kmsClient.DataKeys(uuid.MustParse("2dab95dc-d7d3-482b-a07b-6b4dfae89d58"))
+	dkProvider := kmsClient.DataKeys(uuid.MustParse("7745c93b-8ed3-4eef-921c-87bd8bbdd01b"), uuid.MustParse("2dab95dc-d7d3-482b-a07b-6b4dfae89d58"))
 
 	// Decrypt data key
 	plain, err := dkProvider.DecryptDataKey(context.Background(), encryptedKey)

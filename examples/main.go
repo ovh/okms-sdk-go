@@ -16,13 +16,14 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/google/uuid"
 	"github.com/ovh/okms-sdk-go"
 )
 
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
-	cert, err := tls.LoadX509KeyPair(os.Getenv("KMS_CLIENT_CERT_FILE"), os.Getenv("KMS_CLIENT_KEY_FILE"))
+	cert, err := tls.LoadX509KeyPair(os.Getenv("OKMS_CLIENT_CERT_FILE"), os.Getenv("OKMS_CLIENT_KEY_FILE"))
 	if err != nil {
 		panic(err)
 	}
@@ -32,17 +33,24 @@ func main() {
 			MinVersion:   tls.VersionTLS12,
 		}},
 	}
+
+	okmsIdString := os.Getenv("OKMS_ID")
+	okmsId, err := uuid.Parse(okmsIdString)
+	if err != nil {
+		panic(err)
+	}
+
 	kmsClient, err := okms.NewRestAPIClientWithHttp("https://eu-west-rbx.okms.ovh.net", &httpClient)
 	if err != nil {
 		panic(err)
 	}
 
-	generateKeys(ctx, kmsClient)
-	encryptDecrypt(ctx, kmsClient)
-	signVerify(ctx, kmsClient)
-	dataKeyEncryptDecrypt(ctx, kmsClient)
-	listKeys(ctx, kmsClient)
-	getKey(ctx, kmsClient)
-	dataKeyEncryptStream(ctx, kmsClient)
-	dataKeyDecryptStream(ctx, kmsClient)
+	generateKeys(ctx, kmsClient, okmsId)
+	encryptDecrypt(ctx, kmsClient, okmsId)
+	signVerify(ctx, kmsClient, okmsId)
+	dataKeyEncryptDecrypt(ctx, kmsClient, okmsId)
+	listKeys(ctx, kmsClient, okmsId)
+	getKey(ctx, kmsClient, okmsId)
+	dataKeyEncryptStream(ctx, kmsClient, okmsId)
+	dataKeyDecryptStream(ctx, kmsClient, okmsId)
 }

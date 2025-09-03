@@ -13,27 +13,28 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/ovh/okms-sdk-go"
 	"github.com/ovh/okms-sdk-go/types"
 )
 
-func generateKeys(ctx context.Context, kmsClient *okms.Client) {
+func generateKeys(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
 	// Create a new AES 256 key
-	respAes, err := kmsClient.GenerateSymmetricKey(ctx, types.N256, "AES key example", "", types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey)
+	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", "", types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("AES KEY:", respAes.Id)
 
 	// Create a new RSA 2048 key-pair
-	respRSA, err := kmsClient.GenerateRSAKeyPair(ctx, types.N2048, "RSA key-pair example", "", types.Sign, types.Verify)
+	respRSA, err := okmsClient.GenerateRSAKeyPair(ctx, okmsId, types.N2048, "RSA key-pair example", "", types.Sign, types.Verify)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("RSA KEY:", respRSA.Id)
 
 	// Create a new ECDSA P-256 key-pair
-	respECDSA, err := kmsClient.GenerateECKeyPair(ctx, types.P256, "ECDSA key-pair example", "", types.Sign, types.Verify)
+	respECDSA, err := okmsClient.GenerateECKeyPair(ctx, okmsId, types.P256, "ECDSA key-pair example", "", types.Sign, types.Verify)
 	if err != nil {
 		panic(err)
 	}
