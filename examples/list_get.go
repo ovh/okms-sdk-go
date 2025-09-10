@@ -13,12 +13,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/ovh/okms-sdk-go"
 	"github.com/ovh/okms-sdk-go/types"
 )
 
-func listKeys(ctx context.Context, kmsClient *okms.Client) {
-	it := kmsClient.ListAllServiceKeys(nil, nil)
+func listKeys(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
+	it := okmsClient.ListAllServiceKeys(okmsId, nil, nil)
 	for it.Next(ctx) {
 		key, err := it.Value()
 		if err != nil {
@@ -28,7 +29,7 @@ func listKeys(ctx context.Context, kmsClient *okms.Client) {
 	}
 
 	// You can also range over go 1.23+ iterator:
-	for key, err := range kmsClient.ListAllServiceKeys(nil, nil).Iter(ctx) {
+	for key, err := range okmsClient.ListAllServiceKeys(okmsId, nil, nil).Iter(ctx) {
 		if err != nil {
 			panic(err)
 		}
@@ -36,14 +37,14 @@ func listKeys(ctx context.Context, kmsClient *okms.Client) {
 	}
 }
 
-func getKey(ctx context.Context, kmsClient *okms.Client) {
+func getKey(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
 	// Create a new AES 256 key
-	respAes, err := kmsClient.GenerateSymmetricKey(ctx, types.N256, "AES key example", "", types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey)
+	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", "", types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey)
 	if err != nil {
 		panic(err)
 	}
 
-	getResp, err := kmsClient.GetServiceKey(ctx, respAes.Id, nil)
+	getResp, err := okmsClient.GetServiceKey(ctx, okmsId, respAes.Id, nil)
 	if err != nil {
 		panic(err)
 	}

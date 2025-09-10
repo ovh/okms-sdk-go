@@ -19,20 +19,21 @@ import (
 	"io"
 	"os"
 
+	"github.com/google/uuid"
 	"github.com/ovh/okms-sdk-go"
 	"github.com/ovh/okms-sdk-go/types"
 )
 
-func dataKeyEncryptDecrypt(ctx context.Context, kmsClient *okms.Client) {
+func dataKeyEncryptDecrypt(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
 	// Create a new AES 256 key
-	respAes, err := kmsClient.GenerateSymmetricKey(ctx, types.N256, "AES key example", "", types.WrapKey, types.UnwrapKey)
+	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", "", types.WrapKey, types.UnwrapKey)
 	if err != nil {
 		panic(err)
 	}
 
 	data := "Hello World !!!" // Data to encrypt
 
-	dkProvider := kmsClient.DataKeys(respAes.Id)
+	dkProvider := okmsClient.DataKeys(okmsId, respAes.Id)
 
 	// ENCRYPTION
 
@@ -103,14 +104,14 @@ func dataKeyEncryptDecrypt(ctx context.Context, kmsClient *okms.Client) {
 	fmt.Println("Decrypted:", string(plainData))
 }
 
-func dataKeyEncryptStream(ctx context.Context, kmsClient *okms.Client) {
+func dataKeyEncryptStream(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
 	// Create a new AES 256 key
-	respAes, err := kmsClient.GenerateSymmetricKey(ctx, types.N256, "AES key example", "", types.WrapKey, types.UnwrapKey)
+	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", "", types.WrapKey, types.UnwrapKey)
 	if err != nil {
 		panic(err)
 	}
 
-	dkProvider := kmsClient.DataKeys(respAes.Id)
+	dkProvider := okmsClient.DataKeys(okmsId, respAes.Id)
 
 	sourceFile, err := os.Open("10GB_Plain_File.txt")
 	if err != nil {
@@ -136,14 +137,14 @@ func dataKeyEncryptStream(ctx context.Context, kmsClient *okms.Client) {
 	}
 }
 
-func dataKeyDecryptStream(ctx context.Context, kmsClient *okms.Client) {
+func dataKeyDecryptStream(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
 	// Create a new AES 256 key
-	respAes, err := kmsClient.GenerateSymmetricKey(ctx, types.N256, "AES key example", "", types.WrapKey, types.UnwrapKey)
+	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", "", types.WrapKey, types.UnwrapKey)
 	if err != nil {
 		panic(err)
 	}
 
-	dkProvider := kmsClient.DataKeys(respAes.Id)
+	dkProvider := okmsClient.DataKeys(okmsId, respAes.Id)
 
 	sourceFile, err := os.Create("Encrypted_File.bin")
 	if err != nil {

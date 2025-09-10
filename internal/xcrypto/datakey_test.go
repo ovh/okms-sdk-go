@@ -12,7 +12,6 @@ package xcrypto
 import (
 	"bytes"
 	"context"
-	"crypto/rand"
 	"io"
 	"testing"
 
@@ -39,14 +38,6 @@ func (m *MockKeyProvider) DecryptDataKey(ctx context.Context, key []byte) ([]byt
 func (m *MockKeyProvider) GenerateDataKey(ctx context.Context, name string, size int) (plain []byte, encrypted []byte, err error) {
 	r := m.Called(ctx, name, size)
 	return r.Get(0).([]byte), r.Get(1).([]byte), r.Error(2)
-}
-
-func randomKey(size int) []byte {
-	b := make([]byte, size)
-	if _, err := rand.Read(b); err != nil {
-		panic(err)
-	}
-	return b
 }
 
 func TestEncryptDecryptV2(t *testing.T) {

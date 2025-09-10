@@ -21,6 +21,7 @@ import (
 func TestSigner_RSA(t *testing.T) {
 	api := mocks.NewAPIMock(t)
 	client := Client{api}
+	okmsId := uuid.New()
 	keyId := uuid.New()
 	format := types.Jwk
 
@@ -30,14 +31,14 @@ func TestSigner_RSA(t *testing.T) {
 	jwk, err := types.NewJsonWebKey(pKey, []types.CryptographicUsages{types.Sign, types.Verify}, keyId.String())
 	require.NoError(t, err)
 
-	api.EXPECT().GetServiceKey(mock.Anything, keyId, &format).
+	api.EXPECT().GetServiceKey(mock.Anything, okmsId, keyId, &format).
 		Return(&types.GetServiceKeyResponse{
 			Attributes: &map[string]interface{}{"state": "active"},
 			Keys:       &[]types.JsonWebKeyResponse{jwk},
 		}, nil).
 		Once()
 
-	signer, err := client.NewSigner(context.Background(), keyId)
+	signer, err := client.NewSigner(context.Background(), okmsId, keyId)
 	require.NoError(t, err)
 	require.Equal(t, pKey.Public(), signer.Public())
 
@@ -69,7 +70,7 @@ func TestSigner_RSA(t *testing.T) {
 			require.NoError(t, err)
 
 			rawFormat := types.Raw
-			api.EXPECT().Sign(mock.Anything, keyId, &rawFormat, tc.alg, true, mock.Anything).
+			api.EXPECT().Sign(mock.Anything, okmsId, keyId, &rawFormat, tc.alg, true, mock.Anything).
 				Return(base64.StdEncoding.EncodeToString(rawsig), nil).
 				Once()
 			sig, err := signer.Sign(rand.Reader, digest, tc.hash)
@@ -82,6 +83,7 @@ func TestSigner_RSA(t *testing.T) {
 func TestSigner_ECDSA(t *testing.T) {
 	api := mocks.NewAPIMock(t)
 	client := Client{api}
+	okmsId := uuid.New()
 	keyId := uuid.New()
 	format := types.Jwk
 
@@ -91,14 +93,14 @@ func TestSigner_ECDSA(t *testing.T) {
 	jwk, err := types.NewJsonWebKey(pKey, []types.CryptographicUsages{types.Sign, types.Verify}, keyId.String())
 	require.NoError(t, err)
 
-	api.EXPECT().GetServiceKey(mock.Anything, keyId, &format).
+	api.EXPECT().GetServiceKey(mock.Anything, okmsId, keyId, &format).
 		Return(&types.GetServiceKeyResponse{
 			Attributes: &map[string]interface{}{"state": "active"},
 			Keys:       &[]types.JsonWebKeyResponse{jwk},
 		}, nil).
 		Once()
 
-	signer, err := client.NewSigner(context.Background(), keyId)
+	signer, err := client.NewSigner(context.Background(), okmsId, keyId)
 	require.NoError(t, err)
 	require.Equal(t, pKey.Public(), signer.Public())
 
@@ -123,7 +125,7 @@ func TestSigner_ECDSA(t *testing.T) {
 			rawsig = append(rawsig, s.Bytes()...)
 
 			signFormat := types.Raw
-			api.EXPECT().Sign(mock.Anything, keyId, &signFormat, tc.alg, true, digest).
+			api.EXPECT().Sign(mock.Anything, okmsId, keyId, &signFormat, tc.alg, true, digest).
 				Return(base64.StdEncoding.EncodeToString(rawsig), nil).
 				Once()
 

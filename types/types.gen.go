@@ -7,6 +7,11 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+const (
+	OAuth2ClientCredentialsScopes = "oAuth2ClientCredentials.Scopes"
+	PersonalAccessTokenScopes     = "personalAccessToken.Scopes"
+)
+
 // Defines values for CryptographicUsages.
 const (
 	Decrypt   CryptographicUsages = "decrypt"
@@ -210,7 +215,7 @@ type GenerateDataKeyResponse struct {
 
 // GetConfigResponse Get engine configuration
 type GetConfigResponse struct {
-	// Data Default settings for Secret-API backend service
+	// Data Default settings for Secret API backend service
 	Data      *PostConfigRequest `json:"data,omitempty"`
 	RequestId *string            `json:"request_id"`
 }
@@ -242,7 +247,7 @@ type GetMetadataResponse struct {
 
 // GetSecretConfigV2Response defines model for GetSecretConfigV2Response.
 type GetSecretConfigV2Response struct {
-	// CasRequired cas parameter will be required for each write call if set to true
+	// CasRequired The “Cas” parameter will be required for each write call if set to true. When the “cas” (Check and set) is specified, the current version of the secret is verified before updating it.
 	CasRequired *bool `json:"cas_required,omitempty"`
 
 	// DeactivateVersionAfter The length of time before a version is deleted
@@ -464,9 +469,9 @@ type PatchServiceKeyRequest struct {
 	Name string `json:"name"`
 }
 
-// PostConfigRequest Default settings for Secret-API backend service
+// PostConfigRequest Default settings for Secret API backend service
 type PostConfigRequest struct {
-	// CasRequired cas parameter will be required for each write call if set to true
+	// CasRequired The “Cas” parameter will be required for each write call if set to true. When the “cas” (Check and set) is specified, the current version of the secret is verified before updating it.
 	CasRequired *bool `json:"cas_required"`
 
 	// DeleteVersionAfter The length of time before a version is deleted
@@ -525,7 +530,7 @@ type PostSecretVersionV2Request struct {
 
 // PutSecretConfigV2Request defines model for PutSecretConfigV2Request.
 type PutSecretConfigV2Request struct {
-	// CasRequired cas parameter will be required for each write call if set to true
+	// CasRequired “Cas” parameter will be required for each write call if set to true. When the “cas” (Check and set) is specified, the current version of the secret is verified before updating it.
 	CasRequired *bool `json:"cas_required"`
 
 	// DeactivateVersionAfter The length of time before a version is deleted
@@ -537,7 +542,7 @@ type PutSecretConfigV2Request struct {
 
 // PutSecretConfigV2Response defines model for PutSecretConfigV2Response.
 type PutSecretConfigV2Response struct {
-	// CasRequired cas parameter will be required for each write call if set to true
+	// CasRequired “Cas” parameter will be required for each write call if set to true. When the “cas” (Check and set) is specified, the current version of the secret is verified before updating it.
 	CasRequired *bool `json:"cas_required,omitempty"`
 
 	// DeactivateVersionAfter The length of time before a version is deleted
@@ -592,7 +597,7 @@ type SecretDataSubkeys struct {
 
 // SecretMetadata Secret metadata or list of keys
 type SecretMetadata struct {
-	// CasRequired is the cas parameter required for each write call
+	// CasRequired The “Cas” parameter will be required for each write call if set to true. When the “cas” (Check and set) is specified, the current version of the secret is verified before updating it.
 	CasRequired *bool `json:"cas_required"`
 
 	// CreatedTime Time of creation of the secret version
@@ -625,7 +630,7 @@ type SecretMetadata struct {
 
 // SecretUpdatableMetadata Model of payload to update metadata
 type SecretUpdatableMetadata struct {
-	// CasRequired is the cas parameter required for each write call
+	// CasRequired The “Cas” parameter will be required for each write call if set to true. When the “cas” (Check and set) is specified, the current version of the secret is verified before updating it.
 	CasRequired *bool `json:"cas_required"`
 
 	// CustomMetadata Custom metadata attached to the secret
@@ -668,7 +673,7 @@ type SecretV2Metadata struct {
 
 // SecretV2MetadataShort defines model for SecretV2MetadataShort.
 type SecretV2MetadataShort struct {
-	// CasRequired The cas parameter will be required for all write requests if set to true
+	// CasRequired The “Cas” parameter will be required for each write call if set to true. When the “cas” (Check and set) is specified, the current version of the secret is verified before updating it.
 	CasRequired    *bool                   `json:"cas_required"`
 	CustomMetadata *SecretV2CustomMetadata `json:"custom_metadata,omitempty"`
 
@@ -782,6 +787,21 @@ type VerifyResponse struct {
 	Result bool `json:"result"`
 }
 
+// OkmsId defines model for okmsId.
+type OkmsId = openapi_types.UUID
+
+// PaginationCursor defines model for paginationCursor.
+type PaginationCursor = string
+
+// PaginationSize defines model for paginationSize.
+type PaginationSize = uint32
+
+// SecretPath defines model for secretPath.
+type SecretPath = string
+
+// ServicekeyPath defines model for servicekeyPath.
+type ServicekeyPath = openapi_types.UUID
+
 // GetSecretRequestParams defines parameters for GetSecretRequest.
 type GetSecretRequestParams struct {
 	// Version Version of the secret requested
@@ -793,11 +813,11 @@ type GetSecretsMetadataParams struct {
 	// List Return a list of secrets instead of metadata if set to true
 	List *bool `form:"list,omitempty" json:"list,omitempty"`
 
-	// XPaginationSize Maximum number of secrets returned in one call.
-	XPaginationSize *uint32 `json:"X-Pagination-Size,omitempty"`
+	// XPaginationSize Maximum number of results returned in one call.
+	XPaginationSize *PaginationSize `json:"X-Pagination-Size,omitempty"`
 
 	// XPaginationCursor Page cursor to use as offset.
-	XPaginationCursor *string `json:"X-Pagination-Cursor,omitempty"`
+	XPaginationCursor *PaginationCursor `json:"X-Pagination-Cursor,omitempty"`
 }
 
 // GetSecretSubkeysParams defines parameters for GetSecretSubkeys.
@@ -841,14 +861,11 @@ type SignParams struct {
 
 // ListSecretV2Params defines parameters for ListSecretV2.
 type ListSecretV2Params struct {
-	// XPaginationSize Maximum number of secrets returned in one call.
-	XPaginationSize *uint32 `json:"X-Pagination-Size,omitempty"`
+	// XPaginationSize Maximum number of results returned in one call.
+	XPaginationSize *PaginationSize `json:"X-Pagination-Size,omitempty"`
 
 	// XPaginationCursor Page cursor to use as offset.
-	XPaginationCursor *string `json:"X-Pagination-Cursor,omitempty"`
-
-	// XKmsListIds Comma-separated list of path used as filter.
-	XKmsListIds *string `json:"X-Kms-ListIds,omitempty"`
+	XPaginationCursor *PaginationCursor `json:"X-Pagination-Cursor,omitempty"`
 }
 
 // GetSecretV2Params defines parameters for GetSecretV2.
@@ -862,22 +879,22 @@ type GetSecretV2Params struct {
 
 // PutSecretV2Params defines parameters for PutSecretV2.
 type PutSecretV2Params struct {
-	// Cas Secret version number.
+	// Cas Current secret version number. When the “cas” (Check and set) is specified, the current version of the secret is verified before updating it. In order for a write to be successful,“cas” must be set to the current version of the secret.
 	Cas *uint32 `form:"cas,omitempty" json:"cas,omitempty"`
 }
 
 // ListSecretVersionV2Params defines parameters for ListSecretVersionV2.
 type ListSecretVersionV2Params struct {
-	// XPaginationSize Maximum number of secrets returned in one call.
-	XPaginationSize *uint32 `json:"X-Pagination-Size,omitempty"`
+	// XPaginationSize Maximum number of results returned in one call.
+	XPaginationSize *PaginationSize `json:"X-Pagination-Size,omitempty"`
 
 	// XPaginationCursor Page cursor to use as offset.
-	XPaginationCursor *string `json:"X-Pagination-Cursor,omitempty"`
+	XPaginationCursor *PaginationCursor `json:"X-Pagination-Cursor,omitempty"`
 }
 
 // PostSecretVersionV2Params defines parameters for PostSecretVersionV2.
 type PostSecretVersionV2Params struct {
-	// Cas Secret version number.
+	// Cas Current secret version number. When the “cas” (Check and set) is specified, the current version of the secret is verified before updating it. In order for a write to be successful,“cas” must be set to the current version of the secret.
 	Cas *uint32 `form:"cas,omitempty" json:"cas,omitempty"`
 }
 

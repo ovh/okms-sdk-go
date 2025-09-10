@@ -14,7 +14,7 @@ go get github.com/ovh/okms-sdk-go@latest
 
 Then you can connect to your KMS service
 ```go
-cert, err := tls.LoadX509KeyPair(os.Getenv("KMS_CLIENT_CERT_FILE"), os.Getenv("KMS_CLIENT_KEY_FILE"))
+cert, err := tls.LoadX509KeyPair(os.Getenv("OKMS_CLIENT_CERT_FILE"), os.Getenv("OKMS_CLIENT_KEY_FILE"))
 if err != nil {
     panic(err)
 }
@@ -24,12 +24,25 @@ httpClient := http.Client{
         MinVersion:   tls.VersionTLS12,
     }},
 }
+
+okmsIdString := os.Getenv("OKMS_ID")
+okmsId, err := uuid.Parse(okmsIdString)
+if err != nil {
+    panic(err)
+}
+
 kmsClient, err := okms.NewRestAPIClientWithHttp("https://eu-west-rbx.okms.ovh.net", &httpClient)
 if err != nil {
     panic(err)
 }
 
 // Then start using the kmsClient
+// Create a new AES 256 key
+respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", "", types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey)
+if err != nil {
+    panic(err)
+}
+fmt.Println("AES KEY:", respAes.Id)
 ```
 
 See [examples](./examples) for more.
