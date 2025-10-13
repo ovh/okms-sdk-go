@@ -248,13 +248,13 @@ type GetMetadataResponse struct {
 // GetSecretConfigV2Response defines model for GetSecretConfigV2Response.
 type GetSecretConfigV2Response struct {
 	// CasRequired The “Cas” parameter will be required for each write call if set to true. When the “cas” (Check and set) is specified, the current version of the secret is verified before updating it.
-	CasRequired *bool `json:"cas_required,omitempty"`
+	CasRequired *bool `json:"casRequired,omitempty"`
 
 	// DeactivateVersionAfter The length of time before a version is deleted
-	DeactivateVersionAfter *string `json:"deactivate_version_after"`
+	DeactivateVersionAfter *string `json:"deactivateVersionAfter"`
 
 	// MaxVersions The number of versions to keep (10 default)
-	MaxVersions *uint32 `json:"max_versions"`
+	MaxVersions *uint32 `json:"maxVersions"`
 }
 
 // GetSecretResponse Response to get secret operation
@@ -461,6 +461,9 @@ type PatchSecretResponse struct {
 	// Data Secret version specific metadata fields
 	Data      *SecretVersionMetadata `json:"data,omitempty"`
 	RequestId *string                `json:"request_id"`
+
+	// Warnings List of warnings
+	Warnings *WarningsList `json:"warnings"`
 }
 
 // PatchServiceKeyRequest Patch domain key model
@@ -501,6 +504,9 @@ type PostSecretResponse struct {
 	// Data Secret version specific metadata fields
 	Data      *SecretVersionMetadata `json:"data,omitempty"`
 	RequestId *string                `json:"request_id"`
+
+	// Warnings List of warnings
+	Warnings *WarningsList `json:"warnings"`
 }
 
 // PostSecretV2Request defines model for PostSecretV2Request.
@@ -520,6 +526,9 @@ type PostSecretV2Response struct {
 
 	// Path Secret identifier
 	Path *string `json:"path,omitempty"`
+
+	// Warnings List of warnings
+	Warnings *WarningsList `json:"warnings"`
 }
 
 // PostSecretVersionV2Request defines model for PostSecretVersionV2Request.
@@ -531,25 +540,28 @@ type PostSecretVersionV2Request struct {
 // PutSecretConfigV2Request defines model for PutSecretConfigV2Request.
 type PutSecretConfigV2Request struct {
 	// CasRequired “Cas” parameter will be required for each write call if set to true. When the “cas” (Check and set) is specified, the current version of the secret is verified before updating it.
-	CasRequired *bool `json:"cas_required"`
+	CasRequired *bool `json:"casRequired"`
 
 	// DeactivateVersionAfter The length of time before a version is deleted
-	DeactivateVersionAfter *string `json:"deactivate_version_after"`
+	DeactivateVersionAfter *string `json:"deactivateVersionAfter"`
 
 	// MaxVersions The number of versions to keep (10 default)
-	MaxVersions *uint32 `json:"max_versions"`
+	MaxVersions *uint32 `json:"maxVersions"`
 }
 
 // PutSecretConfigV2Response defines model for PutSecretConfigV2Response.
 type PutSecretConfigV2Response struct {
 	// CasRequired “Cas” parameter will be required for each write call if set to true. When the “cas” (Check and set) is specified, the current version of the secret is verified before updating it.
-	CasRequired *bool `json:"cas_required,omitempty"`
+	CasRequired *bool `json:"casRequired,omitempty"`
 
 	// DeactivateVersionAfter The length of time before a version is deleted
-	DeactivateVersionAfter *string `json:"deactivate_version_after"`
+	DeactivateVersionAfter *string `json:"deactivateVersionAfter"`
 
 	// MaxVersions The number of versions to keep (10 default)
-	MaxVersions *uint32 `json:"max_versions"`
+	MaxVersions *uint32 `json:"maxVersions"`
+
+	// Warnings List of warnings
+	Warnings *WarningsList `json:"warnings"`
 }
 
 // PutSecretV2Request defines model for PutSecretV2Request.
@@ -566,6 +578,9 @@ type PutSecretV2Response struct {
 
 	// Path Secret identifier
 	Path *string `json:"path,omitempty"`
+
+	// Warnings List of warnings
+	Warnings *WarningsList `json:"warnings"`
 }
 
 // PutSecretVersionV2Request defines model for PutSecretVersionV2Request.
@@ -649,39 +664,39 @@ type SecretV2CustomMetadata map[string]string
 // SecretV2Metadata defines model for SecretV2Metadata.
 type SecretV2Metadata struct {
 	// CasRequired The cas parameter will be required for all write requests if set to true
-	CasRequired *bool `json:"cas_required"`
+	CasRequired *bool `json:"casRequired"`
 
 	// CreatedAt Time of creation of the secret version
-	CreatedAt *string `json:"created_at"`
+	CreatedAt *string `json:"createdAt"`
 
 	// CurrentVersion The secret version.
-	CurrentVersion *uint32                 `json:"current_version,omitempty"`
-	CustomMetadata *SecretV2CustomMetadata `json:"custom_metadata,omitempty"`
+	CurrentVersion *uint32                 `json:"currentVersion,omitempty"`
+	CustomMetadata *SecretV2CustomMetadata `json:"customMetadata,omitempty"`
 
 	// DeactivateVersionAfter Time duration before a version is deactivated
-	DeactivateVersionAfter *string `json:"deactivate_version_after"`
+	DeactivateVersionAfter *string `json:"deactivateVersionAfter"`
 
 	// MaxVersions The number of versions to keep (10 default)
-	MaxVersions *uint32 `json:"max_versions"`
+	MaxVersions *uint32 `json:"maxVersions"`
 
 	// OldestVersion The secret oldest version
-	OldestVersion *uint32 `json:"oldest_version,omitempty"`
+	OldestVersion *uint32 `json:"oldestVersion,omitempty"`
 
 	// UpdatedAt Time of the last update of the secret
-	UpdatedAt *string `json:"updated_at"`
+	UpdatedAt *string `json:"updatedAt"`
 }
 
 // SecretV2MetadataShort defines model for SecretV2MetadataShort.
 type SecretV2MetadataShort struct {
 	// CasRequired The “Cas” parameter will be required for each write call if set to true. When the “cas” (Check and set) is specified, the current version of the secret is verified before updating it.
-	CasRequired    *bool                   `json:"cas_required"`
-	CustomMetadata *SecretV2CustomMetadata `json:"custom_metadata,omitempty"`
+	CasRequired    *bool                   `json:"casRequired"`
+	CustomMetadata *SecretV2CustomMetadata `json:"customMetadata,omitempty"`
 
 	// DeactivateVersionAfter Time duration before a version is deactivated
-	DeactivateVersionAfter *string `json:"deactivate_version_after"`
+	DeactivateVersionAfter *string `json:"deactivateVersionAfter"`
 
 	// MaxVersions The number of versions to keep (10 default)
-	MaxVersions *uint32 `json:"max_versions"`
+	MaxVersions *uint32 `json:"maxVersions"`
 }
 
 // SecretV2State State of the secret version
@@ -690,19 +705,22 @@ type SecretV2State string
 // SecretV2Version defines model for SecretV2Version.
 type SecretV2Version struct {
 	// CreatedAt Time of creation of the secret version
-	CreatedAt string `json:"created_at"`
+	CreatedAt string `json:"createdAt"`
 
 	// Data The secret data map to store
 	Data *map[string]interface{} `json:"data"`
 
 	// DeactivatedAt Time of deactivation of the secret version
-	DeactivatedAt *string `json:"deactivated_at"`
+	DeactivatedAt *string `json:"deactivatedAt"`
 
 	// Id Secret version
 	Id uint32 `json:"id"`
 
 	// State State of the secret version
 	State SecretV2State `json:"state"`
+
+	// Warnings List of warnings
+	Warnings *WarningsList `json:"warnings"`
 }
 
 // SecretV2VersionShort Data of the secret version
@@ -787,6 +805,15 @@ type VerifyResponse struct {
 	Result bool `json:"result"`
 }
 
+// Warnings defines model for Warnings.
+type Warnings struct {
+	// Warnings List of warnings
+	Warnings *WarningsList `json:"warnings"`
+}
+
+// WarningsList List of warnings
+type WarningsList = []string
+
 // OkmsId defines model for okmsId.
 type OkmsId = openapi_types.UUID
 
@@ -806,6 +833,15 @@ type ServicekeyPath = openapi_types.UUID
 type GetSecretRequestParams struct {
 	// Version Version of the secret requested
 	Version *uint32 `form:"version,omitempty" json:"version,omitempty"`
+}
+
+// ListSecretsMetadataParams defines parameters for ListSecretsMetadata.
+type ListSecretsMetadataParams struct {
+	// XPaginationSize Maximum number of results returned in one call.
+	XPaginationSize *PaginationSize `json:"X-Pagination-Size,omitempty"`
+
+	// XPaginationCursor Page cursor to use as offset.
+	XPaginationCursor *PaginationCursor `json:"X-Pagination-Cursor,omitempty"`
 }
 
 // GetSecretsMetadataParams defines parameters for GetSecretsMetadata.
