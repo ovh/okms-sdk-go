@@ -126,6 +126,9 @@ type ClientInterface interface {
 
 	PutSecretDestroy(ctx context.Context, okmsId OkmsId, path SecretPath, body PutSecretDestroyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ListSecretsMetadata request
+	ListSecretsMetadata(ctx context.Context, okmsId OkmsId, params *ListSecretsMetadataParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// DeleteSecretMetadata request
 	DeleteSecretMetadata(ctx context.Context, okmsId OkmsId, path SecretPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -413,6 +416,18 @@ func (c *Client) PutSecretDestroyWithBody(ctx context.Context, okmsId OkmsId, pa
 
 func (c *Client) PutSecretDestroy(ctx context.Context, okmsId OkmsId, path SecretPath, body PutSecretDestroyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPutSecretDestroyRequest(c.Server, okmsId, path, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListSecretsMetadata(ctx context.Context, okmsId OkmsId, params *ListSecretsMetadataParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListSecretsMetadataRequest(c.Server, okmsId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1419,6 +1434,66 @@ func NewPutSecretDestroyRequestWithBody(server string, okmsId OkmsId, path Secre
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListSecretsMetadataRequest generates requests for ListSecretsMetadata
+func NewListSecretsMetadataRequest(server string, okmsId OkmsId, params *ListSecretsMetadataParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "okmsId", runtime.ParamLocationPath, okmsId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/%s/v1/secret/metadata", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XPaginationSize != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "X-Pagination-Size", runtime.ParamLocationHeader, *params.XPaginationSize)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Pagination-Size", headerParam0)
+		}
+
+		if params.XPaginationCursor != nil {
+			var headerParam1 string
+
+			headerParam1, err = runtime.StyleParamWithLocation("simple", false, "X-Pagination-Cursor", runtime.ParamLocationHeader, *params.XPaginationCursor)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Pagination-Cursor", headerParam1)
+		}
+
+	}
 
 	return req, nil
 }
@@ -3309,6 +3384,9 @@ type ClientWithResponsesInterface interface {
 
 	PutSecretDestroyWithResponse(ctx context.Context, okmsId OkmsId, path SecretPath, body PutSecretDestroyJSONRequestBody, reqEditors ...RequestEditorFn) (*PutSecretDestroyHTTPResponse, error)
 
+	// ListSecretsMetadataWithResponse request
+	ListSecretsMetadataWithResponse(ctx context.Context, okmsId OkmsId, params *ListSecretsMetadataParams, reqEditors ...RequestEditorFn) (*ListSecretsMetadataHTTPResponse, error)
+
 	// DeleteSecretMetadataWithResponse request
 	DeleteSecretMetadataWithResponse(ctx context.Context, okmsId OkmsId, path SecretPath, reqEditors ...RequestEditorFn) (*DeleteSecretMetadataHTTPResponse, error)
 
@@ -3650,6 +3728,33 @@ func (r PutSecretDestroyHTTPResponse) StatusCode() int {
 	return 0
 }
 
+type ListSecretsMetadataHTTPResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GetMetadataResponse
+	JSON400      *ErrorResponse
+	JSON401      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON429      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r ListSecretsMetadataHTTPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListSecretsMetadataHTTPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type DeleteSecretMetadataHTTPResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -3706,6 +3811,7 @@ func (r GetSecretsMetadataHTTPResponse) StatusCode() int {
 type PatchSecretMetadataHTTPResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *Warnings
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
@@ -3732,6 +3838,7 @@ func (r PatchSecretMetadataHTTPResponse) StatusCode() int {
 type PostSecretMetadataHTTPResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *Warnings
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON404      *ErrorResponse
@@ -4569,6 +4676,15 @@ func (c *ClientWithResponses) PutSecretDestroyWithResponse(ctx context.Context, 
 		return nil, err
 	}
 	return ParsePutSecretDestroyHTTPResponse(rsp)
+}
+
+// ListSecretsMetadataWithResponse request returning *ListSecretsMetadataHTTPResponse
+func (c *ClientWithResponses) ListSecretsMetadataWithResponse(ctx context.Context, okmsId OkmsId, params *ListSecretsMetadataParams, reqEditors ...RequestEditorFn) (*ListSecretsMetadataHTTPResponse, error) {
+	rsp, err := c.ListSecretsMetadata(ctx, okmsId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListSecretsMetadataHTTPResponse(rsp)
 }
 
 // DeleteSecretMetadataWithResponse request returning *DeleteSecretMetadataHTTPResponse
@@ -5453,6 +5569,67 @@ func ParsePutSecretDestroyHTTPResponse(rsp *http.Response) (*PutSecretDestroyHTT
 	return response, nil
 }
 
+// ParseListSecretsMetadataHTTPResponse parses an HTTP response from a ListSecretsMetadataWithResponse call
+func ParseListSecretsMetadataHTTPResponse(rsp *http.Response) (*ListSecretsMetadataHTTPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListSecretsMetadataHTTPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetMetadataResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseDeleteSecretMetadataHTTPResponse parses an HTTP response from a DeleteSecretMetadataWithResponse call
 func ParseDeleteSecretMetadataHTTPResponse(rsp *http.Response) (*DeleteSecretMetadataHTTPResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -5582,6 +5759,13 @@ func ParsePatchSecretMetadataHTTPResponse(rsp *http.Response) (*PatchSecretMetad
 	}
 
 	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Warnings
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -5636,6 +5820,13 @@ func ParsePostSecretMetadataHTTPResponse(rsp *http.Response) (*PostSecretMetadat
 	}
 
 	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Warnings
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest ErrorResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {

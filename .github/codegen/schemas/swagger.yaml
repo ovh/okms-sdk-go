@@ -1,18 +1,21 @@
 openapi: 3.0.1
 info:
   title: OVHcloud KMS REST API
-  version: 2.3.0
-
+  version: 2.6.1
 paths:
   /api/{okmsId}/v1/servicekey:
     post:
       tags:
         - Service Key API
       summary: Create or imports customer service key
-      description: |
+      description: >
         |  Action IAM      | Description |
+
         | ---------------- | ------------|
-        | okms:apikms:serviceKey/import | Required when importing a service key |
+
+        | okms:apikms:serviceKey/import | Required when importing a service key
+        |
+
         | okms:apikms:serviceKey/create | Required when creating a service key |
       operationId: CreateImportServiceKey
       parameters:
@@ -249,10 +252,13 @@ paths:
       tags:
         - Service Key API
       summary: Generate data key enveloped by servicekey
-      description: |
+      description: >
         |  Action IAM      | Description |
+
         | ---------------- | ------------|
-        | okms:apikms:serviceKey/dataKey/create | Required to use this operation |
+
+        | okms:apikms:serviceKey/dataKey/create | Required to use this operation
+        |
       operationId: GenerateDataKey
       parameters:
         - $ref: '#/components/parameters/okmsId'
@@ -306,10 +312,13 @@ paths:
       tags:
         - Service Key API
       summary: Decrypt data key encrypted by service key
-      description: |
+      description: >
         |  Action IAM      | Description |
+
         | ---------------- | ------------|
-        | okms:apikms:serviceKey/dataKey/decrypt | Required to use this operation |
+
+        | okms:apikms:serviceKey/dataKey/decrypt | Required to use this
+        operation |
       operationId: DecryptDataKey
       parameters:
         - $ref: '#/components/parameters/okmsId'
@@ -978,11 +987,15 @@ paths:
       tags:
         - Secret API
       summary: Update a secret
-      description: |
+      description: >
         |  Action IAM      | Description |
+
         | ---------------- | ------------|
+
         | okms:apikms:secret/version/create | Required to update secret data |
-        | okms:apikms:secret/updateMetadata | Required to update secret metadata |
+
+        | okms:apikms:secret/updateMetadata | Required to update secret metadata
+        |
       operationId: PutSecretV2
       parameters:
         - $ref: '#/components/parameters/okmsId'
@@ -1098,7 +1111,9 @@ paths:
         |  Action IAM      | Description |
 
         | ---------------- | ------------|
-        | okms:apikms:secret/get | Only the secret you have the right on will be displayed |
+
+        | okms:apikms:secret/get | Only the secret you have the right on will be
+        displayed |
       operationId: ListSecretVersionV2
       parameters:
         - $ref: '#/components/parameters/okmsId'
@@ -1224,7 +1239,8 @@ paths:
       description: |
         |  Action IAM      | Description |
         | ---------------- | ------------|
-        | okms:apikms:secret/version/getData | Required to use this operation |
+        | okms:apikms:secret/get | Required to use this operation |
+        | okms:apikms:secret/version/getData | Required to get version data |
       operationId: GetSecretVersionV2
       parameters:
         - $ref: '#/components/parameters/okmsId'
@@ -1287,12 +1303,19 @@ paths:
       tags:
         - Secret API
       summary: Update a secret version
-      description: |
+      description: >
         |  Action IAM      | Description |
+
         | ---------------- | ------------|
-        | okms:apikms:secret/version/delete | Required to delete a secret version |
-        | okms:apikms:secret/version/activate | Required to activate a secret version |
-        | okms:apikms:secret/version/deactivate | Required to deactivate a secret version |
+
+        | okms:apikms:secret/version/delete | Required to delete a secret
+        version |
+
+        | okms:apikms:secret/version/activate | Required to activate a secret
+        version |
+
+        | okms:apikms:secret/version/deactivate | Required to deactivate a
+        secret version |
       operationId: PutSecretVersionV2
       parameters:
         - $ref: '#/components/parameters/okmsId'
@@ -1456,7 +1479,7 @@ paths:
   /api/{okmsId}/v1/secret/config:
     get:
       tags:
-        - Secret API (Vault KV2 compliant)
+        - Secret API (Hashicorp Vault KV2 compliant)
       summary: Read KV engine configuration
       description: |
         |  Action IAM      | Description |
@@ -1504,7 +1527,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     post:
       tags:
-        - Secret API (Vault KV2 compliant)
+        - Secret API (Hashicorp Vault KV2 compliant)
       summary: Configure the KV engine
       description: |
         |  Action IAM      | Description |
@@ -1556,13 +1579,17 @@ paths:
   /api/{okmsId}/v1/secret/data/{path}:
     post:
       tags:
-        - Secret API (Vault KV2 compliant)
+        - Secret API (Hashicorp Vault KV2 compliant)
       summary: Create/update secret
-      description: |
+      description: >
         |  Action IAM      | Description |
+
         | ---------------- | ------------|
+
         | okms:apikms:secret/create | Required when creating a new secret |
-        | okms:apikms:secret/version/create | Required when creating a new secret version |
+
+        | okms:apikms:secret/version/create | Required when creating a new
+        secret version |
       operationId: PostSecretRequest
       parameters:
         - $ref: '#/components/parameters/okmsId'
@@ -1613,7 +1640,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     get:
       tags:
-        - Secret API (Vault KV2 compliant)
+        - Secret API (Hashicorp Vault KV2 compliant)
       summary: Read secret version
       description: |
         |  Action IAM      | Description |
@@ -1670,7 +1697,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     patch:
       tags:
-        - Secret API (Vault KV2 compliant)
+        - Secret API (Hashicorp Vault KV2 compliant)
       summary: Patch secret
       description: |
         |  Action IAM      | Description |
@@ -1749,19 +1776,22 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags:
-        - Secret API (Vault KV2 compliant)
-      summary: Delete secret versions
-      description: |
+        - Secret API (Hashicorp Vault KV2 compliant)
+      summary: Delete latest secret version
+      description: >
         |  Action IAM      | Description |
+
         | ---------------- | ------------|
-        | okms:apikms:secret/version/deactivate | Required to use this operation |
+
+        | okms:apikms:secret/version/deactivate | Required to use this operation
+        |
       operationId: DeleteSecretRequest
       parameters:
         - $ref: '#/components/parameters/okmsId'
         - $ref: '#/components/parameters/secretPath'
       responses:
         '204':
-          description: Secret versions are deleted
+          description: Secret version is deleted
         '400':
           description: Bad request error
           content:
@@ -1795,7 +1825,7 @@ paths:
   /api/{okmsId}/v1/secret/subkeys/{path}:
     get:
       tags:
-        - Secret API (Vault KV2 compliant)
+        - Secret API (Hashicorp Vault KV2 compliant)
       summary: Read secret subkeys
       description: |
         |  Action IAM      | Description |
@@ -1860,12 +1890,15 @@ paths:
   /api/{okmsId}/v1/secret/delete/{path}:
     post:
       tags:
-        - Secret API (Vault KV2 compliant)
+        - Secret API (Hashicorp Vault KV2 compliant)
       summary: Delete secret versions
-      description: |
+      description: >
         |  Action IAM      | Description |
+
         | ---------------- | ------------|
-        | okms:apikms:secret/version/deactivate | Required to use this operation |
+
+        | okms:apikms:secret/version/deactivate | Required to use this operation
+        |
       operationId: DeleteSecretVersions
       parameters:
         - $ref: '#/components/parameters/okmsId'
@@ -1912,7 +1945,7 @@ paths:
   /api/{okmsId}/v1/secret/undelete/{path}:
     post:
       tags:
-        - Secret API (Vault KV2 compliant)
+        - Secret API (Hashicorp Vault KV2 compliant)
       summary: Undelete secret versions
       description: |
         |  Action IAM      | Description |
@@ -1964,7 +1997,7 @@ paths:
   /api/{okmsId}/v1/secret/destroy/{path}:
     put:
       tags:
-        - Secret API (Vault KV2 compliant)
+        - Secret API (Hashicorp Vault KV2 compliant)
       summary: Destroy secret versions
       description: |
         |  Action IAM      | Description |
@@ -2013,14 +2046,69 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/{okmsId}/v1/secret/metadata:
+    get:
+      tags:
+        - Secret API (Hashicorp Vault KV2 compliant)
+      summary: List secrets
+      description: |
+        |  Action IAM      | Description |
+        | ---------------- | ------------|
+        | okms:apikms:secret/get | Required on each secret to list |
+      operationId: ListSecretsMetadata
+      parameters:
+        - $ref: '#/components/parameters/okmsId'
+        - $ref: '#/components/parameters/paginationSize'
+        - $ref: '#/components/parameters/paginationCursor'
+      responses:
+        '200':
+          description: List of secret
+          headers:
+            X-Pagination-Cursor-Next:
+              description: continuation token if list is not complete.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMetadataResponse'
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/{okmsId}/v1/secret/metadata/{path}:
     get:
       tags:
-        - Secret API (Vault KV2 compliant)
+        - Secret API (Hashicorp Vault KV2 compliant)
       summary: Read secret metadata or list secrets
-      description: >
+      description: |
         |  Action IAM      | Description |
-
         | ---------------- | ------------|
         | okms:apikms:secret/get | Required on each secret to list |
       operationId: GetSecretsMetadata
@@ -2079,7 +2167,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     post:
       tags:
-        - Secret API (Vault KV2 compliant)
+        - Secret API (Hashicorp Vault KV2 compliant)
       summary: Update secret metadata
       description: |
         |  Action IAM      | Description |
@@ -2097,6 +2185,12 @@ paths:
               $ref: '#/components/schemas/SecretUpdatableMetadata'
         required: true
       responses:
+        '200':
+          description: Metadata is created/updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warnings'
         '204':
           description: Metadata is created/updated
         '400':
@@ -2131,7 +2225,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     patch:
       tags:
-        - Secret API (Vault KV2 compliant)
+        - Secret API (Hashicorp Vault KV2 compliant)
       summary: Update secret metadata
       description: |
         |  Action IAM      | Description |
@@ -2151,6 +2245,12 @@ paths:
             schema:
               $ref: '#/components/schemas/SecretUpdatableMetadata'
       responses:
+        '200':
+          description: Metadata is created/updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warnings'
         '204':
           description: Metadata is updated
         '400':
@@ -2185,7 +2285,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags:
-        - Secret API (Vault KV2 compliant)
+        - Secret API (Hashicorp Vault KV2 compliant)
       summary: Delete metadata and all versions
       description: |
         |  Action IAM      | Description |
@@ -2283,10 +2383,11 @@ components:
       type: oauth2
       description: >-
         This API uses OAuth 2 with the client credential grant flow. [More info
-        on service accounts](https://help.ovhcloud.com/csm/en-manage-service-account?id=kb_article_view&sysparm_article=KB0059343)
+        on service
+        accounts](https://help.ovhcloud.com/csm/en-manage-service-account?id=kb_article_view&sysparm_article=KB0059343)
       flows:
         clientCredentials:
-          tokenUrl: '<token-url>'
+          tokenUrl: <token-url>
           scopes:
             all: Allow all operations
   schemas:
@@ -2880,6 +2981,8 @@ components:
           type: string
           nullable: true
           example: 79b66eba-273e-4f7a-b954-78ed7e70b85d
+        warnings:
+          $ref: '#/components/schemas/WarningsList'
         data:
           $ref: '#/components/schemas/SecretVersionMetadata'
       additionalProperties: false
@@ -2954,6 +3057,8 @@ components:
           type: string
           nullable: true
           example: 79b66eba-273e-4f7a-b954-78ed7e70b85d
+        warnings:
+          $ref: '#/components/schemas/WarningsList'
         data:
           $ref: '#/components/schemas/SecretVersionMetadata'
       additionalProperties: false
@@ -3274,31 +3379,31 @@ components:
       description: State of the secret version
     SecretV2Metadata:
       properties:
-        cas_required:
+        casRequired:
           type: boolean
           nullable: true
           description: >-
             The cas parameter will be required for all write requests if set to
             true
-        created_at:
+        createdAt:
           type: string
           description: Time of creation of the secret version
           nullable: true
           example: '2025-07-02T15:04:05+02:00'
-        current_version:
+        currentVersion:
           type: integer
           nullable: false
           description: The secret version.
           format: uint32
           example: 4
-        custom_metadata:
+        customMetadata:
           $ref: '#/components/schemas/SecretV2CustomMetadata'
-        deactivate_version_after:
+        deactivateVersionAfter:
           type: string
           description: Time duration before a version is deactivated
           nullable: true
           example: 10h30m10s
-        max_versions:
+        maxVersions:
           type: integer
           nullable: true
           description: The number of versions to keep (10 default)
@@ -3306,34 +3411,34 @@ components:
           minimum: 0
           maximum: 24000
           example: 15
-        oldest_version:
+        oldestVersion:
           type: integer
           nullable: false
           description: The secret oldest version
           format: uint32
           example: 2
-        updated_at:
+        updatedAt:
           type: string
           nullable: true
           description: Time of the last update of the secret
           example: '2025-07-02T17:08:09+02:00'
     SecretV2MetadataShort:
       properties:
-        cas_required:
+        casRequired:
           type: boolean
           nullable: true
           description: >-
             The “Cas” parameter will be required for each write call if set to
             true. When the “cas” (Check and set) is specified, the current
             version of the secret is verified before updating it.
-        custom_metadata:
+        customMetadata:
           $ref: '#/components/schemas/SecretV2CustomMetadata'
-        deactivate_version_after:
+        deactivateVersionAfter:
           type: string
           description: Time duration before a version is deactivated
           nullable: true
           example: 10h30m10s
-        max_versions:
+        maxVersions:
           type: integer
           nullable: true
           description: The number of versions to keep (10 default)
@@ -3345,9 +3450,9 @@ components:
       required:
         - id
         - state
-        - created_at
+        - createdAt
       properties:
-        created_at:
+        createdAt:
           type: string
           description: Time of creation of the secret version
           example: '2025-07-02T15:04:05+02:00'
@@ -3357,7 +3462,7 @@ components:
           nullable: true
           example:
             foo: bar
-        deactivated_at:
+        deactivatedAt:
           type: string
           description: Time of deactivation of the secret version
           nullable: true
@@ -3371,6 +3476,8 @@ components:
           example: 3
         state:
           $ref: '#/components/schemas/SecretV2State'
+        warnings:
+          $ref: '#/components/schemas/WarningsList'
     SecretV2VersionShort:
       type: object
       description: Data of the secret version
@@ -3415,6 +3522,8 @@ components:
       properties:
         metadata:
           $ref: '#/components/schemas/SecretV2Metadata'
+        warnings:
+          $ref: '#/components/schemas/WarningsList'
         path:
           type: string
           nullable: false
@@ -3444,6 +3553,8 @@ components:
       properties:
         metadata:
           $ref: '#/components/schemas/SecretV2Metadata'
+        warnings:
+          $ref: '#/components/schemas/WarningsList'
         path:
           type: string
           nullable: false
@@ -3479,19 +3590,19 @@ components:
     GetSecretConfigV2Response:
       type: object
       properties:
-        cas_required:
+        casRequired:
           type: boolean
           description: >-
             The “Cas” parameter will be required for each write call if set to
             true. When the “cas” (Check and set) is specified, the current
             version of the secret is verified before updating it.
           nullable: false
-        deactivate_version_after:
+        deactivateVersionAfter:
           type: string
           description: The length of time before a version is deleted
           nullable: true
           example: 10h30m10s
-        max_versions:
+        maxVersions:
           type: integer
           description: The number of versions to keep (10 default)
           nullable: true
@@ -3502,19 +3613,21 @@ components:
     PutSecretConfigV2Response:
       type: object
       properties:
-        cas_required:
+        warnings:
+          $ref: '#/components/schemas/WarningsList'
+        casRequired:
           type: boolean
           description: >-
             “Cas” parameter will be required for each write call if set to true.
             When the “cas” (Check and set) is specified, the current version of
             the secret is verified before updating it.
           nullable: false
-        deactivate_version_after:
+        deactivateVersionAfter:
           type: string
           description: The length of time before a version is deleted
           nullable: true
           example: 10h30m10s
-        max_versions:
+        maxVersions:
           type: integer
           description: The number of versions to keep (10 default)
           nullable: true
@@ -3525,19 +3638,19 @@ components:
     PutSecretConfigV2Request:
       type: object
       properties:
-        cas_required:
+        casRequired:
           type: boolean
           description: >-
             “Cas” parameter will be required for each write call if set to true.
             When the “cas” (Check and set) is specified, the current version of
             the secret is verified before updating it.
           nullable: true
-        deactivate_version_after:
+        deactivateVersionAfter:
           type: string
           description: The length of time before a version is deleted
           nullable: true
           example: 10h30m10s
-        max_versions:
+        maxVersions:
           type: integer
           minimum: 0
           maximum: 24000
@@ -3545,6 +3658,17 @@ components:
           nullable: true
           format: uint32
           example: 25
+    Warnings:
+      type: object
+      properties:
+        warnings:
+          $ref: '#/components/schemas/WarningsList'
+    WarningsList:
+      type: array
+      items:
+        type: string
+      description: List of warnings
+      nullable: true
 security:
   - personalAccessToken: []
   - oAuth2ClientCredentials:
