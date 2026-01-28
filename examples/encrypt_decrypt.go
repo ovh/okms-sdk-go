@@ -20,7 +20,7 @@ import (
 
 func encryptDecrypt(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
 	// Create a new AES 256 key
-	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", "", types.Encrypt, types.Decrypt)
+	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", types.SOFTWARE, "", types.Encrypt, types.Decrypt)
 	if err != nil {
 		panic(err)
 	}
