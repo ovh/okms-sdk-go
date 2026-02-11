@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: OVHcloud KMS REST API
-  version: 2.6.1
+  version: 2.10.0
 paths:
   /api/{okmsId}/v1/servicekey:
     post:
@@ -1185,7 +1185,7 @@ paths:
           schema:
             type: integer
             format: uint32
-            minimum: 1
+            minimum: 0
             maximum: 24000
           example: 3
       requestBody:
@@ -2356,6 +2356,7 @@ components:
       required: false
       schema:
         type: string
+        format: base64url
     secretPath:
       name: path
       in: path
@@ -2418,6 +2419,9 @@ components:
             $ref: '#/components/schemas/CryptographicUsages'
           description: Operations array specifies key usage
           nullable: true
+        protectionLevel:
+          $ref: '#/components/schemas/ProtectionLevelEnum'
+          default: SOFTWARE
         keys:
           type: array
           items:
@@ -2426,6 +2430,13 @@ components:
           nullable: true
       additionalProperties: false
       description: Create domain key model
+    ProtectionLevelEnum:
+      enum:
+        - SOFTWARE
+        - HSM
+        - MANAGED_HSM
+      type: string
+      description: Should the key be created in HSM
     CryptographicUsages:
       enum:
         - sign
@@ -2721,6 +2732,7 @@ components:
         - id
         - name
         - type
+        - protectionLevel
       type: object
       properties:
         id:
@@ -2743,6 +2755,8 @@ components:
           description: Key usage array specifies key usage
         size:
           $ref: '#/components/schemas/KeySizes'
+        protectionLevel:
+          $ref: '#/components/schemas/ProtectionLevelEnum'
         attributes:
           type: object
           additionalProperties: {}
@@ -3141,6 +3155,10 @@ components:
           example:
             foo: abc
             bar: '123'
+        urn:
+          type: string
+          description: IAM URN of the secret
+          nullable: true
         delete_version_after:
           type: string
           description: The length of time before a version is deleted
@@ -3398,6 +3416,10 @@ components:
           example: 4
         customMetadata:
           $ref: '#/components/schemas/SecretV2CustomMetadata'
+        urn:
+          type: string
+          description: IAM URN of the secret
+          nullable: false
         deactivateVersionAfter:
           type: string
           description: Time duration before a version is deactivated

@@ -20,21 +20,21 @@ import (
 
 func generateKeys(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
 	// Create a new AES 256 key
-	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", "", types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey)
+	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", types.SOFTWARE, "", types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("AES KEY:", respAes.Id)
 
 	// Create a new RSA 2048 key-pair
-	respRSA, err := okmsClient.GenerateRSAKeyPair(ctx, okmsId, types.N2048, "RSA key-pair example", "", types.Sign, types.Verify)
+	respRSA, err := okmsClient.GenerateRSAKeyPair(ctx, okmsId, types.N2048, "RSA key-pair example", types.SOFTWARE, "", types.Sign, types.Verify)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("RSA KEY:", respRSA.Id)
 
 	// Create a new ECDSA P-256 key-pair
-	respECDSA, err := okmsClient.GenerateECKeyPair(ctx, okmsId, types.P256, "ECDSA key-pair example", "", types.Sign, types.Verify)
+	respECDSA, err := okmsClient.GenerateECKeyPair(ctx, okmsId, types.P256, "ECDSA key-pair example", types.SOFTWARE, "", types.Sign, types.Verify)
 	if err != nil {
 		panic(err)
 	}
