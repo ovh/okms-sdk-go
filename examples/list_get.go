@@ -39,7 +39,7 @@ func listKeys(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
 
 func getKey(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
 	// Create a new AES 256 key
-	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", "", types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey)
+	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", types.SOFTWARE, "", types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey)
 	if err != nil {
 		panic(err)
 	}

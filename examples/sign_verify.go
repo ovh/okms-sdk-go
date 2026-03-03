@@ -24,7 +24,7 @@ import (
 
 func signVerify(ctx context.Context, kmsClient *okms.Client, okmsId uuid.UUID) {
 	// Create a new ECDSA P-256 key-pair. Sign / Verify also works with RSA keys
-	respECDSA, err := kmsClient.GenerateECKeyPair(ctx, okmsId, types.P256, "ECDSA key-pair example", "", types.Sign, types.Verify)
+	respECDSA, err := kmsClient.GenerateECKeyPair(ctx, okmsId, types.P256, "ECDSA key-pair example", types.SOFTWARE, "", types.Sign, types.Verify)
 	if err != nil {
 		panic(err)
 	}

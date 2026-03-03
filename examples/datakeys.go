@@ -26,7 +26,7 @@ import (
 
 func dataKeyEncryptDecrypt(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
 	// Create a new AES 256 key
-	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", "", types.WrapKey, types.UnwrapKey)
+	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", types.SOFTWARE, "", types.WrapKey, types.UnwrapKey)
 	if err != nil {
 		panic(err)
 	}
@@ -106,7 +106,7 @@ func dataKeyEncryptDecrypt(ctx context.Context, okmsClient *okms.Client, okmsId 
 
 func dataKeyEncryptStream(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
 	// Create a new AES 256 key
-	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", "", types.WrapKey, types.UnwrapKey)
+	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", types.SOFTWARE, "", types.WrapKey, types.UnwrapKey)
 	if err != nil {
 		panic(err)
 	}
@@ -139,7 +139,7 @@ func dataKeyEncryptStream(ctx context.Context, okmsClient *okms.Client, okmsId u
 
 func dataKeyDecryptStream(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
 	// Create a new AES 256 key
-	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", "", types.WrapKey, types.UnwrapKey)
+	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", types.SOFTWARE, "", types.WrapKey, types.UnwrapKey)
 	if err != nil {
 		panic(err)
 	}

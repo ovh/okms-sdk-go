@@ -45,55 +45,58 @@ func (client *Client) WithCustomHeader(key, value string) *Client {
 }
 
 // GenerateSymmetricKey asks the KMS to generate a symmetric key with the given bits length, name and usage. The keyCtx parameter can be left empty if not needed.
-func (client *Client) GenerateSymmetricKey(ctx context.Context, okmsId uuid.UUID, bitSize types.KeySizes, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+func (client *Client) GenerateSymmetricKey(ctx context.Context, okmsId uuid.UUID, bitSize types.KeySizes, name string, protectionLevel types.ProtectionLevelEnum, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
 	var keyContext *string
 	if keyCtx != "" {
 		keyContext = &keyCtx
 	}
 	kTy := types.Oct
 	body := types.CreateImportServiceKeyRequest{
-		Context:    keyContext,
-		Name:       name,
-		Type:       &kTy,
-		Operations: &ops,
-		Size:       &bitSize,
-		Keys:       nil,
+		Context:         keyContext,
+		Name:            name,
+		Type:            &kTy,
+		Operations:      &ops,
+		Size:            &bitSize,
+		Keys:            nil,
+		ProtectionLevel: &protectionLevel,
 	}
 	return client.CreateImportServiceKey(ctx, okmsId, nil, body)
 }
 
 // GenerateRSAKeyPair asks the KMS to generate an RSA asymmetric key-pair with the given bits length, name and usage. The keyCtx parameter can be left empty if not needed.
-func (client *Client) GenerateRSAKeyPair(ctx context.Context, okmsId uuid.UUID, bitSize types.KeySizes, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+func (client *Client) GenerateRSAKeyPair(ctx context.Context, okmsId uuid.UUID, bitSize types.KeySizes, name string, protectionLevel types.ProtectionLevelEnum, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
 	var keyContext *string
 	if keyCtx != "" {
 		keyContext = &keyCtx
 	}
 	kTy := types.RSA
 	body := types.CreateImportServiceKeyRequest{
-		Context:    keyContext,
-		Name:       name,
-		Type:       &kTy,
-		Operations: &ops,
-		Size:       &bitSize,
-		Keys:       nil,
+		Context:         keyContext,
+		Name:            name,
+		Type:            &kTy,
+		Operations:      &ops,
+		Size:            &bitSize,
+		Keys:            nil,
+		ProtectionLevel: &protectionLevel,
 	}
 	return client.CreateImportServiceKey(ctx, okmsId, nil, body)
 }
 
 // GenerateECKeyPair asks the KMS to generate an EC asymmetric key-pair with the given elliptic curve, name and usage. The keyCtx parameter can be left empty if not needed.
-func (client *Client) GenerateECKeyPair(ctx context.Context, okmsId uuid.UUID, curve types.Curves, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+func (client *Client) GenerateECKeyPair(ctx context.Context, okmsId uuid.UUID, curve types.Curves, name string, protectionLevel types.ProtectionLevelEnum, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
 	var keyContext *string
 	if keyCtx != "" {
 		keyContext = &keyCtx
 	}
 	kTy := types.EC
 	body := types.CreateImportServiceKeyRequest{
-		Context:    keyContext,
-		Name:       name,
-		Type:       &kTy,
-		Operations: &ops,
-		Curve:      &curve,
-		Keys:       nil,
+		Context:         keyContext,
+		Name:            name,
+		Type:            &kTy,
+		Operations:      &ops,
+		Curve:           &curve,
+		Keys:            nil,
+		ProtectionLevel: &protectionLevel,
 	}
 	return client.CreateImportServiceKey(ctx, okmsId, nil, body)
 }
