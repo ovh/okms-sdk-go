@@ -177,7 +177,6 @@ func (code ErrorCode) Category() Category {
 }
 
 func (code ErrorCode) AppSpecificCode() uint16 {
-	//nolint:gosec // No integer overflow possible as we mask it with 0x0fff
 	return uint16(code & 0x0fff)
 }
 
