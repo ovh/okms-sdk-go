@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: OVHcloud KMS REST API
-  version: 2.10.0
+  version: 2.12.1
 paths:
   /api/{okmsId}/v1/servicekey:
     post:
@@ -34,7 +34,7 @@ paths:
         required: true
       responses:
         '201':
-          description: Returns id of a key created or imported.
+          description: Returns information of a key created or imported.
           content:
             application/json:
               schema:
@@ -2422,6 +2422,7 @@ components:
         protectionLevel:
           $ref: '#/components/schemas/ProtectionLevelEnum'
           default: SOFTWARE
+          nullable: true 
         keys:
           type: array
           items:
