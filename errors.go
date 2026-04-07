@@ -141,6 +141,8 @@ const (
 	CategoryDatabase
 	CategoryUnavailable
 	CategoryBadArgument
+	CategoryTooManyRequest
+	CategoryConflict
 )
 
 func (c Category) String() string {
@@ -160,6 +162,8 @@ var categoryStr = map[Category]string{
 	CategoryDatabase:       "Database",
 	CategoryUnavailable:    "Unavailable",
 	CategoryBadArgument:    "Bad Argument",
+	CategoryTooManyRequest: "Too many requests",
+	CategoryConflict:       "Conflict",
 }
 
 type ErrorCode uint32

@@ -41,6 +41,8 @@ func TestErrorParsing(t *testing.T) {
 		{50425858, MajorREST, MinorGeneral, CategoryUnavailable},
 		{50405377, MajorREST, MinorGeneral, CategoryArgument},
 		{50475011, MajorREST, MinorRESTAuthProvider, CategoryAuthentication},
+		{50434049, MajorREST, MinorGeneral, CategoryTooManyRequest},
+		{50438145, MajorREST, MinorGeneral, CategoryConflict},
 
 		{100732929, MajorXLIB, MinorGeneral, CategoryInternal},
 		{100798465, MajorXLIB, MinorXlibHttpHelper, CategoryInternal},
