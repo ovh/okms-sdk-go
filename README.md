@@ -38,7 +38,7 @@ if err != nil {
 
 // Then start using the kmsClient
 // Create a new AES 256 key
-respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", "", types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey)
+respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", "", []types.CryptographicUsages{types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey})
 if err != nil {
     panic(err)
 }

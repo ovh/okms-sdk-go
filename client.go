@@ -45,7 +45,9 @@ func (client *Client) WithCustomHeader(key, value string) *Client {
 }
 
 // GenerateSymmetricKey asks the KMS to generate a symmetric key with the given bits length, name and usage. The keyCtx parameter can be left empty if not needed.
-func (client *Client) GenerateSymmetricKey(ctx context.Context, okmsId uuid.UUID, bitSize types.KeySizes, name string, protectionLevel types.ProtectionLevelEnum, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+//
+// Use [WithKeyId] to assign a specific UUID to the key.
+func (client *Client) GenerateSymmetricKey(ctx context.Context, okmsId uuid.UUID, bitSize types.KeySizes, name string, protectionLevel types.ProtectionLevelEnum, keyCtx string, ops []types.CryptographicUsages, opts ...ServiceKeyOption) (*types.GetServiceKeyResponse, error) {
 	var keyContext *string
 	if keyCtx != "" {
 		keyContext = &keyCtx
@@ -60,11 +62,16 @@ func (client *Client) GenerateSymmetricKey(ctx context.Context, okmsId uuid.UUID
 		Keys:            nil,
 		ProtectionLevel: &protectionLevel,
 	}
+	for _, option := range opts {
+		option(&body)
+	}
 	return client.CreateImportServiceKey(ctx, okmsId, nil, body)
 }
 
 // GenerateRSAKeyPair asks the KMS to generate an RSA asymmetric key-pair with the given bits length, name and usage. The keyCtx parameter can be left empty if not needed.
-func (client *Client) GenerateRSAKeyPair(ctx context.Context, okmsId uuid.UUID, bitSize types.KeySizes, name string, protectionLevel types.ProtectionLevelEnum, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+//
+// Use [WithKeyId] to assign a specific UUID to the key.
+func (client *Client) GenerateRSAKeyPair(ctx context.Context, okmsId uuid.UUID, bitSize types.KeySizes, name string, protectionLevel types.ProtectionLevelEnum, keyCtx string, ops []types.CryptographicUsages, opts ...ServiceKeyOption) (*types.GetServiceKeyResponse, error) {
 	var keyContext *string
 	if keyCtx != "" {
 		keyContext = &keyCtx
@@ -79,11 +86,16 @@ func (client *Client) GenerateRSAKeyPair(ctx context.Context, okmsId uuid.UUID, 
 		Keys:            nil,
 		ProtectionLevel: &protectionLevel,
 	}
+	for _, option := range opts {
+		option(&body)
+	}
 	return client.CreateImportServiceKey(ctx, okmsId, nil, body)
 }
 
 // GenerateECKeyPair asks the KMS to generate an EC asymmetric key-pair with the given elliptic curve, name and usage. The keyCtx parameter can be left empty if not needed.
-func (client *Client) GenerateECKeyPair(ctx context.Context, okmsId uuid.UUID, curve types.Curves, name string, protectionLevel types.ProtectionLevelEnum, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+//
+// Use [WithKeyId] to assign a specific UUID to the key.
+func (client *Client) GenerateECKeyPair(ctx context.Context, okmsId uuid.UUID, curve types.Curves, name string, protectionLevel types.ProtectionLevelEnum, keyCtx string, ops []types.CryptographicUsages, opts ...ServiceKeyOption) (*types.GetServiceKeyResponse, error) {
 	var keyContext *string
 	if keyCtx != "" {
 		keyContext = &keyCtx
@@ -98,10 +110,13 @@ func (client *Client) GenerateECKeyPair(ctx context.Context, okmsId uuid.UUID, c
 		Keys:            nil,
 		ProtectionLevel: &protectionLevel,
 	}
+	for _, option := range opts {
+		option(&body)
+	}
 	return client.CreateImportServiceKey(ctx, okmsId, nil, body)
 }
 
-func (client *Client) importJWK(ctx context.Context, okmsId uuid.UUID, jwk types.JsonWebKeyRequest, name, keyCtx string) (*types.GetServiceKeyResponse, error) {
+func (client *Client) importJWK(ctx context.Context, okmsId uuid.UUID, jwk types.JsonWebKeyRequest, name, keyCtx string, opts ...ServiceKeyOption) (*types.GetServiceKeyResponse, error) {
 	var keyContext *string
 	if keyCtx != "" {
 		keyContext = &keyCtx
@@ -111,23 +126,28 @@ func (client *Client) importJWK(ctx context.Context, okmsId uuid.UUID, jwk types
 		Name:    name,
 		Keys:    &[]types.JsonWebKeyRequest{jwk},
 	}
+	for _, option := range opts {
+		option(&req)
+	}
 	format := types.Jwk
 	return client.CreateImportServiceKey(ctx, okmsId, &format, req)
 }
 
 // ImportKey imports a key into the KMS. keyCtx can be left empty if not needed.
 //
+// Use [WithKeyId] to assign a specific UUID to the key.
+//
 // The accepted types of the key parameter are
 //   - *rsa.PrivateKey
 //   - *ecdsa.PrivateKey
 //   - types.JsonWebKey and *types.JsonWebKey
 //   - []byte for importing symmetric keys.
-func (client *Client) ImportKey(ctx context.Context, okmsId uuid.UUID, key any, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+func (client *Client) ImportKey(ctx context.Context, okmsId uuid.UUID, key any, name, keyCtx string, ops []types.CryptographicUsages, opts ...ServiceKeyOption) (*types.GetServiceKeyResponse, error) {
 	switch k := key.(type) {
 	case types.JsonWebKeyRequest:
-		return client.importJWK(ctx, okmsId, k, name, keyCtx)
+		return client.importJWK(ctx, okmsId, k, name, keyCtx, opts...)
 	case *types.JsonWebKeyRequest:
-		return client.importJWK(ctx, okmsId, *k, name, keyCtx)
+		return client.importJWK(ctx, okmsId, *k, name, keyCtx, opts...)
 	}
 	jwk, err := types.NewJsonWebKey(key, ops, name)
 	if err != nil {
@@ -150,17 +170,19 @@ func (client *Client) ImportKey(ctx context.Context, okmsId uuid.UUID, key any, 
 		Crv:    jwk.Crv,
 		K:      jwk.K,
 	}
-	return client.importJWK(ctx, okmsId, jwkRequest, name, keyCtx)
+	return client.importJWK(ctx, okmsId, jwkRequest, name, keyCtx, opts...)
 }
 
 // ImportKeyPairPEM imports a PEM formated key into the KMS. keyCtx can be left empty if not needed.
+//
+// Use [WithKeyId] to assign a specific UUID to the key.
 //
 // Supported PEM types are:
 //   - PKCS8
 //   - PKCS1 private keys
 //   - SEC1
 //   - OpenSSH private keys
-func (client *Client) ImportKeyPairPEM(ctx context.Context, okmsId uuid.UUID, privateKeyPem []byte, name, keyCtx string, ops ...types.CryptographicUsages) (*types.GetServiceKeyResponse, error) {
+func (client *Client) ImportKeyPairPEM(ctx context.Context, okmsId uuid.UUID, privateKeyPem []byte, name, keyCtx string, ops []types.CryptographicUsages, opts ...ServiceKeyOption) (*types.GetServiceKeyResponse, error) {
 	block, _ := pem.Decode(privateKeyPem)
 	if block == nil {
 		return nil, errors.New("No key to import")
@@ -182,7 +204,7 @@ func (client *Client) ImportKeyPairPEM(ctx context.Context, okmsId uuid.UUID, pr
 	if err != nil {
 		return nil, err
 	}
-	return client.ImportKey(ctx, okmsId, k, name, keyCtx, ops...)
+	return client.ImportKey(ctx, okmsId, k, name, keyCtx, ops, opts...)
 }
 
 // ExportJwkPublicKey returns the public part of a key pair as a Json Web Key.

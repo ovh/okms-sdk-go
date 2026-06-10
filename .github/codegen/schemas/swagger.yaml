@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: OVHcloud KMS REST API
-  version: 2.12.1
+  version: 2.14.0
 paths:
   /api/{okmsId}/v1/servicekey:
     post:
@@ -137,7 +137,7 @@ paths:
     post:
       tags:
         - Service Key API
-      summary: Encrypts data, up to 4Kb in size, using service key provided
+      summary: Encrypts data, up to 4KB in size, using service key provided
       description: |
         |  Action IAM      | Description |
         | ---------------- | ------------|
@@ -2364,7 +2364,6 @@ components:
       required: true
       schema:
         type: string
-        maxLength: 255
         pattern: ^[a-zA-Z0-9_.:/=@%-]+$
       example: foo/bar
     servicekeyPath:
@@ -2397,6 +2396,11 @@ components:
         - name
       type: object
       properties:
+        id:
+          type: string
+          description: Optional user-defined key id (UUID)
+          format: uuid
+          nullable: true
         name:
           maxLength: 32
           minLength: 1
@@ -2422,7 +2426,7 @@ components:
         protectionLevel:
           $ref: '#/components/schemas/ProtectionLevelEnum'
           default: SOFTWARE
-          nullable: true 
+          nullable: true
         keys:
           type: array
           items:
@@ -2495,7 +2499,7 @@ components:
       type: object
       properties:
         ciphertext:
-          maxLength: 5120
+          maxLength: 5464
           minLength: 1
           type: string
           description: Ciphertext for Decrypt operation
@@ -2539,7 +2543,7 @@ components:
       type: object
       properties:
         plaintext:
-          maxLength: 4096
+          maxLength: 5464
           minLength: 1
           type: string
           description: Plaintext for encryption
@@ -3052,6 +3056,7 @@ components:
       type: object
       properties:
         data:
+          type: object
           description: The secret data map to store
           nullable: true
           example:
@@ -3314,7 +3319,7 @@ components:
       type: object
       properties:
         message:
-          maxLength: 4096
+          maxLength: 5464
           minLength: 1
           type: string
           description: Message to be signed
@@ -3351,7 +3356,7 @@ components:
       type: object
       properties:
         message:
-          maxLength: 4094
+          maxLength: 5464
           type: string
           description: Signed message to be verified
           format: byte
