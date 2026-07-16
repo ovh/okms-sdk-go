@@ -11,6 +11,7 @@ package okms
 
 import (
 	"github.com/google/uuid"
+	"github.com/ovh/okms-sdk-go/internal/utils"
 	"github.com/ovh/okms-sdk-go/types"
 )
 
@@ -18,6 +19,6 @@ type ServiceKeyOption func(request *types.CreateImportServiceKeyRequest)
 
 func WithKeyID(id uuid.UUID) ServiceKeyOption {
 	return func(req *types.CreateImportServiceKeyRequest) {
-		req.Id = &id
+		req.Id = utils.PtrTo(id.String())
 	}
 }

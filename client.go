@@ -180,6 +180,7 @@ func (client *Client) ImportKey(ctx context.Context, okmsId uuid.UUID, key any, 
 // Supported PEM types are:
 //   - PKCS8
 //   - PKCS1 private keys
+//   - PKIX public keys
 //   - SEC1
 //   - OpenSSH private keys
 func (client *Client) ImportKeyPairPEM(ctx context.Context, okmsId uuid.UUID, privateKeyPem []byte, name, keyCtx string, ops []types.CryptographicUsages, opts ...ServiceKeyOption) (*types.GetServiceKeyResponse, error) {
@@ -192,10 +193,16 @@ func (client *Client) ImportKeyPairPEM(ctx context.Context, okmsId uuid.UUID, pr
 	switch block.Type {
 	case "PRIVATE KEY":
 		k, err = x509.ParsePKCS8PrivateKey(block.Bytes)
+	case "PUBLIC KEY":
+		k, err = x509.ParsePKIXPublicKey(block.Bytes)
 	case "EC PRIVATE KEY":
 		k, err = x509.ParseECPrivateKey(block.Bytes)
 	case "RSA PRIVATE KEY":
 		k, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+	case "RSA PUBLIC KEY":
+		k, err = x509.ParsePKCS1PublicKey(block.Bytes)
+	case "EC PUBLIC KEY":
+		k, err = x509.ParsePKIXPublicKey(block.Bytes)
 	case "OPENSSH PRIVATE KEY":
 		k, err = ssh.ParseRawPrivateKey(privateKeyPem)
 	default:
@@ -205,6 +212,42 @@ func (client *Client) ImportKeyPairPEM(ctx context.Context, okmsId uuid.UUID, pr
 		return nil, err
 	}
 	return client.ImportKey(ctx, okmsId, k, name, keyCtx, ops, opts...)
+}
+
+// ImportWrappedKey imports a key that was wrapped (encrypted) with a transport key previously
+// created in the KMS domain, so that the plain key material is never exposed outside the KMS.
+//
+// The wrapped material must be provided as a JWE Compact Serialization string, produced by
+// wrapping the plaintext key material with the public part of the transport key identified by
+// wrappingKeyID, using one of the supported [types.WrappingAlgorithms]. keyFormat describes the
+// format of the plaintext key material that was wrapped.
+//
+// The KMS infers the key type, size and curve from the decrypted material.
+//
+// keyCtx can be left empty if not needed.
+//
+// Use [WithKeyID] to assign a specific UUID to the key.
+func (client *Client) ImportWrappedKey(ctx context.Context, okmsId, wrappingKeyID uuid.UUID, ciphertext string, keyFormat types.KeyFormatTypes, name, keyCtx string, ops []types.CryptographicUsages, opts ...ServiceKeyOption) (*types.GetServiceKeyResponse, error) {
+	var keyContext *string
+	if keyCtx != "" {
+		keyContext = &keyCtx
+	}
+	body := types.CreateImportServiceKeyRequest{
+		Context:    keyContext,
+		Name:       name,
+		Operations: &ops,
+		WrappedKeys: &[]types.WrappedKeyEntry{
+			{
+				Ciphertext:    ciphertext,
+				KeyFormatType: keyFormat,
+				WrappingKeyId: wrappingKeyID.String(),
+			},
+		},
+	}
+	for _, option := range opts {
+		option(&body)
+	}
+	return client.CreateImportServiceKey(ctx, okmsId, nil, body)
 }
 
 // ExportJwkPublicKey returns the public part of a key pair as a Json Web Key.
@@ -395,6 +438,26 @@ func (client *apiClient) GetServiceKey(ctx context.Context, okmsId, keyId uuid.U
 		return nil, err
 	}
 	return r.JSON200, err
+}
+
+// GetWrappedKey exports the key material of the service key `keyId` in wrapped (encrypted) form. The key material is
+// encrypted by the KMS using the transport key `wrappingKeyId` and the given wrapping algorithm, and returned
+// as JWE Compact Serialization ciphertext(s). The wrappedKeyFormat selects the format of the plaintext key
+// material before wrapping.
+func (client *apiClient) GetWrappedKey(ctx context.Context, okmsId, keyId, wrappingKeyId uuid.UUID, wrappedKeyFormat types.KeyFormatTypes, wrappingAlgorithm types.WrappingAlgorithms) ([]types.WrappedKeyEntry, error) {
+	params := &types.GetServiceKeyParams{
+		WrappingKeyId:     &wrappingKeyId,
+		WrappedKeyFormat:  &wrappedKeyFormat,
+		WrappingAlgorithm: &wrappingAlgorithm,
+	}
+	r, err := mapRestErr(client.inner.GetServiceKeyWithResponse(ctx, okmsId, keyId, params))
+	if err != nil {
+		return nil, err
+	}
+	if r.JSON200.WrappedKeys == nil || len(*r.JSON200.WrappedKeys) == 0 {
+		return nil, errors.New("The server returned no wrapped key")
+	}
+	return *r.JSON200.WrappedKeys, nil
 }
 
 // ListServiceKeys returns a page of service keys. The response contains a continuationToken that must be passed to the
