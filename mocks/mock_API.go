@@ -1162,6 +1162,69 @@ func (_c *APIMock_GetServiceKey_Call) RunAndReturn(run func(context.Context, uui
 	return _c
 }
 
+// GetWrappedServiceKey provides a mock function with given fields: ctx, okmsId, keyId, wrappingKeyId, wrappedKeyFormat, wrappingAlgorithm
+func (_m *APIMock) GetWrappedServiceKey(ctx context.Context, okmsId uuid.UUID, keyId uuid.UUID, wrappingKeyId uuid.UUID, wrappedKeyFormat types.KeyFormatTypes, wrappingAlgorithm types.WrappingAlgorithms) ([]types.WrappedKeyEntry, error) {
+	ret := _m.Called(ctx, okmsId, keyId, wrappingKeyId, wrappedKeyFormat, wrappingAlgorithm)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWrappedServiceKey")
+	}
+
+	var r0 []types.WrappedKeyEntry
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID, uuid.UUID, types.KeyFormatTypes, types.WrappingAlgorithms) ([]types.WrappedKeyEntry, error)); ok {
+		return rf(ctx, okmsId, keyId, wrappingKeyId, wrappedKeyFormat, wrappingAlgorithm)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID, uuid.UUID, types.KeyFormatTypes, types.WrappingAlgorithms) []types.WrappedKeyEntry); ok {
+		r0 = rf(ctx, okmsId, keyId, wrappingKeyId, wrappedKeyFormat, wrappingAlgorithm)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]types.WrappedKeyEntry)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID, uuid.UUID, types.KeyFormatTypes, types.WrappingAlgorithms) error); ok {
+		r1 = rf(ctx, okmsId, keyId, wrappingKeyId, wrappedKeyFormat, wrappingAlgorithm)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// APIMock_GetWrappedServiceKey_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWrappedServiceKey'
+type APIMock_GetWrappedServiceKey_Call struct {
+	*mock.Call
+}
+
+// GetWrappedServiceKey is a helper method to define mock.On call
+//   - ctx context.Context
+//   - okmsId uuid.UUID
+//   - keyId uuid.UUID
+//   - wrappingKeyId uuid.UUID
+//   - wrappedKeyFormat types.KeyFormatTypes
+//   - wrappingAlgorithm types.WrappingAlgorithms
+func (_e *APIMock_Expecter) GetWrappedServiceKey(ctx interface{}, okmsId interface{}, keyId interface{}, wrappingKeyId interface{}, wrappedKeyFormat interface{}, wrappingAlgorithm interface{}) *APIMock_GetWrappedServiceKey_Call {
+	return &APIMock_GetWrappedServiceKey_Call{Call: _e.mock.On("GetWrappedServiceKey", ctx, okmsId, keyId, wrappingKeyId, wrappedKeyFormat, wrappingAlgorithm)}
+}
+
+func (_c *APIMock_GetWrappedServiceKey_Call) Run(run func(ctx context.Context, okmsId uuid.UUID, keyId uuid.UUID, wrappingKeyId uuid.UUID, wrappedKeyFormat types.KeyFormatTypes, wrappingAlgorithm types.WrappingAlgorithms)) *APIMock_GetWrappedServiceKey_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID), args[3].(uuid.UUID), args[4].(types.KeyFormatTypes), args[5].(types.WrappingAlgorithms))
+	})
+	return _c
+}
+
+func (_c *APIMock_GetWrappedServiceKey_Call) Return(_a0 []types.WrappedKeyEntry, _a1 error) *APIMock_GetWrappedServiceKey_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *APIMock_GetWrappedServiceKey_Call) RunAndReturn(run func(context.Context, uuid.UUID, uuid.UUID, uuid.UUID, types.KeyFormatTypes, types.WrappingAlgorithms) ([]types.WrappedKeyEntry, error)) *APIMock_GetWrappedServiceKey_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListSecretV2 provides a mock function with given fields: ctx, okmsId, pageSize, pageCursor
 func (_m *APIMock) ListSecretV2(ctx context.Context, okmsId uuid.UUID, pageSize *uint32, pageCursor *string) (*types.ListSecretV2ResponseWithPagination, error) {
 	ret := _m.Called(ctx, okmsId, pageSize, pageCursor)

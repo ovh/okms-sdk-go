@@ -74,6 +74,11 @@ type ServiceKeyApi interface {
 	DeleteServiceKey(ctx context.Context, okmsId, keyId uuid.UUID) error
 	// GetServiceKey returns a key metadata. If format is not nil, then the public key material is also returned.
 	GetServiceKey(ctx context.Context, okmsId, keyId uuid.UUID, format *types.KeyFormats) (*types.GetServiceKeyResponse, error)
+	// GetWrappedServiceKey exports the key material of the service key `keyId` in wrapped (encrypted) form. The key material is
+	// encrypted by the KMS using the transport key `wrappingKeyId` and the given wrapping algorithm, and returned
+	// as JWE Compact Serialization ciphertext(s). The wrappedKeyFormat selects the format of the plaintext key
+	// material before wrapping.
+	GetWrappedServiceKey(ctx context.Context, okmsId, keyId, wrappingKeyId uuid.UUID, wrappedKeyFormat types.KeyFormatTypes, wrappingAlgorithm types.WrappingAlgorithms) ([]types.WrappedKeyEntry, error)
 	// ListServiceKeys returns a page of service keys. The response contains a continuationToken that must be passed to the
 	// subsequent calls in order to get the next page. The state parameter when no nil is used to query keys having a specific state.
 	ListServiceKeys(ctx context.Context, okmsId uuid.UUID, continuationToken *string, maxKey *uint32, state *types.KeyStates) (*types.ListServiceKeysResponse, error)

@@ -11,6 +11,7 @@ package okms
 
 import (
 	"github.com/google/uuid"
+	"github.com/ovh/okms-sdk-go/internal/utils"
 	"github.com/ovh/okms-sdk-go/types"
 )
 
@@ -18,6 +19,15 @@ type ServiceKeyOption func(request *types.CreateImportServiceKeyRequest)
 
 func WithKeyID(id uuid.UUID) ServiceKeyOption {
 	return func(req *types.CreateImportServiceKeyRequest) {
-		req.Id = &id
+		req.Id = utils.PtrTo(id.String())
+	}
+}
+
+// WithExtractable sets whether the key and information about it can be extracted from the KMS.
+// When set to false, the key material cannot be exported in any form (plain or wrapped).
+// The default is true, and once set to false it cannot be reverted to true.
+func WithExtractable(extractable bool) ServiceKeyOption {
+	return func(req *types.CreateImportServiceKeyRequest) {
+		req.Extractable = utils.PtrTo(extractable)
 	}
 }

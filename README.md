@@ -54,12 +54,14 @@ Current SDK allows you to manipulate and consume keys through the KMS REST API. 
 - Keys and Key Pairs lifecycle:
     - Create keys and key pairs
     - Import keys and key pairs
+    - Import wrapped keys and key pairs (unwrapped by the KMS using a transport key)
     - Activate and Deactivate keys and key pairs
     - Update keys and key pairs
     - Destroy keys and key pairs
     - Update keys and key pairs metadata
     - List keys and key pairs
     - Export key pair's public keys
+    - Export keys and key pairs in wrapped form (encrypted under a transport key)
     - Read keys and key pairs metadata
 - Symmetric Key operations
     - Encrypt / Decrypt data
