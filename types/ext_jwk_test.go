@@ -38,6 +38,21 @@ func TestNewJsonWebKey_RSA(t *testing.T) {
 	assert.EqualValues(t, private.Public(), pubKey)
 }
 
+func TestNewJsonWebKey_RSAPublic(t *testing.T) {
+	private, err := rsa.GenerateKey(rand.Reader, 2048)
+	require.NoError(t, err)
+
+	jwk, err := NewJsonWebKey(&private.PublicKey, []CryptographicUsages{Verify}, "the-key")
+	require.NoError(t, err)
+
+	// No private material must be present.
+	assert.Nil(t, jwk.D)
+
+	pubKey, err := jwk.PublicKey()
+	require.NoError(t, err)
+	assert.EqualValues(t, private.Public(), pubKey)
+}
+
 func TestNewJsonWebKey_ECDSA(t *testing.T) {
 	tcs := []struct {
 		name  string
@@ -55,6 +70,34 @@ func TestNewJsonWebKey_ECDSA(t *testing.T) {
 
 			jwk, err := NewJsonWebKey(private, []CryptographicUsages{Sign, Verify}, "the-key")
 			require.NoError(t, err)
+
+			pubKey, err := jwk.PublicKey()
+			require.NoError(t, err)
+			assert.EqualValues(t, private.Public(), pubKey)
+		})
+	}
+}
+
+func TestNewJsonWebKey_ECDSAPublic(t *testing.T) {
+	tcs := []struct {
+		name  string
+		curve elliptic.Curve
+	}{
+		{"P-256", elliptic.P256()},
+		{"P-384", elliptic.P384()},
+		{"P-521", elliptic.P521()},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			private, err := ecdsa.GenerateKey(tc.curve, rand.Reader)
+			require.NoError(t, err)
+
+			jwk, err := NewJsonWebKey(&private.PublicKey, []CryptographicUsages{Verify}, "the-key")
+			require.NoError(t, err)
+
+			// No private material must be present.
+			assert.Nil(t, jwk.D)
 
 			pubKey, err := jwk.PublicKey()
 			require.NoError(t, err)

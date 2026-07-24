@@ -1,22 +1,23 @@
 openapi: 3.0.1
 info:
   title: OVHcloud KMS REST API
-  version: 2.14.0
+  version: 2.16.2
 paths:
   /api/{okmsId}/v1/servicekey:
     post:
       tags:
         - Service Key API
-      summary: Create or imports customer service key
+      summary: Create, import, or wrapped-import a customer service key
       description: >
         |  Action IAM      | Description |
 
         | ---------------- | ------------|
 
-        | okms:apikms:serviceKey/import | Required when importing a service key
-        |
-
         | okms:apikms:serviceKey/create | Required when creating a service key |
+
+        | okms:apikms:serviceKey/import | Required when importing a service key |
+
+        | okms:apikms:serviceKey/unwrapKey | Required on the transport key when `wrappedKeys` is provided |
       operationId: CreateImportServiceKey
       parameters:
         - $ref: '#/components/parameters/okmsId'
@@ -45,8 +46,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Operation is not authorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Not found error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — a key with the supplied `id` already exists.
           content:
             application/json:
               schema:
@@ -534,23 +547,54 @@ paths:
     get:
       tags:
         - Service Key API
-      summary: Get service key metadata
-      description: |
+      summary: Get service key metadata, or export key material in wrapped form
+      description: >
         |  Action IAM      | Description |
+
         | ---------------- | ------------|
-        | okms:apikms:serviceKey/get | Required to use this operation |
+
+        | okms:apikms:serviceKey/get | Required on the key being exported |
+
+        | okms:apikms:serviceKey/wrapKey | Required on the transport key when `wrapKey` is provided |
       operationId: GetServiceKey
       parameters:
         - $ref: '#/components/parameters/okmsId'
         - $ref: '#/components/parameters/servicekeyPath'
         - name: format
           in: query
-          description: Formatting options for key representation.
+          description: Formatting options for key representation. Ignored in wrapped-export mode.
           schema:
             $ref: '#/components/schemas/KeyFormats'
+        - name: wrappingKeyId
+          in: query
+          description: >-
+            ID of the transport (wrapping) key. When present, triggers
+            wrapped-export mode: key material is encrypted with this key and
+            returned in `wrappedKeys`. Must reference a SOFTWARE key in the
+            same domain that has the `wrapKey` usage.
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: wrappedKeyFormat
+          in: query
+          description: >-
+            Format of the plaintext key material before wrapping. Required when
+            `wrappingKeyId` is present.
+          required: false
+          schema:
+            $ref: '#/components/schemas/KeyFormatTypes'
+        - name: wrappingAlgorithm
+          in: query
+          description: >-
+            Wrapping algorithm to use. Must be compatible with the `wrappingKeyId`. Required when `wrappingKeyId` is present.
+          required: false
+          schema:
+            $ref: '#/components/schemas/WrappingAlgorithms'
+
       responses:
         '200':
-          description: Service key metadata.
+          description: Service key metadata, or wrapped key material when `wrappingKeyId` is provided.
           content:
             application/json:
               schema:
@@ -563,6 +607,12 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Operation is not authorized.
           content:
             application/json:
               schema:
@@ -592,7 +642,7 @@ paths:
       description: |
         |  Action IAM      | Description |
         | ---------------- | ------------|
-        | okms:apikms:serviceKey/update | Required to use this operation |
+        | okms:apikms:serviceKey/update | Required to update name and/or extractable attribute |
       operationId: PatchServiceKey
       parameters:
         - $ref: '#/components/parameters/okmsId'
@@ -2399,7 +2449,6 @@ components:
         id:
           type: string
           description: Optional user-defined key id (UUID)
-          format: uuid
           nullable: true
         name:
           maxLength: 32
@@ -2433,15 +2482,40 @@ components:
             $ref: '#/components/schemas/JsonWebKeyRequest'
           description: Json Web Key Set representing keys in request
           nullable: true
+        extractable:
+          type: boolean
+          description: >-
+            Whether the key material can be exported (plain or wrapped).
+            Default: false; public-only keys default true.
+          nullable: true
+        wrappedKeys:
+          type: array
+          items:
+            $ref: '#/components/schemas/WrappedKeyEntry'
+          description: >-
+            Wrapped key material to unwrap and import. When present, triggers
+            wrapped-import mode: type, size, and curve are inferred from the
+            decrypted material.
+          nullable: true
       additionalProperties: false
       description: Create domain key model
     ProtectionLevelEnum:
       enum:
         - SOFTWARE
         - HSM
-        - MANAGED_HSM
+        - CLOUD_HSM
       type: string
       description: Should the key be created in HSM
+    ServiceKeyClassEnum:
+      enum:
+        - SECRET_KEY
+        - PUBLIC_KEY
+        - KEY_PAIR
+      type: string
+      description: >-
+        Kind of service key material: SECRET_KEY (symmetric), KEY_PAIR
+        (asymmetric with private and public parts), or PUBLIC_KEY (asymmetric,
+        public part only).
     CryptographicUsages:
       enum:
         - sign
@@ -2751,6 +2825,8 @@ components:
           description: Key friendly name
         type:
           $ref: '#/components/schemas/KeyTypes'
+        class:
+          $ref: '#/components/schemas/ServiceKeyClassEnum'
         curve:
           $ref: '#/components/schemas/Curves'
         operations:
@@ -2771,8 +2847,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JsonWebKeyResponse'
-          description: Json Web Key Set representing keys in request
-          nullable: true
+          description: Json Web Key Set representing keys in request (plain export)
+        wrappedKeys:
+          type: array
+          items:
+            $ref: '#/components/schemas/WrappedKeyEntry'
+          description: >-
+            Wrapped key material (wrapped-export mode only). Present instead of
+            `keys` on wrap mode.
       additionalProperties: false
       description: Get service key response
     JsonWebKeyRequest:
@@ -3007,8 +3089,6 @@ components:
       additionalProperties: false
       description: Patch secret operation response
     PatchServiceKeyRequest:
-      required:
-        - name
       type: object
       properties:
         name:
@@ -3016,6 +3096,12 @@ components:
           minLength: 1
           type: string
           description: Key friendly name
+        extractable:
+          type: boolean
+          description: >-
+            Whether the key material can be exported. Making a key extractable
+            permanently sets never_extractable to false.
+          nullable: true
       additionalProperties: false
       description: Patch domain key model
     PostConfigRequest:
@@ -3686,6 +3772,48 @@ components:
           nullable: true
           format: uint32
           example: 25
+    KeyFormatTypes:
+      enum:
+        - RAW
+        - JWK
+        - PKCS1
+        - PKCS8
+      type: string
+      description: >-
+        Format of the plaintext key material used for wrap/unwrap.
+    WrappingAlgorithms:
+      enum:
+        - RSA1_5
+        - RSA-OAEP
+        - RSA-OAEP-256
+      type: string
+      description: >-
+        Key wrapping algorithm. All GA algorithms require an RSA transport key.
+        RSA1_5 is RSAES-PKCS1-v1_5; RSA-OAEP is RSAES-OAEP with SHA-1;
+        RSA-OAEP-256 is RSAES-OAEP with SHA-256 (recommended).
+    WrappedKeyEntry:
+      required:
+        - keyFormatType
+        - wrappingKeyId
+        - ciphertext
+      type: object
+      properties:
+        keyFormatType:
+          $ref: '#/components/schemas/KeyFormatTypes'
+        wrappingKeyId:
+          type: string
+          format: uuid
+          description: >-
+            ID (UUID) of the transport key used to wrap/unwrap. Validated as a
+            UUID by the server.
+        ciphertext:
+          minLength: 1
+          maxLength: 5000
+          type: string
+          description: Encrypted key material in format JWE Compact Serialization.
+          format: string
+      additionalProperties: false
+      description: Single wrapped key material entry used in wrapped export and import
     Warnings:
       type: object
       properties:

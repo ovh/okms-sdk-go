@@ -53,9 +53,12 @@ func (key JsonWebKeyResponse) PublicKey() (crypto.PublicKey, error) {
 	}
 }
 
-// NewJsonWebKey creates a new JWK private key from either a [*rsa.PrivateKey], a [*ecdsa.PrivateKey] or a []byte symmetric key.
-func NewJsonWebKey(privateKey any, ops []CryptographicUsages, id string) (JsonWebKeyResponse, error) {
-	switch key := privateKey.(type) {
+// NewJsonWebKey creates a new JWK from a key. The accepted types are:
+//   - [*rsa.PrivateKey] and [*rsa.PublicKey]
+//   - [*ecdsa.PrivateKey] and [*ecdsa.PublicKey]
+//   - []byte for symmetric keys
+func NewJsonWebKey(key any, ops []CryptographicUsages, id string) (JsonWebKeyResponse, error) {
+	switch key := key.(type) {
 	case *rsa.PrivateKey:
 		key.Precompute()
 		return JsonWebKeyResponse{
@@ -71,6 +74,14 @@ func NewJsonWebKey(privateKey any, ops []CryptographicUsages, id string) (JsonWe
 			Dq:     toBase64(key.Precomputed.Dq),
 			Qi:     toBase64(key.Precomputed.Qinv),
 		}, nil
+	case *rsa.PublicKey:
+		return JsonWebKeyResponse{
+			Kid:    id,
+			KeyOps: &ops,
+			Kty:    RSA,
+			E:      toBase64(big.NewInt(int64(key.E))),
+			N:      toBase64(key.N),
+		}, nil
 	case *ecdsa.PrivateKey:
 		curve := Curves(key.Curve.Params().Name)
 		return JsonWebKeyResponse{
@@ -78,6 +89,16 @@ func NewJsonWebKey(privateKey any, ops []CryptographicUsages, id string) (JsonWe
 			KeyOps: &ops,
 			Kty:    EC,
 			D:      toBase64(key.D),
+			X:      toBase64(key.X),
+			Y:      toBase64(key.Y),
+			Crv:    &curve,
+		}, nil
+	case *ecdsa.PublicKey:
+		curve := Curves(key.Curve.Params().Name)
+		return JsonWebKeyResponse{
+			Kid:    id,
+			KeyOps: &ops,
+			Kty:    EC,
 			X:      toBase64(key.X),
 			Y:      toBase64(key.Y),
 			Crv:    &curve,
@@ -90,7 +111,7 @@ func NewJsonWebKey(privateKey any, ops []CryptographicUsages, id string) (JsonWe
 			K:      toBase64(new(big.Int).SetBytes(key)),
 		}, nil
 	default:
-		return JsonWebKeyResponse{}, fmt.Errorf("Unsupported key type: %T", privateKey)
+		return JsonWebKeyResponse{}, fmt.Errorf("Unsupported key type: %T", key)
 	}
 }
 
