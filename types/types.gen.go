@@ -362,7 +362,6 @@ func (e SignatureFormats) Valid() bool {
 
 // Defines values for WrappingAlgorithms.
 const (
-	RSA15      WrappingAlgorithms = "RSA1_5"
 	RSAOAEP    WrappingAlgorithms = "RSA-OAEP"
 	RSAOAEP256 WrappingAlgorithms = "RSA-OAEP-256"
 )
@@ -370,8 +369,6 @@ const (
 // Valid indicates whether the value is a known member of the WrappingAlgorithms enum.
 func (e WrappingAlgorithms) Valid() bool {
 	switch e {
-	case RSA15:
-		return true
 	case RSAOAEP:
 		return true
 	case RSAOAEP256:
@@ -1140,7 +1137,7 @@ type WrappedKeyEntry struct {
 	WrappingKeyId openapi_types.UUID `json:"wrappingKeyId"`
 }
 
-// WrappingAlgorithms Key wrapping algorithm. All GA algorithms require an RSA transport key. RSA1_5 is RSAES-PKCS1-v1_5; RSA-OAEP is RSAES-OAEP with SHA-1; RSA-OAEP-256 is RSAES-OAEP with SHA-256 (recommended).
+// WrappingAlgorithms Key wrapping algorithm. All GA algorithms require an RSA transport key. RSA-OAEP is RSAES-OAEP with SHA-1; RSA-OAEP-256 is RSAES-OAEP with SHA-256 (recommended).
 type WrappingAlgorithms string
 
 // OkmsId defines model for okmsId.
