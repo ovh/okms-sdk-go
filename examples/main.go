@@ -46,11 +46,14 @@ func main() {
 	}
 
 	generateKeys(ctx, kmsClient, okmsId)
+	importPlainKeys(ctx, kmsClient, okmsId)
+	importWrappedKeys(ctx, kmsClient, okmsId)
 	encryptDecrypt(ctx, kmsClient, okmsId)
 	signVerify(ctx, kmsClient, okmsId)
 	dataKeyEncryptDecrypt(ctx, kmsClient, okmsId)
 	listKeys(ctx, kmsClient, okmsId)
 	getKey(ctx, kmsClient, okmsId)
+	getWrappedKey(ctx, kmsClient, okmsId)
 	dataKeyEncryptStream(ctx, kmsClient, okmsId)
 	dataKeyDecryptStream(ctx, kmsClient, okmsId)
 }

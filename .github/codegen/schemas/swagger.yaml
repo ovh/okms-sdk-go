@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: OVHcloud KMS REST API
-  version: 2.16.2
+  version: 2.17.0
 paths:
   /api/{okmsId}/v1/servicekey:
     post:
@@ -15,9 +15,11 @@ paths:
 
         | okms:apikms:serviceKey/create | Required when creating a service key |
 
-        | okms:apikms:serviceKey/import | Required when importing a service key |
+        | okms:apikms:serviceKey/import | Required when importing a service key
+        |
 
-        | okms:apikms:serviceKey/unwrapKey | Required on the transport key when `wrappedKeys` is provided |
+        | okms:apikms:serviceKey/unwrapKey | Required on the transport key when
+        `wrappedKeys` is provided |
       operationId: CreateImportServiceKey
       parameters:
         - $ref: '#/components/parameters/okmsId'
@@ -555,14 +557,17 @@ paths:
 
         | okms:apikms:serviceKey/get | Required on the key being exported |
 
-        | okms:apikms:serviceKey/wrapKey | Required on the transport key when `wrapKey` is provided |
+        | okms:apikms:serviceKey/wrapKey | Required on the transport key when
+        `wrapKey` is provided |
       operationId: GetServiceKey
       parameters:
         - $ref: '#/components/parameters/okmsId'
         - $ref: '#/components/parameters/servicekeyPath'
         - name: format
           in: query
-          description: Formatting options for key representation. Ignored in wrapped-export mode.
+          description: >-
+            Formatting options for key representation. Ignored in wrapped-export
+            mode.
           schema:
             $ref: '#/components/schemas/KeyFormats'
         - name: wrappingKeyId
@@ -570,8 +575,8 @@ paths:
           description: >-
             ID of the transport (wrapping) key. When present, triggers
             wrapped-export mode: key material is encrypted with this key and
-            returned in `wrappedKeys`. Must reference a SOFTWARE key in the
-            same domain that has the `wrapKey` usage.
+            returned in `wrappedKeys`. Must reference a SOFTWARE key in the same
+            domain that has the `wrapKey` usage.
           required: false
           schema:
             type: string
@@ -587,14 +592,16 @@ paths:
         - name: wrappingAlgorithm
           in: query
           description: >-
-            Wrapping algorithm to use. Must be compatible with the `wrappingKeyId`. Required when `wrappingKeyId` is present.
+            Wrapping algorithm to use. Must be compatible with the
+            `wrappingKeyId`. Required when `wrappingKeyId` is present.
           required: false
           schema:
             $ref: '#/components/schemas/WrappingAlgorithms'
-
       responses:
         '200':
-          description: Service key metadata, or wrapped key material when `wrappingKeyId` is provided.
+          description: >-
+            Service key metadata, or wrapped key material when `wrappingKeyId`
+            is provided.
           content:
             application/json:
               schema:
@@ -639,10 +646,13 @@ paths:
       tags:
         - Service Key API
       summary: Patch service key metadata
-      description: |
+      description: >
         |  Action IAM      | Description |
+
         | ---------------- | ------------|
-        | okms:apikms:serviceKey/update | Required to update name and/or extractable attribute |
+
+        | okms:apikms:serviceKey/update | Required to update name and/or
+        extractable attribute |
       operationId: PatchServiceKey
       parameters:
         - $ref: '#/components/parameters/okmsId'
@@ -2503,7 +2513,7 @@ components:
       enum:
         - SOFTWARE
         - HSM
-        - CLOUD_HSM
+        # - CLOUD_HSM # disabled, see protectionLevelAvailable/fromOpenapiHsmEnum/fromProtoHsmEnum in service_key_management.go
       type: string
       description: Should the key be created in HSM
     ServiceKeyClassEnum:
@@ -3779,8 +3789,7 @@ components:
         - PKCS1
         - PKCS8
       type: string
-      description: >-
-        Format of the plaintext key material used for wrap/unwrap.
+      description: Format of the plaintext key material used for wrap/unwrap.
     WrappingAlgorithms:
       enum:
         - RSA-OAEP
