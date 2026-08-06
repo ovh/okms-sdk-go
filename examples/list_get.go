@@ -50,3 +50,28 @@ func getKey(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
 	}
 	fmt.Println("Key:", getResp.Id)
 }
+
+// getWrappedKey exports the key material of a service key in wrapped (encrypted) form.
+func getWrappedKey(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
+	// Generate the transport key used to wrap the exported material. It must be a RSA key-pair with the wrapKey usage.
+	transportKey, err := okmsClient.GenerateRSAKeyPair(ctx, okmsId, types.N4096, "Transport key example", types.SOFTWARE, "", []types.CryptographicUsages{types.WrapKey})
+	if err != nil {
+		panic(err)
+	}
+
+	// The key to export. It must be extractable for its key material to be exportable.
+	aesKey, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key to export", types.SOFTWARE, "", []types.CryptographicUsages{types.Encrypt, types.Decrypt}, okms.WithExtractable(true))
+	if err != nil {
+		panic(err)
+	}
+
+	// The KMS encrypts the key material with the transport key, and returns it as a JWE Compact Serialization string.
+	wrappedKeys, err := okmsClient.GetWrappedServiceKey(ctx, okmsId, aesKey.Id, transportKey.Id, types.RAW, types.RSAOAEP256)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, wrapped := range wrappedKeys {
+		fmt.Println("WRAPPED KEY:", wrapped.KeyFormatType, wrapped.WrappingKeyId, wrapped.Ciphertext)
+	}
+}

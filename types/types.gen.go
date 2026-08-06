@@ -240,7 +240,6 @@ func (e KeyTypes) Valid() bool {
 
 // Defines values for ProtectionLevelEnum.
 const (
-	CLOUDHSM ProtectionLevelEnum = "CLOUD_HSM"
 	HSM      ProtectionLevelEnum = "HSM"
 	SOFTWARE ProtectionLevelEnum = "SOFTWARE"
 )
@@ -248,8 +247,6 @@ const (
 // Valid indicates whether the value is a known member of the ProtectionLevelEnum enum.
 func (e ProtectionLevelEnum) Valid() bool {
 	switch e {
-	case CLOUDHSM:
-		return true
 	case HSM:
 		return true
 	case SOFTWARE:
