@@ -1,13 +1,13 @@
 module github.com/ovh/okms-sdk-go
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/oapi-codegen/runtime v1.7.0
 	github.com/stretchr/testify v1.12.1
-	golang.org/x/crypto v0.55.0
+	golang.org/x/crypto v0.56.0
 )
 
 require (
