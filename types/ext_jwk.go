@@ -35,19 +35,14 @@ func (key JsonWebKeyResponse) PublicKey() (crypto.PublicKey, error) {
 		}
 		return &rsa.PublicKey{E: int(e.Int64()), N: n}, nil
 	case EC:
-		x, err := parseBase64BigInt(key.X, "x")
-		if err != nil {
-			return nil, err
-		}
-		y, err := parseBase64BigInt(key.Y, "y")
-		if err != nil {
-			return nil, err
+		if key.Crv == nil {
+			return nil, fmt.Errorf("Invalid JWK key: Parameter %q is missing", "crv")
 		}
 		crv, err := getCurve(*key.Crv)
 		if err != nil {
 			return nil, err
 		}
-		return &ecdsa.PublicKey{X: x, Y: y, Curve: crv}, nil
+		return parseEcPublicKey(crv, key.X, key.Y)
 	default:
 		return nil, fmt.Errorf("unsupported key type %s", key.Kty)
 	}
@@ -84,23 +79,35 @@ func NewJsonWebKey(key any, ops []CryptographicUsages, id string) (JsonWebKeyRes
 		}, nil
 	case *ecdsa.PrivateKey:
 		curve := Curves(key.Curve.Params().Name)
+		d, err := key.Bytes()
+		if err != nil {
+			return JsonWebKeyResponse{}, err
+		}
+		x, y, err := ecPointToBase64(&key.PublicKey)
+		if err != nil {
+			return JsonWebKeyResponse{}, err
+		}
 		return JsonWebKeyResponse{
 			Kid:    id,
 			KeyOps: &ops,
 			Kty:    EC,
-			D:      toBase64(key.D),
-			X:      toBase64(key.X),
-			Y:      toBase64(key.Y),
+			D:      bytesToBase64(d),
+			X:      x,
+			Y:      y,
 			Crv:    &curve,
 		}, nil
 	case *ecdsa.PublicKey:
 		curve := Curves(key.Curve.Params().Name)
+		x, y, err := ecPointToBase64(key)
+		if err != nil {
+			return JsonWebKeyResponse{}, err
+		}
 		return JsonWebKeyResponse{
 			Kid:    id,
 			KeyOps: &ops,
 			Kty:    EC,
-			X:      toBase64(key.X),
-			Y:      toBase64(key.Y),
+			X:      x,
+			Y:      y,
 			Crv:    &curve,
 		}, nil
 	case []byte:
@@ -115,11 +122,15 @@ func NewJsonWebKey(key any, ops []CryptographicUsages, id string) (JsonWebKeyRes
 	}
 }
 
-func parseBase64BigInt(v *string, name string) (*big.Int, error) {
+func parseBase64Bytes(v *string, name string) ([]byte, error) {
 	if v == nil {
 		return nil, fmt.Errorf("Invalid JWK key: Parameter %q is missing", name)
 	}
-	v64, err := base64.RawURLEncoding.DecodeString(*v)
+	return base64.RawURLEncoding.DecodeString(*v)
+}
+
+func parseBase64BigInt(v *string, name string) (*big.Int, error) {
+	v64, err := parseBase64Bytes(v, name)
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +141,55 @@ func toBase64(n *big.Int) *string {
 	if n == nil {
 		return nil
 	}
-	v := base64.RawURLEncoding.EncodeToString(n.Bytes())
+	return bytesToBase64(n.Bytes())
+}
+
+func bytesToBase64(b []byte) *string {
+	v := base64.RawURLEncoding.EncodeToString(b)
 	return &v
+}
+
+// ecPointToBase64 encodes the affine coordinates of an EC public key as the
+// base64url "x" and "y" JWK parameters.
+func ecPointToBase64(key *ecdsa.PublicKey) (x, y *string, err error) {
+	point, err := key.Bytes()
+	if err != nil {
+		return nil, nil, err
+	}
+	// point is the SEC 1 uncompressed point encoding: 0x04 || x || y
+	size := (key.Curve.Params().BitSize + 7) / 8
+	if len(point) != 1+2*size || point[0] != 4 {
+		return nil, nil, fmt.Errorf("unexpected EC public key encoding")
+	}
+	return bytesToBase64(point[1 : 1+size]), bytesToBase64(point[1+size:]), nil
+}
+
+// parseEcPublicKey builds an EC public key from the base64url "x" and "y" JWK parameters.
+func parseEcPublicKey(crv elliptic.Curve, x, y *string) (*ecdsa.PublicKey, error) {
+	size := (crv.Params().BitSize + 7) / 8
+	// SEC 1 uncompressed point encoding: 0x04 || x || y
+	point := make([]byte, 1+2*size)
+	point[0] = 4
+	if err := fillCoordinate(point[1:1+size], x, "x"); err != nil {
+		return nil, err
+	}
+	if err := fillCoordinate(point[1+size:], y, "y"); err != nil {
+		return nil, err
+	}
+	return ecdsa.ParseUncompressedPublicKey(crv, point)
+}
+
+// fillCoordinate decodes a base64url JWK coordinate into dst, left padded to its size.
+func fillCoordinate(dst []byte, v *string, name string) error {
+	raw, err := parseBase64Bytes(v, name)
+	if err != nil {
+		return err
+	}
+	if len(raw) > len(dst) {
+		return fmt.Errorf("Invalid JWK key: Parameter %q is too large", name)
+	}
+	copy(dst[len(dst)-len(raw):], raw) // coordinates may have lost their leading zeroes
+	return nil
 }
 
 func getCurve(crv Curves) (elliptic.Curve, error) {
