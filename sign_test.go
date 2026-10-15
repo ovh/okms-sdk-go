@@ -121,8 +121,12 @@ func TestSigner_ECDSA(t *testing.T) {
 
 			r, s, err := ecdsa.Sign(rand.Reader, pKey, digest)
 			require.NoError(t, err)
-			rawsig := r.Bytes()
-			rawsig = append(rawsig, s.Bytes()...)
+			// The KMS returns r and s concatenated, each padded to the curve size,
+			// so both halves must be of fixed length even when they have leading zeroes.
+			size := (pKey.Curve.Params().BitSize + 7) / 8
+			rawsig := make([]byte, 2*size)
+			r.FillBytes(rawsig[:size])
+			s.FillBytes(rawsig[size:])
 
 			signFormat := types.Raw
 			api.EXPECT().Sign(mock.Anything, okmsId, keyId, &signFormat, tc.alg, true, digest).
