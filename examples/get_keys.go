@@ -18,25 +18,6 @@ import (
 	"github.com/ovh/okms-sdk-go/types"
 )
 
-func listKeys(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
-	it := okmsClient.ListAllServiceKeys(okmsId, nil, nil)
-	for it.Next(ctx) {
-		key, err := it.Value()
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(key)
-	}
-
-	// You can also range over go 1.23+ iterator:
-	for key, err := range okmsClient.ListAllServiceKeys(okmsId, nil, nil).Iter(ctx) {
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(key.Id)
-	}
-}
-
 func getKey(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
 	// Create a new AES 256 key
 	respAes, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "AES key example", types.SOFTWARE, "", []types.CryptographicUsages{types.Encrypt, types.Decrypt, types.WrapKey, types.UnwrapKey})
@@ -72,6 +53,39 @@ func getWrappedKey(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUI
 	}
 
 	for _, wrapped := range wrappedKeys {
-		fmt.Println("WRAPPED KEY:", wrapped.KeyFormatType, wrapped.WrappingKeyId, wrapped.Ciphertext)
+		var keyFormat types.KeyFormatTypes
+		if wrapped.KeyFormatType != nil {
+			keyFormat = *wrapped.KeyFormatType
+		}
+		fmt.Println("WRAPPED KEY:", keyFormat, wrapped.WrappingKeyId, wrapped.Ciphertext)
+	}
+}
+
+// getWrappedKeyFromHSM exports the key material of a key held by the HSM, in wrapped (encrypted) form.
+//
+// The transport key must itself be in the HSM: a key in the HSM cannot be wrapped with a software
+// transport key. Only a symmetric (oct) key can be exported from the HSM.
+func getWrappedKeyFromHSM(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
+	// Generate the transport key in the HSM. It must be a RSA key-pair with the wrapKey usage.
+	transportKey, err := okmsClient.GenerateRSAKeyPair(ctx, okmsId, types.N2048, "HSM transport key example", types.HSM, "", []types.CryptographicUsages{types.WrapKey})
+	if err != nil {
+		panic(err)
+	}
+
+	// The key to export, in the HSM. It must be extractable for its key material to be exportable.
+	aesKey, err := okmsClient.GenerateSymmetricKey(ctx, okmsId, types.N256, "HSM AES key to export", types.HSM, "", []types.CryptographicUsages{types.Encrypt, types.Decrypt}, okms.WithExtractable(true))
+	if err != nil {
+		panic(err)
+	}
+
+	// The HSM wraps the key material in its native encoding, so the key format must be either RAW or
+	// left empty.
+	wrappedKeys, err := okmsClient.GetWrappedServiceKey(ctx, okmsId, aesKey.Id, transportKey.Id, types.RAW, types.RSAOAEP256)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, wrapped := range wrappedKeys {
+		fmt.Println("WRAPPED HSM KEY:", wrapped.WrappingKeyId, wrapped.Ciphertext)
 	}
 }

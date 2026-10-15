@@ -220,17 +220,27 @@ func (client *Client) ImportKeyPairPEM(ctx context.Context, okmsId uuid.UUID, pr
 // The wrapped material must be provided as a JWE Compact Serialization string, produced by
 // wrapping the plaintext key material with the public part of the transport key identified by
 // wrappingKeyID, using one of the supported [types.WrappingAlgorithms]. keyFormat describes the
-// format of the plaintext key material that was wrapped.
+// format of the plaintext key material that was wrapped. For an HSM import, which unwraps into the
+// HSM's native encoding, it must be either empty, in which case the field is omitted, or [types.RAW].
 //
 // The KMS infers the key type, size and curve from the decrypted material.
 //
 // keyCtx can be left empty if not needed.
 //
 // Use [WithKeyID] to assign a specific UUID to the key.
+//
+// To import the key into the HSM, use [WithProtectionLevel] with [types.HSM]. The transport key must
+// then itself be an HSM key, keyFormat must be empty or [types.RAW], and the key type must be declared with
+// [WithKeyType], as the HSM never exposes the unwrapped material. The wrapped material is the raw
+// key bytes for a [types.Oct] key, and a PKCS#8 DER private key for a [types.RSA] or [types.EC] key.
 func (client *Client) ImportWrappedServiceKey(ctx context.Context, okmsId, wrappingKeyID uuid.UUID, ciphertext string, keyFormat types.KeyFormatTypes, name, keyCtx string, ops []types.CryptographicUsages, opts ...ServiceKeyOption) (*types.GetServiceKeyResponse, error) {
 	var keyContext *string
 	if keyCtx != "" {
 		keyContext = &keyCtx
+	}
+	var keyFormatType *types.KeyFormatTypes
+	if keyFormat != "" {
+		keyFormatType = &keyFormat
 	}
 	body := types.CreateImportServiceKeyRequest{
 		Context:    keyContext,
@@ -239,7 +249,7 @@ func (client *Client) ImportWrappedServiceKey(ctx context.Context, okmsId, wrapp
 		WrappedKeys: &[]types.WrappedKeyEntry{
 			{
 				Ciphertext:    ciphertext,
-				KeyFormatType: keyFormat,
+				KeyFormatType: keyFormatType,
 				WrappingKeyId: wrappingKeyID,
 			},
 		},
@@ -443,12 +453,15 @@ func (client *apiClient) GetServiceKey(ctx context.Context, okmsId, keyId uuid.U
 // GetWrappedServiceKey exports the key material of the service key `keyId` in wrapped (encrypted) form. The key material is
 // encrypted by the KMS using the transport key `wrappingKeyId` and the given wrapping algorithm, and returned
 // as JWE Compact Serialization ciphertext(s). The wrappedKeyFormat selects the format of the plaintext key
-// material before wrapping.
+// material before wrapping. For a key in the HSM, which is wrapped in the HSM's native encoding, it must
+// be either empty, in which case the parameter is omitted, or [types.RAW].
 func (client *apiClient) GetWrappedServiceKey(ctx context.Context, okmsId, keyId, wrappingKeyId uuid.UUID, wrappedKeyFormat types.KeyFormatTypes, wrappingAlgorithm types.WrappingAlgorithms) ([]types.WrappedKeyEntry, error) {
 	params := &types.GetServiceKeyParams{
 		WrappingKeyId:     &wrappingKeyId,
-		WrappedKeyFormat:  &wrappedKeyFormat,
 		WrappingAlgorithm: &wrappingAlgorithm,
+	}
+	if wrappedKeyFormat != "" {
+		params.WrappedKeyFormat = &wrappedKeyFormat
 	}
 	r, err := mapRestErr(client.inner.GetServiceKeyWithResponse(ctx, okmsId, keyId, params))
 	if err != nil {

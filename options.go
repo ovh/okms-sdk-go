@@ -31,3 +31,19 @@ func WithExtractable(extractable bool) ServiceKeyOption {
 		req.Extractable = utils.PtrTo(extractable)
 	}
 }
+
+// WithProtectionLevel sets where the key is stored and used: [types.SOFTWARE] or [types.HSM].
+// When not set, the KMS defaults to software protection.
+func WithProtectionLevel(level types.ProtectionLevelEnum) ServiceKeyOption {
+	return func(req *types.CreateImportServiceKeyRequest) {
+		req.ProtectionLevel = utils.PtrTo(level)
+	}
+}
+
+// WithKeyType declares the type of the imported key. It is required for a wrapped import into the HSM,
+// where the key type cannot be inferred from the key material.
+func WithKeyType(keyType types.KeyTypes) ServiceKeyOption {
+	return func(req *types.CreateImportServiceKeyRequest) {
+		req.Type = utils.PtrTo(keyType)
+	}
+}
