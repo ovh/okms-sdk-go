@@ -3,6 +3,7 @@ module github.com/ovh/okms-sdk-go
 go 1.26.0
 
 require (
+	github.com/go-jose/go-jose/v4 v4.1.6
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/oapi-codegen/runtime v1.7.0

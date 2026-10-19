@@ -447,6 +447,15 @@ type ClientInterface interface {
 	// | ---------------- | ------------|
 	// | okms:apikms:serviceKey/activate | Required to use this operation |
 	//
+	// Moves the key back to the `active` state from `deactivated` or `compromised`. The
+	// deactivation date, the compromise dates and the revocation reason are cleared, and a new
+	// activation date is set.
+	//
+	// Only an active key can be used for cryptographic operations, so activation restores them
+	// all: `encrypt`, `decrypt`, `sign`, `verify`, `datakey`, `datakey/decrypt`, and using the key
+	// to wrap or unwrap another key. A key is already active when it is created, so this operation
+	// is normally only needed to undo a deactivation.
+	//
 	// Corresponds with POST /api/{okmsId}/v1/servicekey/{keyId}/activate (the `ActivateServiceKey` operationId).
 	ActivateServiceKey(ctx context.Context, okmsId OkmsId, keyId ServicekeyPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -500,6 +509,18 @@ type ClientInterface interface {
 	// | ---------------- | ------------|
 	// | okms:apikms:serviceKey/deactivate | Required to use this operation |
 	//
+	// Moves the key to the `deactivated` state, or to `compromised` when the revocation reason is
+	// `key_compromise` or `ca_compromise`.
+	//
+	// In both states no cryptographic operation is possible any more: `encrypt`, `decrypt`,
+	// `sign`, `verify`, `datakey`, `datakey/decrypt`, and using the key to wrap or unwrap another
+	// key are all rejected with `400`. Data encrypted under this key can only be decrypted again
+	// after the key is activated.
+	//
+	// The key itself stays available: its metadata can be read and patched, and it can be
+	// activated again. Deletion requires a deactivated or compromised key, so this is also the
+	// step that makes `DELETE /servicekey/{keyId}` possible.
+	//
 	// Takes any type of body and a specified content type.
 	//
 	// Corresponds with POST /api/{okmsId}/v1/servicekey/{keyId}/deactivate (the `DeactivateServiceKey` operationId).
@@ -510,6 +531,18 @@ type ClientInterface interface {
 	// |  Action IAM      | Description |
 	// | ---------------- | ------------|
 	// | okms:apikms:serviceKey/deactivate | Required to use this operation |
+	//
+	// Moves the key to the `deactivated` state, or to `compromised` when the revocation reason is
+	// `key_compromise` or `ca_compromise`.
+	//
+	// In both states no cryptographic operation is possible any more: `encrypt`, `decrypt`,
+	// `sign`, `verify`, `datakey`, `datakey/decrypt`, and using the key to wrap or unwrap another
+	// key are all rejected with `400`. Data encrypted under this key can only be decrypted again
+	// after the key is activated.
+	//
+	// The key itself stays available: its metadata can be read and patched, and it can be
+	// activated again. Deletion requires a deactivated or compromised key, so this is also the
+	// step that makes `DELETE /servicekey/{keyId}` possible.
 	//
 	// Takes a body of the `application/json` content type.
 	//
@@ -1463,6 +1496,15 @@ func (c *Client) PatchServiceKey(ctx context.Context, okmsId OkmsId, keyId Servi
 // | ---------------- | ------------|
 // | okms:apikms:serviceKey/activate | Required to use this operation |
 //
+// Moves the key back to the `active` state from `deactivated` or `compromised`. The
+// deactivation date, the compromise dates and the revocation reason are cleared, and a new
+// activation date is set.
+//
+// Only an active key can be used for cryptographic operations, so activation restores them
+// all: `encrypt`, `decrypt`, `sign`, `verify`, `datakey`, `datakey/decrypt`, and using the key
+// to wrap or unwrap another key. A key is already active when it is created, so this operation
+// is normally only needed to undo a deactivation.
+//
 // Corresponds with POST /api/{okmsId}/v1/servicekey/{keyId}/activate (the `ActivateServiceKey` operationId).
 func (c *Client) ActivateServiceKey(ctx context.Context, okmsId OkmsId, keyId ServicekeyPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewActivateServiceKeyRequest(c.Server, okmsId, keyId)
@@ -1566,6 +1608,18 @@ func (c *Client) DecryptDataKey(ctx context.Context, okmsId OkmsId, keyId Servic
 // | ---------------- | ------------|
 // | okms:apikms:serviceKey/deactivate | Required to use this operation |
 //
+// Moves the key to the `deactivated` state, or to `compromised` when the revocation reason is
+// `key_compromise` or `ca_compromise`.
+//
+// In both states no cryptographic operation is possible any more: `encrypt`, `decrypt`,
+// `sign`, `verify`, `datakey`, `datakey/decrypt`, and using the key to wrap or unwrap another
+// key are all rejected with `400`. Data encrypted under this key can only be decrypted again
+// after the key is activated.
+//
+// The key itself stays available: its metadata can be read and patched, and it can be
+// activated again. Deletion requires a deactivated or compromised key, so this is also the
+// step that makes `DELETE /servicekey/{keyId}` possible.
+//
 // Takes any type of body and a specified content type.
 //
 // Corresponds with POST /api/{okmsId}/v1/servicekey/{keyId}/deactivate (the `DeactivateServiceKey` operationId).
@@ -1586,6 +1640,18 @@ func (c *Client) DeactivateServiceKeyWithBody(ctx context.Context, okmsId OkmsId
 // |  Action IAM      | Description |
 // | ---------------- | ------------|
 // | okms:apikms:serviceKey/deactivate | Required to use this operation |
+//
+// Moves the key to the `deactivated` state, or to `compromised` when the revocation reason is
+// `key_compromise` or `ca_compromise`.
+//
+// In both states no cryptographic operation is possible any more: `encrypt`, `decrypt`,
+// `sign`, `verify`, `datakey`, `datakey/decrypt`, and using the key to wrap or unwrap another
+// key are all rejected with `400`. Data encrypted under this key can only be decrypted again
+// after the key is activated.
+//
+// The key itself stays available: its metadata can be read and patched, and it can be
+// activated again. Deletion requires a deactivated or compromised key, so this is also the
+// step that makes `DELETE /servicekey/{keyId}` possible.
 //
 // Takes a body of the `application/json` content type.
 //
@@ -4876,6 +4942,15 @@ type ClientWithResponsesInterface interface {
 	// | ---------------- | ------------|
 	// | okms:apikms:serviceKey/activate | Required to use this operation |
 	//
+	// Moves the key back to the `active` state from `deactivated` or `compromised`. The
+	// deactivation date, the compromise dates and the revocation reason are cleared, and a new
+	// activation date is set.
+	//
+	// Only an active key can be used for cryptographic operations, so activation restores them
+	// all: `encrypt`, `decrypt`, `sign`, `verify`, `datakey`, `datakey/decrypt`, and using the key
+	// to wrap or unwrap another key. A key is already active when it is created, so this operation
+	// is normally only needed to undo a deactivation.
+	//
 	// Returns a wrapper object for the known response body format(s).
 	//
 	// Corresponds with POST /api/{okmsId}/v1/servicekey/{keyId}/activate (the `ActivateServiceKey` operationId).
@@ -4931,6 +5006,18 @@ type ClientWithResponsesInterface interface {
 	// | ---------------- | ------------|
 	// | okms:apikms:serviceKey/deactivate | Required to use this operation |
 	//
+	// Moves the key to the `deactivated` state, or to `compromised` when the revocation reason is
+	// `key_compromise` or `ca_compromise`.
+	//
+	// In both states no cryptographic operation is possible any more: `encrypt`, `decrypt`,
+	// `sign`, `verify`, `datakey`, `datakey/decrypt`, and using the key to wrap or unwrap another
+	// key are all rejected with `400`. Data encrypted under this key can only be decrypted again
+	// after the key is activated.
+	//
+	// The key itself stays available: its metadata can be read and patched, and it can be
+	// activated again. Deletion requires a deactivated or compromised key, so this is also the
+	// step that makes `DELETE /servicekey/{keyId}` possible.
+	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
 	// Corresponds with POST /api/{okmsId}/v1/servicekey/{keyId}/deactivate (the `DeactivateServiceKey` operationId).
@@ -4941,6 +5028,18 @@ type ClientWithResponsesInterface interface {
 	// |  Action IAM      | Description |
 	// | ---------------- | ------------|
 	// | okms:apikms:serviceKey/deactivate | Required to use this operation |
+	//
+	// Moves the key to the `deactivated` state, or to `compromised` when the revocation reason is
+	// `key_compromise` or `ca_compromise`.
+	//
+	// In both states no cryptographic operation is possible any more: `encrypt`, `decrypt`,
+	// `sign`, `verify`, `datakey`, `datakey/decrypt`, and using the key to wrap or unwrap another
+	// key are all rejected with `400`. Data encrypted under this key can only be decrypted again
+	// after the key is activated.
+	//
+	// The key itself stays available: its metadata can be read and patched, and it can be
+	// activated again. Deletion requires a deactivated or compromised key, so this is also the
+	// step that makes `DELETE /servicekey/{keyId}` possible.
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
@@ -8730,6 +8829,15 @@ func (c *ClientWithResponses) PatchServiceKeyWithResponse(ctx context.Context, o
 // | ---------------- | ------------|
 // | okms:apikms:serviceKey/activate | Required to use this operation |
 //
+// Moves the key back to the `active` state from `deactivated` or `compromised`. The
+// deactivation date, the compromise dates and the revocation reason are cleared, and a new
+// activation date is set.
+//
+// Only an active key can be used for cryptographic operations, so activation restores them
+// all: `encrypt`, `decrypt`, `sign`, `verify`, `datakey`, `datakey/decrypt`, and using the key
+// to wrap or unwrap another key. A key is already active when it is created, so this operation
+// is normally only needed to undo a deactivation.
+//
 // Returns a wrapper object for the known response body format(s).
 //
 // Corresponds with POST /api/{okmsId}/v1/servicekey/{keyId}/activate (the `ActivateServiceKey` operationId).
@@ -8815,6 +8923,18 @@ func (c *ClientWithResponses) DecryptDataKeyWithResponse(ctx context.Context, ok
 // | ---------------- | ------------|
 // | okms:apikms:serviceKey/deactivate | Required to use this operation |
 //
+// Moves the key to the `deactivated` state, or to `compromised` when the revocation reason is
+// `key_compromise` or `ca_compromise`.
+//
+// In both states no cryptographic operation is possible any more: `encrypt`, `decrypt`,
+// `sign`, `verify`, `datakey`, `datakey/decrypt`, and using the key to wrap or unwrap another
+// key are all rejected with `400`. Data encrypted under this key can only be decrypted again
+// after the key is activated.
+//
+// The key itself stays available: its metadata can be read and patched, and it can be
+// activated again. Deletion requires a deactivated or compromised key, so this is also the
+// step that makes `DELETE /servicekey/{keyId}` possible.
+//
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
 // Corresponds with POST /api/{okmsId}/v1/servicekey/{keyId}/deactivate (the `DeactivateServiceKey` operationId).
@@ -8831,6 +8951,18 @@ func (c *ClientWithResponses) DeactivateServiceKeyWithBodyWithResponse(ctx conte
 // |  Action IAM      | Description |
 // | ---------------- | ------------|
 // | okms:apikms:serviceKey/deactivate | Required to use this operation |
+//
+// Moves the key to the `deactivated` state, or to `compromised` when the revocation reason is
+// `key_compromise` or `ca_compromise`.
+//
+// In both states no cryptographic operation is possible any more: `encrypt`, `decrypt`,
+// `sign`, `verify`, `datakey`, `datakey/decrypt`, and using the key to wrap or unwrap another
+// key are all rejected with `400`. Data encrypted under this key can only be decrypted again
+// after the key is activated.
+//
+// The key itself stays available: its metadata can be read and patched, and it can be
+// activated again. Deletion requires a deactivated or compromised key, so this is also the
+// step that makes `DELETE /servicekey/{keyId}` possible.
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //

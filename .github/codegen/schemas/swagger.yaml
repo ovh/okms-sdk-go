@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: OVHcloud KMS REST API
-  version: 2.17.0
+  version: 2.20.0
 paths:
   /api/{okmsId}/v1/servicekey:
     post:
@@ -712,10 +712,33 @@ paths:
       tags:
         - Service Key API
       summary: Activate service key
-      description: |
+      description: >
         |  Action IAM      | Description |
+
         | ---------------- | ------------|
+
         | okms:apikms:serviceKey/activate | Required to use this operation |
+
+
+        Moves the key back to the `active` state from `deactivated` or
+        `compromised`. The
+
+        deactivation date, the compromise dates and the revocation reason are
+        cleared, and a new
+
+        activation date is set.
+
+
+        Only an active key can be used for cryptographic operations, so
+        activation restores them
+
+        all: `encrypt`, `decrypt`, `sign`, `verify`, `datakey`,
+        `datakey/decrypt`, and using the key
+
+        to wrap or unwrap another key. A key is already active when it is
+        created, so this operation
+
+        is normally only needed to undo a deactivation.
       operationId: ActivateServiceKey
       parameters:
         - $ref: '#/components/parameters/okmsId'
@@ -758,10 +781,39 @@ paths:
       tags:
         - Service Key API
       summary: Deactivate service key
-      description: |
+      description: >
         |  Action IAM      | Description |
+
         | ---------------- | ------------|
+
         | okms:apikms:serviceKey/deactivate | Required to use this operation |
+
+
+        Moves the key to the `deactivated` state, or to `compromised` when the
+        revocation reason is
+
+        `key_compromise` or `ca_compromise`.
+
+
+        In both states no cryptographic operation is possible any more:
+        `encrypt`, `decrypt`,
+
+        `sign`, `verify`, `datakey`, `datakey/decrypt`, and using the key to
+        wrap or unwrap another
+
+        key are all rejected with `400`. Data encrypted under this key can only
+        be decrypted again
+
+        after the key is activated.
+
+
+        The key itself stays available: its metadata can be read and patched,
+        and it can be
+
+        activated again. Deletion requires a deactivated or compromised key, so
+        this is also the
+
+        step that makes `DELETE /servicekey/{keyId}` possible.
       operationId: DeactivateServiceKey
       parameters:
         - $ref: '#/components/parameters/okmsId'
@@ -2496,7 +2548,10 @@ components:
           type: boolean
           description: >-
             Whether the key material can be exported (plain or wrapped).
-            Default: false; public-only keys default true.
+            Default: false for generated keys, true for imported keys (`keys`
+            or `wrappedKeys`). Set it explicitly to false to import a
+            non-extractable key. The flag is one-way: once false it cannot be
+            turned back on.
           nullable: true
         wrappedKeys:
           type: array
@@ -2513,7 +2568,6 @@ components:
       enum:
         - SOFTWARE
         - HSM
-        # - CLOUD_HSM # disabled, see protectionLevelAvailable/fromOpenapiHsmEnum/fromProtoHsmEnum in service_key_management.go
       type: string
       description: Should the key be created in HSM
     ServiceKeyClassEnum:
@@ -3109,8 +3163,9 @@ components:
         extractable:
           type: boolean
           description: >-
-            Whether the key material can be exported. Making a key extractable
-            permanently sets never_extractable to false.
+            Whether the key material can be exported (plain or wrapped). This
+            flag is one-way: it can be turned off, but once false it cannot be
+            set back to true.
           nullable: true
       additionalProperties: false
       description: Patch domain key model
@@ -3495,8 +3550,11 @@ components:
         - active
         - deactivated
         - deleted
+        - ACTIVE
+        - DEACTIVATED
+        - DELETED
       type: string
-      description: State of the secret version
+      description: State of the secret version. Lower and upper case accepted.
     SecretV2Metadata:
       properties:
         casRequired:
@@ -3801,13 +3859,24 @@ components:
         SHA-256 (recommended).
     WrappedKeyEntry:
       required:
-        - keyFormatType
         - wrappingKeyId
         - ciphertext
       type: object
       properties:
         keyFormatType:
-          $ref: '#/components/schemas/KeyFormatTypes'
+          description: >-
+            Encoding of the wrapped key material. Required for a software import
+            (so the decrypted material can be interpreted) and for wrapped
+            export. For an HSM import, which unwraps into the HSM's native
+            encoding, it may be omitted or RAW.
+          type: string
+          enum:
+            - ''
+            - RAW
+            - JWK
+            - PKCS1
+            - PKCS8
+          x-go-type: KeyFormatTypes
         wrappingKeyId:
           type: string
           format: uuid
