@@ -19,6 +19,7 @@ import (
 	"encoding/pem"
 	"fmt"
 
+	"github.com/go-jose/go-jose/v4"
 	"github.com/google/uuid"
 	"github.com/ovh/okms-sdk-go"
 	"github.com/ovh/okms-sdk-go/types"
@@ -108,9 +109,78 @@ func reimportWrappedKey(ctx context.Context, okmsClient *okms.Client, okmsId, ke
 
 	// The KMS unwraps the material with the transport key, and infers the key type, size and
 	// curve from it. Add okms.WithExtractable(false) to make the imported key non-exportable.
-	resp, err := okmsClient.ImportWrappedServiceKey(ctx, okmsId, wrapped.WrappingKeyId, wrapped.Ciphertext, wrapped.KeyFormatType, name, "", ops)
+	resp, err := okmsClient.ImportWrappedServiceKey(ctx, okmsId, wrapped.WrappingKeyId, wrapped.Ciphertext, keyFormat, name, "", ops)
 	if err != nil {
 		panic(err)
 	}
 	return resp.Id
+}
+
+// importWrappedKeysInHSM imports locally generated key material into the HSM, wrapped (encrypted)
+// with the public part of a transport key held by the HSM.
+//
+// The transport key must itself be in the HSM: a software transport key cannot be used to import
+// a key into the HSM. The HSM unwraps the material into its native encoding, so the key format must
+// be either RAW or left empty, and as the KMS never sees the material, the key type must be declared
+// with okms.WithKeyType.
+func importWrappedKeysInHSM(ctx context.Context, okmsClient *okms.Client, okmsId uuid.UUID) {
+	// Create the transport key in the HSM. It must be a RSA key-pair with the unwrapKey usage.
+	transportKey, err := okmsClient.GenerateRSAKeyPair(ctx, okmsId, types.N2048, "HSM transport key example", types.HSM, "", []types.CryptographicUsages{types.WrapKey, types.UnwrapKey})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("HSM TRANSPORT KEY:", transportKey.Id)
+
+	// Export the public part of the transport key, used to wrap the key material locally.
+	transportPub, err := okmsClient.ExportPublicKey(ctx, okmsId, transportKey.Id)
+	if err != nil {
+		panic(err)
+	}
+
+	// Import a locally generated AES-256 key. Its material is the raw key bytes.
+	aesKey := make([]byte, 32)
+	if _, err := rand.Read(aesKey); err != nil {
+		panic(err)
+	}
+	aesJwe := wrapKeyMaterial(transportPub.(*rsa.PublicKey), aesKey)
+	respAes, err := okmsClient.ImportWrappedServiceKey(ctx, okmsId, transportKey.Id, aesJwe, types.RAW, "Imported wrapped AES key in HSM", "", []types.CryptographicUsages{types.Encrypt, types.Decrypt}, okms.WithProtectionLevel(types.HSM), okms.WithKeyType(types.Oct))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("IMPORTED WRAPPED AES KEY IN HSM:", respAes.Id)
+
+	// Import a locally generated RSA 2048 key-pair. Its material is the PKCS#8 DER encoded private key.
+	rsaKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		panic(err)
+	}
+	rsaDer, err := x509.MarshalPKCS8PrivateKey(rsaKey)
+	if err != nil {
+		panic(err)
+	}
+	rsaJwe := wrapKeyMaterial(transportPub.(*rsa.PublicKey), rsaDer)
+	respRSA, err := okmsClient.ImportWrappedServiceKey(ctx, okmsId, transportKey.Id, rsaJwe, types.RAW, "Imported wrapped RSA key-pair in HSM", "", []types.CryptographicUsages{types.Sign, types.Verify}, okms.WithProtectionLevel(types.HSM), okms.WithKeyType(types.RSA))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("IMPORTED WRAPPED RSA KEY IN HSM:", respRSA.Id)
+}
+
+// wrapKeyMaterial wraps the key material with the public part of a transport key, and returns it as a
+// JWE Compact Serialization string: a single-use AES-256 key is encrypted with the transport key using
+// RSA-OAEP-256, and the key material is encrypted with that AES key using AES-256-GCM.
+func wrapKeyMaterial(transportKey *rsa.PublicKey, material []byte) string {
+	encrypter, err := jose.NewEncrypter(jose.A256GCM, jose.Recipient{Algorithm: jose.RSA_OAEP_256, Key: transportKey}, nil)
+	if err != nil {
+		panic(err)
+	}
+	jwe, err := encrypter.Encrypt(material)
+	if err != nil {
+		panic(err)
+	}
+	compact, err := jwe.CompactSerialize()
+	if err != nil {
+		panic(err)
+	}
+	return compact
 }

@@ -291,7 +291,10 @@ func (e RevocationReasons) Valid() bool {
 
 // Defines values for SecretV2State.
 const (
+	SecretV2StateACTIVE      SecretV2State = "ACTIVE"
 	SecretV2StateActive      SecretV2State = "active"
+	SecretV2StateDEACTIVATED SecretV2State = "DEACTIVATED"
+	SecretV2StateDELETED     SecretV2State = "DELETED"
 	SecretV2StateDeactivated SecretV2State = "deactivated"
 	SecretV2StateDeleted     SecretV2State = "deleted"
 )
@@ -299,7 +302,13 @@ const (
 // Valid indicates whether the value is a known member of the SecretV2State enum.
 func (e SecretV2State) Valid() bool {
 	switch e {
+	case SecretV2StateACTIVE:
+		return true
 	case SecretV2StateActive:
+		return true
+	case SecretV2StateDEACTIVATED:
+		return true
+	case SecretV2StateDELETED:
 		return true
 	case SecretV2StateDeactivated:
 		return true
@@ -376,7 +385,7 @@ type CreateImportServiceKeyRequest struct {
 	Context *string `json:"context,omitempty"`
 	Curve   *Curves `json:"curve,omitempty"`
 
-	// Extractable Whether the key material can be exported (plain or wrapped). Default: false; public-only keys default true.
+	// Extractable Whether the key material can be exported (plain or wrapped). Default: false for generated keys, true for imported keys (`keys` or `wrappedKeys`). Set it explicitly to false to import a non-extractable key. The flag is one-way: once false it cannot be turned back on.
 	Extractable *bool `json:"extractable,omitempty"`
 
 	// Id Optional user-defined key id (UUID)
@@ -778,7 +787,7 @@ type PatchSecretResponse struct {
 
 // PatchServiceKeyRequest Patch domain key model
 type PatchServiceKeyRequest struct {
-	// Extractable Whether the key material can be exported. Making a key extractable permanently sets never_extractable to false.
+	// Extractable Whether the key material can be exported (plain or wrapped). This flag is one-way: it can be turned off, but once false it cannot be set back to true.
 	Extractable *bool `json:"extractable,omitempty"`
 
 	// Name Key friendly name
@@ -927,7 +936,7 @@ type PutSecretV2Response struct {
 
 // PutSecretVersionV2Request defines model for PutSecretVersionV2Request.
 type PutSecretVersionV2Request struct {
-	// State State of the secret version
+	// State State of the secret version. Lower and upper case accepted.
 	State SecretV2State `json:"state"`
 }
 
@@ -1091,7 +1100,7 @@ type SecretV2MetadataShort struct {
 	MaxVersions *uint32 `json:"maxVersions,omitempty"`
 }
 
-// SecretV2State State of the secret version
+// SecretV2State State of the secret version. Lower and upper case accepted.
 type SecretV2State string
 
 // SecretV2Version defines model for SecretV2Version.
@@ -1116,7 +1125,7 @@ type SecretV2Version struct {
 	// Example: 3
 	Id uint32 `json:"id"`
 
-	// State State of the secret version
+	// State State of the secret version. Lower and upper case accepted.
 	State SecretV2State `json:"state"`
 
 	// Warnings List of warnings
@@ -1242,8 +1251,8 @@ type WrappedKeyEntry struct {
 	// Ciphertext Encrypted key material in format JWE Compact Serialization.
 	Ciphertext string `json:"ciphertext"`
 
-	// KeyFormatType Format of the plaintext key material used for wrap/unwrap.
-	KeyFormatType KeyFormatTypes `json:"keyFormatType"`
+	// KeyFormatType Encoding of the wrapped key material. Required for a software import (so the decrypted material can be interpreted) and for wrapped export. For an HSM import, which unwraps into the HSM's native encoding, it may be omitted or RAW.
+	KeyFormatType *KeyFormatTypes `json:"keyFormatType,omitempty"`
 
 	// WrappingKeyId ID (UUID) of the transport key used to wrap/unwrap. Validated as a UUID by the server.
 	WrappingKeyId openapi_types.UUID `json:"wrappingKeyId"`
